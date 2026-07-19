@@ -1,0 +1,59 @@
+html {
+  font-size: 62.5%;
+}
+.greeting-message {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.title-name {
+  margin: 2rem;
+}
+.info-card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-top: solid 0.1rem var(--border-line);
+}
+.icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--text-muted);
+  font-size: 2rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--border-radius);
+}
+.icon-box i {
+  color: var(--white);
+}
+.info-label {
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 15rem;
+  margin: 0 2rem;
+}
+.info-value {
+  color: var(--text-main);
+  flex-grow: 1;
+}
+.resetPassword {
+  background-color: transparent;
+  border-radius: 0.1rem solid var(--text-muted);
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  margin: 0 2rem;
+}
+.resetPassword:hover {
+  background-color: var(--sidebar);
+}

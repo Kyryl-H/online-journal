@@ -1,0 +1,58 @@
+html {
+  font-size: 62.5%;
+}
+.card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+.icon-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  /* border-radius: var(--border-radius); */
+  border-top: 0.1rem solid var(--border-line);
+  padding: 1.2rem 2rem;
+}
+.student-number {
+  color: var(--text-muted);
+}
+.input-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.message {
+  margin: 2rem 1rem;
+}
+.card-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.card-info {
+  display: flex;
+  align-items: center;
+}
+.info-static {
+  margin: 0 2rem;
+}
+.static-value {
+  font-weight: 600;
+}
+
+.reports {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1rem;
+}

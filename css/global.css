@@ -1,0 +1,293 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  color: var(--text-main);
+}
+html {
+  font-size: 62.5%;
+}
+:root {
+  --brand-color: #7bb8a9;
+  --sidebar: #f3f4f6;
+  --text-main: #334155;
+  --text-muted: #64748b;
+  --card-bg: #ffffff;
+  --message-color: #fce3cd;
+  --exclamation-color: #ee9b60;
+  --border-radius: 1rem;
+  --active-card: rgb(16, 205, 16);
+  --border-line: #e2e8f0;
+  --white: #fff;
+  --table-line-hover: #f8fafc;
+  --replacement: goldenrod;
+}
+ul {
+  list-style: none;
+}
+
+body {
+  background-color: var(--sidebar);
+  color: var(--text-main);
+  font-size: 1.6rem;
+}
+.container {
+  width: 100%;
+  max-width: 150rem;
+  margin: 0 auto;
+}
+.main-content {
+  min-height: 100vh;
+  padding: 8rem 3rem 3rem;
+}
+/* Бокова панель керування */
+.sidebar {
+  position: fixed;
+  top: 6rem;
+  left: 0;
+  z-index: 100;
+  width: 25rem;
+  height: calc(100vh - 6rem);
+  background-color: var(--sidebar);
+  color: var(--text-main);
+  transition: all 0.4s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-right: 0.1rem solid var(--text-muted);
+}
+.sidebar.collapsed {
+  width: 7rem;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  color: var(--text-main);
+  text-decoration: none;
+  padding: 1.5rem;
+  white-space: nowrap;
+}
+.sidebar .icon {
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  min-width: 4rem;
+  font-size: 3rem;
+}
+.sidebar .link-name {
+  margin-left: 1rem;
+  font-size: 1.8rem;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+.sidebar.collapsed .link-name,
+.sidebar.collapsed .logo-text {
+  opacity: 0;
+  pointer-events: none;
+}
+.main-content {
+  margin-left: 25rem;
+  transition: all 0.4s ease;
+}
+.sidebar.collapsed ~ .main-content {
+  margin-left: 7rem;
+}
+.sidebar .toggle-btn {
+  min-width: 4rem;
+  font-size: 3rem;
+  margin: 1.5rem;
+}
+.logo-text {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  font-size: 3rem;
+  font-weight: bold;
+  padding-left: 1.9rem;
+}
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+.sidebar .nav-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-grow: 1;
+}
+
+.sidebar .nav-list .exit {
+  margin-top: auto;
+}
+.toggle-btn {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: var(--text-main);
+}
+.nav-active {
+  background-color: var(--brand-color);
+  border-radius: 4rem;
+}
+.nav-active .icon {
+  color: var(--card-bg);
+}
+/* верхня панель */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  background-color: var(--brand-color);
+  height: 6rem;
+  width: 100%;
+  z-index: 100;
+  border-bottom: 0.1rem solid #9ae6d3;
+}
+.logo-header {
+  display: flex;
+  color: var(--text-main);
+  min-width: 4rem;
+  font-size: 3rem;
+  padding: 0 2rem;
+}
+.logo-header h4 {
+  margin: 0 2rem;
+}
+.nav-list-top {
+  display: flex;
+  color: var(--text-main);
+  min-width: 4rem;
+  font-size: 3rem;
+}
+.nav-el-top {
+  overflow: hidden;
+  padding: 2rem;
+}
+.icon-btn {
+  min-width: 4rem;
+  font-size: 3rem;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: var(--text-main);
+}
+/* модальне вікно для виходу */
+.hidden {
+  display: none;
+}
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 101;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4rem 6rem rgb(0, 0, 0, 0.3);
+  background-color: var(--white);
+  max-width: 60rem;
+  padding: 5rem 6rem;
+  transition: all 0.5s;
+  border-radius: var(--border-radius);
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(0, 0, 0, 0.5);
+  backdrop-filter: blur(0.4rem);
+  z-index: 100;
+  transition: all 0.5s;
+}
+.modal .btn-close-modal {
+  position: absolute;
+  border: none;
+  background-color: transparent;
+  font-size: 1.5rem;
+  top: 0.5rem;
+  right: 1rem;
+  cursor: pointer;
+}
+.modal .exitBtn {
+  border-radius: var(--border-radius);
+  height: 2rem;
+  width: 10rem;
+  cursor: pointer;
+  margin: 1rem 5rem;
+  box-shadow: rgb(0, 0, 0, 0.3);
+}
+.modal h2 {
+  font-size: 2rem;
+}
+.group-select {
+  background-color: transparent;
+  border: 0.1rem solid var(--text-muted);
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  margin: 1rem 0;
+}
+.btn {
+  background-color: transparent;
+  border: 0.1rem solid var(--text-muted);
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  margin: 1rem 0;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+.btn:hover {
+  background-color: var(--sidebar);
+}
+/* Пошуковий рядок */
+.search-form {
+  display: flex;
+  margin: 2rem 1rem;
+}
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border-right: none;
+  flex-grow: 1;
+  background-color: var(--white);
+  border: 0.1rem solid var(--text-muted);
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+  padding: 0 1.5rem;
+}
+.search-icon {
+  margin: 1rem;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+}
+.search-input {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  padding: 1rem 0;
+  width: 100%;
+  font-size: 1.5rem;
+}
+.search-btn {
+  background-color: var(--sidebar);
+  color: var(--text-muted);
+  border: 0.1rem solid var(--text-muted);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  padding: 1rem 2.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.search-btn:hover {
+  background-color: var(--brand-color);
+  color: var(--white);
+  border-color: var(--brand-color);
+}

@@ -1,0 +1,114 @@
+html {
+  font-size: 62.5%;
+}
+.card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+.schedule-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 1rem;
+}
+.selector-label {
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin: 0 1rem;
+}
+.group-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.week-navigation {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+.current-week {
+  font-weight: bold;
+  color: var(--text-muted);
+  padding: 0.8rem 1.6rem;
+  margin: 1rem 0;
+}
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(35rem, 1fr));
+  gap: 2rem;
+  padding: 1rem 2rem;
+  overflow-wrap: break-word;
+  align-items: start;
+}
+.day-header {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 4rem 1fr 6rem;
+  text-align: center;
+  align-items: center;
+  font-size: 1.4rem;
+}
+.lesson-card {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 4rem 1fr 6rem;
+  border-top: 0.1rem solid var(--border-line);
+  align-items: stretch;
+}
+.day-name {
+  padding: 1rem;
+  border-left: 0.1rem solid var(--border-line);
+  border-right: 0.1rem solid var(--border-line);
+}
+.lesson-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-left: 0.1rem solid var(--border-line);
+  border-right: 0.1rem solid var(--border-line);
+  align-items: stretch;
+}
+.day-column {
+  width: 35rem;
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+}
+.lesson-number,
+.lesson-room {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  width: auto;
+}
+.lesson-name,
+.lesson-teacher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  width: auto;
+  font-size: 1.4rem;
+  word-break: break-word;
+}
+.lesson-name {
+  font-weight: 500;
+}
+.lesson-teacher {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  border-top: 0.1rem dashed var(--border-line);
+  padding-top: 0.5rem;
+}
+.day-header h5,
+.day-header h3,
+.day-header span {
+  padding: 0 0.5rem;
+}
+.replacement {
+  background-color: var(--replacement);
+}

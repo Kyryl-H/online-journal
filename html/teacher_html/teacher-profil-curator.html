@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/curator-profil.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <title>Document</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo-header">
+        <i class="bi bi-book"></i>
+        <h4>Онлайн журнал</h4>
+      </div>
+      <ul class="nav-list-top">
+        <li class="nav-el-top">
+          <div class="el"><i class="bi bi-bell-fill"></i></div>
+        </li>
+        <li class="nav-el-top">
+          <div class="el"><i class="bi bi-gear-fill"></i></div>
+        </li>
+      </ul>
+    </header>
+
+    <nav class="sidebar">
+      <div class="logo-section">
+        <button class="toggle-btn"><i class="bi bi-list icon"></i></button>
+      </div>
+      <ul class="nav-list">
+        <li>
+          <a
+            href="/html/teacher_html/teacher-main.html"
+            data-target="main"
+            class="nav-link active"
+            ><i class="bi bi-house icon"></i>
+            <span class="link-name">Головна</span>
+          </a>
+        </li>
+        <li>
+          <a
+            href="/html/teacher_html/teacher-profil.html"
+            data-target="profil"
+            class="nav-link"
+            ><i class="bi bi-person icon"></i>
+            <span class="link-name">Особистий кабінет</span></a
+          >
+        </li>
+        <li>
+          <a
+            href="/html//teacher_html/journal-main.html"
+            data-target="journal"
+            class="nav-link"
+            ><i class="bi bi-book icon"></i
+            ><span class="link-name">Журнал</span></a
+          >
+        </li>
+        <li>
+          <a
+            href="/html/teacher_html/teacher-schedule.html"
+            data-target="schedule"
+            class="nav-link"
+            ><i class="bi bi-journal-text icon"></i
+            ><span class="link-name">Розклад</span></a
+          >
+        </li>
+        <li>
+          <a
+            href="/html/teacher_html/teacher-profil-curator.html"
+            data-target="profil-curator"
+            class="nav-link"
+            ><i class="bi bi-people icon"></i
+            ><span class="link-name">Кабінет куратора</span></a
+          >
+        </li>
+        <li class="exit">
+          <a href="#" class="nav-link"
+            ><i class="bi bi-box-arrow-right icon"></i
+            ><span class="link-name">Вихід з акаунту</span></a
+          >
+        </li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <div class="container">
+        <div class="input-group">
+          <div class="message"><h1>Ваша група</h1></div>
+          <select class="group-select">
+            <option value="p-33" selected>П-33</option>
+          </select>
+        </div>
+        <div class="card-box">
+          <div class="card">
+            <div class="message">
+              <h2>Список студентів групи П-33</h2>
+            </div>
+            <form action="/search" method="GET" class="search-form">
+              <div class="input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                  class="search-input"
+                  type="search"
+                  id="search-input"
+                  name="query "
+                  placeholder="Пошук студентів..."
+                />
+              </div>
+              <button type="submit" class="search-btn">Знайти</button>
+            </form>
+            <div class="card-row">
+              <div class="student-number">1</div>
+              <div class="icon-box"><i class="bi bi-person"></i></div>
+              <div class="full-name">Кирил Васильович</div>
+            </div>
+            <div class="card-row">
+              <div class="student-number">2</div>
+              <div class="icon-box"><i class="bi bi-person"></i></div>
+              <div class="full-name">Сахнюк Любомир</div>
+            </div>
+            <div class="card-row">
+              <div class="student-number">3</div>
+
+              <div class="icon-box"><i class="bi bi-person"></i></div>
+              <div class="full-name">Шелегатський Степан</div>
+            </div>
+            <div class="card-row">
+              <div class="student-number">4</div>
+
+              <div class="icon-box"><i class="bi bi-person"></i></div>
+              <div class="full-name">Семенчук Максим</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="message"><h2>Статистика групи П-33</h2></div>
+            <div class="chart-container" style="width: 200px; margin: 0 auto">
+              <canvas id="gradesChart"></canvas>
+            </div>
+            <div class="card-info">
+              <div class="icon-box"><i class="bi bi-bar-chart-line"></i></div>
+              <div class="info-static">Загальна успішність:</div>
+              <div class="static-value">4,2</div>
+            </div>
+            <div class="card-info">
+              <div class="icon-box"><i class="bi bi-eye-slash"></i></div>
+              <div class="info-static">Пропуски:</div>
+              <div class="static-value">32</div>
+            </div>
+            <div class="reports">
+              <button class="btn btnGaps">
+                Експортувати звіт по пропусках
+              </button>
+              <button class="btn btnProgress">
+                Експортувати звіт успішність
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div class="modal hidden">
+      <button class="btn-close-modal"><i class="bi bi-x-circle"></i></button>
+
+      <h2>Ви впевнені що хочете вийти?</h2>
+      <button class="exitBtn exitBtnNo">Ні</button>
+      <button class="exitBtn exitBtnYes">Так</button>
+    </div>
+    <div class="overlay hidden"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/curator.js"></script>
+    <script src="/js/global.js"></script>
+  </body>
+</html>

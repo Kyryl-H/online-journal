@@ -1,0 +1,26 @@
+{
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "Local DB",
+      "database": "postgres",
+      "username": "postgres",
+      "password": "1111"
+    },
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "database": "online_journal",
+      "name": "Online Journal",
+      "username": "postgres",
+      "password": "1111"
+    }
+  ]
+}

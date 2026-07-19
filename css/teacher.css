@@ -1,0 +1,100 @@
+html {
+  font-size: 62.5%;
+}
+/* Налаштування розміщення вікна */
+body {
+  background-color: var(--sidebar);
+  color: var(--text-main);
+}
+.main-content {
+  min-height: 100vh;
+  padding: 8rem 3rem 3rem;
+}
+.conteiner {
+  width: 100%;
+  max-width: 110rem;
+  margin: 0 auto;
+}
+/* Розміщення інших елементів */
+h1,
+h2 {
+  text-align: center;
+  margin: 2rem;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+  gap: 2.4rem;
+  max-width: 100rem;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+.schedule-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  color: var(--text-main);
+  padding: 0.5;
+  transition: 0.2s;
+}
+.schedule-active {
+  border: 0.3rem solid var(--active-card);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+.time {
+  padding: 0.5rem;
+}
+.status-badge {
+  padding: 0.5rem;
+}
+.status-badge.active {
+  background-color: var(--active-card);
+  border-radius: var(--border-radius);
+  color: var(--card-bg);
+  font-weight: bold;
+}
+.schedule-card h3 {
+  font-weight: bold;
+  margin: 1rem;
+}
+.card-details {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.message {
+  background-color: var(--message-color);
+  height: 6rem;
+  width: 100%;
+  max-width: 80rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--border-radius);
+  font-size: 1.6rem;
+  padding: 1rem;
+  margin: 0 auto;
+}
+.message button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: var(--text-main);
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+.message-content .bi-exclamation-circle-fill {
+  color: var(--exclamation-color);
+  font-size: 3rem;
+  margin-right: 1rem;
+}
+.message-content {
+  display: flex;
+  align-items: center;
+}
