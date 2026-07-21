@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "П-33", "curator_id": 1 },
+  { "id": 2, "name": "П-34", "curator_id": 2 },
+  { "id": 3, "name": "К-31", "curator_id": 3 },
+  { "id": 4, "name": "Б-31", "curator_id": 4 }
+]

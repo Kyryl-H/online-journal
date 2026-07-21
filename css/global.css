@@ -32,6 +32,10 @@ body {
   color: var(--text-main);
   font-size: 1.6rem;
 }
+.stop-animation * {
+  transition: none !important;
+  animation: none !important;
+}
 .container {
   width: 100%;
   max-width: 150rem;
@@ -205,21 +209,27 @@ body {
   position: absolute;
   border: none;
   background-color: transparent;
-  font-size: 1.5rem;
+  font-size: 2rem;
   top: 0.5rem;
   right: 1rem;
   cursor: pointer;
 }
 .modal .exitBtn {
   border-radius: var(--border-radius);
-  height: 2rem;
+  height: 3rem;
   width: 10rem;
   cursor: pointer;
   margin: 1rem 5rem;
   box-shadow: rgb(0, 0, 0, 0.3);
+  text-align: center;
+}
+.modal .exitBtn:hover {
+  background-color: var(--brand-color);
+  color: var(--white);
 }
 .modal h2 {
   font-size: 2rem;
+  text-align: center;
 }
 .group-select {
   background-color: transparent;

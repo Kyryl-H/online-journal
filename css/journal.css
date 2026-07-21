@@ -165,6 +165,7 @@ tbody tr:hover td {
   transition: all 0.2s ease;
   font-size: 1.6rem;
   font-weight: 600;
+  box-shadow: rgb(0, 0, 0, 0.3);
 }
 .btn-container button:hover {
   background-color: var(--brand-color);

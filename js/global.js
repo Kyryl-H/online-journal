@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     sidebar.classList.add("collapsed");
   }
+  setTimeout(() => document.body.classList.remove("stop-animation"), 10);
 });
 // додати відображення(підсвітку) перебування на панелі керування
 document.addEventListener("DOMContentLoaded", function () {
@@ -70,5 +71,5 @@ btnCloseNo.addEventListener("click", function () {
 });
 btnCloseYes.addEventListener("click", function () {
   closeModal();
-  window.location.href = "../index.html";
+  window.location.href = "/index.html";
 });
