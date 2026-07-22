@@ -1,0 +1,43 @@
+# Details
+
+Date : 2026-07-21 20:35:25
+
+Directory /home/kurul/online-journal
+
+Total : 28 files,  2762 codes, 42 comments, 131 blanks, all 2935 lines
+
+[Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
+
+## Files
+| filename | language | code | comment | blank | total |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| [css/curator-profil.css](/css/curator-profil.css) | PostCSS | 55 | 1 | 3 | 59 |
+| [css/global.css](/css/global.css) | PostCSS | 297 | 4 | 3 | 304 |
+| [css/journal.css](/css/journal.css) | PostCSS | 204 | 1 | 4 | 209 |
+| [css/login.css](/css/login.css) | PostCSS | 104 | 0 | 8 | 112 |
+| [css/schedule.css](/css/schedule.css) | PostCSS | 113 | 0 | 2 | 115 |
+| [css/teacher-profil.css](/css/teacher-profil.css) | PostCSS | 59 | 0 | 1 | 60 |
+| [css/teacher.css](/css/teacher.css) | PostCSS | 96 | 2 | 3 | 101 |
+| [data/grades.json](/data/grades.json) | JSON | 35 | 0 | 1 | 36 |
+| [data/groups.json](/data/groups.json) | JSON | 6 | 0 | 1 | 7 |
+| [data/schedule.json](/data/schedule.json) | JSON | 102 | 0 | 1 | 103 |
+| [data/students.json](/data/students.json) | JSON | 74 | 0 | 1 | 75 |
+| [data/teachers.json](/data/teachers.json) | JSON | 6 | 0 | 1 | 7 |
+| [data/users.json](/data/users.json) | JSON | 98 | 0 | 1 | 99 |
+| [html/student\_html/main.html](/html/student_html/main.html) | HTML | 0 | 0 | 1 | 1 |
+| [html/teacher\_html/journal-main.html](/html/teacher_html/journal-main.html) | HTML | 112 | 0 | 6 | 118 |
+| [html/teacher\_html/teacher-journal.html](/html/teacher_html/teacher-journal.html) | HTML | 453 | 0 | 7 | 460 |
+| [html/teacher\_html/teacher-main.html](/html/teacher_html/teacher-main.html) | HTML | 109 | 18 | 5 | 132 |
+| [html/teacher\_html/teacher-profil-curator.html](/html/teacher_html/teacher-profil-curator.html) | HTML | 172 | 0 | 8 | 180 |
+| [html/teacher\_html/teacher-profil.html](/html/teacher_html/teacher-profil.html) | HTML | 148 | 0 | 9 | 157 |
+| [html/teacher\_html/teacher-schedule.html](/html/teacher_html/teacher-schedule.html) | HTML | 259 | 0 | 39 | 298 |
+| [index.html](/index.html) | HTML | 43 | 0 | 5 | 48 |
+| [js/admin.js](/js/admin.js) | JavaScript | 1 | 0 | 1 | 2 |
+| [js/api.js](/js/api.js) | JavaScript | 1 | 0 | 1 | 2 |
+| [js/curator.js](/js/curator.js) | JavaScript | 28 | 0 | 2 | 30 |
+| [js/global.js](/js/global.js) | JavaScript | 66 | 5 | 5 | 76 |
+| [js/login.js](/js/login.js) | JavaScript | 26 | 2 | 3 | 31 |
+| [js/student.js](/js/student.js) | JavaScript | 1 | 0 | 1 | 2 |
+| [js/teacher-main-render.js](/js/teacher-main-render.js) | JavaScript | 94 | 9 | 8 | 111 |
+
+[Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

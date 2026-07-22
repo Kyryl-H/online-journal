@@ -268,7 +268,7 @@ body {
   flex-grow: 1;
   background-color: var(--white);
   border: 0.1rem solid var(--text-muted);
-  border-radius: var(--border-radius) 0 0 var(--border-radius);
+  border-radius: var(--border-radius);
   padding: 0 1.5rem;
 }
 .search-icon {
@@ -284,20 +284,4 @@ body {
   padding: 1rem 0;
   width: 100%;
   font-size: 1.5rem;
-}
-.search-btn {
-  background-color: var(--sidebar);
-  color: var(--text-muted);
-  border: 0.1rem solid var(--text-muted);
-  border-radius: 0 var(--border-radius) var(--border-radius) 0;
-  padding: 1rem 2.5rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.search-btn:hover {
-  background-color: var(--brand-color);
-  color: var(--white);
-  border-color: var(--brand-color);
 }

@@ -3,7 +3,6 @@ const greeting = document.querySelector(".greeting");
 const labelDate = document.querySelector(".date");
 const scheduleGrid = document.querySelector(".schedule-grid");
 const userId = localStorage.getItem("userId");
-let teacher_id;
 const render = async function (userId) {
   // привітання
   const teachers = await fetch("/data/teachers.json");
@@ -13,7 +12,7 @@ const render = async function (userId) {
     (teacher) => teacher.user_id == userId,
   );
   greeting.textContent = `Вітаю, ${currentTeacher.full_name}`;
-  teacher_id = currentTeacher.id;
+  const teacher_id = currentTeacher.id;
   // дата
   const days = [
     "Неділя",

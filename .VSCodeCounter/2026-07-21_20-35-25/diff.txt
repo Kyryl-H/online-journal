@@ -1,0 +1,76 @@
+Date : 2026-07-21 20:35:25
+Directory : /home/kurul/online-journal
+Total : 39 files,  424 codes, 22 comments, 0 blanks, all 446 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          7 |        321 |          0 |          3 |        324 |
+| JavaScript |          4 |        114 |          9 |          6 |        129 |
+| PostCSS    |          9 |         65 |         -3 |         -3 |         59 |
+| HTML       |         19 |        -76 |         16 |         -6 |        -66 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                     | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                        |         39 |        424 |         22 |          0 |        446 |
+| . (Files)                                                                |          1 |          2 |          0 |          0 |          2 |
+| admin_html                                                               |          1 |          0 |          0 |         -1 |         -1 |
+| css                                                                      |          9 |         65 |         -3 |         -3 |         59 |
+| data                                                                     |          7 |        321 |          0 |          3 |        324 |
+| html                                                                     |          7 |      1,253 |         18 |         75 |      1,346 |
+| html/student_html                                                        |          1 |          0 |          0 |          1 |          1 |
+| html/teacher_html                                                        |          6 |      1,253 |         18 |         74 |      1,345 |
+| js                                                                       |          4 |        114 |          9 |          6 |        129 |
+| student_html                                                             |          4 |        -54 |          0 |         -4 |        -58 |
+| teacher_html                                                             |          6 |     -1,277 |         -2 |        -76 |     -1,355 |
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                 | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /home/kurul/online-journal/admin_html/admin.html                         | HTML       |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/css/admin.css                                 | PostCSS    |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/css/curator-profil.css                        | PostCSS    |          3 |          0 |          0 |          3 |
+| /home/kurul/online-journal/css/global.css                                | PostCSS    |         17 |          0 |          0 |         17 |
+| /home/kurul/online-journal/css/journal.css                               | PostCSS    |         33 |         -3 |         -1 |         29 |
+| /home/kurul/online-journal/css/login.css                                 | PostCSS    |          3 |          0 |          0 |          3 |
+| /home/kurul/online-journal/css/schedule.css                              | PostCSS    |          3 |          0 |          0 |          3 |
+| /home/kurul/online-journal/css/student.css                               | PostCSS    |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/css/teacher-profil.css                        | PostCSS    |          3 |          0 |          0 |          3 |
+| /home/kurul/online-journal/css/teacher.css                               | PostCSS    |          3 |          0 |          0 |          3 |
+| /home/kurul/online-journal/data/grades.json                              | JSON       |         35 |          0 |          0 |         35 |
+| /home/kurul/online-journal/data/groups.json                              | JSON       |          6 |          0 |          1 |          7 |
+| /home/kurul/online-journal/data/schedule.json                            | JSON       |        102 |          0 |          0 |        102 |
+| /home/kurul/online-journal/data/students.json                            | JSON       |         74 |          0 |          1 |         75 |
+| /home/kurul/online-journal/data/teachers.json                            | JSON       |          6 |          0 |          1 |          7 |
+| /home/kurul/online-journal/data/user.json                                | JSON       |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/data/users.json                               | JSON       |         98 |          0 |          1 |         99 |
+| /home/kurul/online-journal/html/student_html/main.html                   | HTML       |          0 |          0 |          1 |          1 |
+| /home/kurul/online-journal/html/teacher_html/journal-main.html           | HTML       |        112 |          0 |          6 |        118 |
+| /home/kurul/online-journal/html/teacher_html/teacher-journal.html        | HTML       |        453 |          0 |          7 |        460 |
+| /home/kurul/online-journal/html/teacher_html/teacher-main.html           | HTML       |        109 |         18 |          5 |        132 |
+| /home/kurul/online-journal/html/teacher_html/teacher-profil-curator.html | HTML       |        172 |          0 |          8 |        180 |
+| /home/kurul/online-journal/html/teacher_html/teacher-profil.html         | HTML       |        148 |          0 |          9 |        157 |
+| /home/kurul/online-journal/html/teacher_html/teacher-schedule.html       | HTML       |        259 |          0 |         39 |        298 |
+| /home/kurul/online-journal/index.html                                    | HTML       |          2 |          0 |          0 |          2 |
+| /home/kurul/online-journal/js/global.js                                  | JavaScript |          1 |          0 |          0 |          1 |
+| /home/kurul/online-journal/js/login.js                                   | JavaScript |         20 |          0 |         -1 |         19 |
+| /home/kurul/online-journal/js/teacher-main-render.js                     | JavaScript |         94 |          9 |          8 |        111 |
+| /home/kurul/online-journal/js/teacher.js                                 | JavaScript |         -1 |          0 |         -1 |         -2 |
+| /home/kurul/online-journal/student_html/student-journal.html             | HTML       |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/student_html/student-main.html                | HTML       |        -54 |          0 |         -1 |        -55 |
+| /home/kurul/online-journal/student_html/student-profil.html              | HTML       |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/student_html/student-schedule.html            | HTML       |          0 |          0 |         -1 |         -1 |
+| /home/kurul/online-journal/teacher_html/journal-main.html                | HTML       |       -104 |          0 |         -4 |       -108 |
+| /home/kurul/online-journal/teacher_html/teacher-journal.html             | HTML       |       -420 |          0 |         -5 |       -425 |
+| /home/kurul/online-journal/teacher_html/teacher-main.html                | HTML       |       -188 |         -2 |        -15 |       -205 |
+| /home/kurul/online-journal/teacher_html/teacher-profil-curator.html      | HTML       |       -165 |          0 |         -6 |       -171 |
+| /home/kurul/online-journal/teacher_html/teacher-profil.html              | HTML       |       -148 |          0 |         -9 |       -157 |
+| /home/kurul/online-journal/teacher_html/teacher-schedule.html            | HTML       |       -252 |          0 |        -37 |       -289 |
+| Total                                                                    |            |        424 |         22 |          0 |        446 |
++--------------------------------------------------------------------------+------------+------------+------------+------------+------------+

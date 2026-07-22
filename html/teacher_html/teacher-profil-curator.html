@@ -91,8 +91,8 @@
       <div class="container">
         <div class="input-group">
           <div class="message"><h1>Ваша група</h1></div>
-          <select class="group-select">
-            <option value="p-33" selected>П-33</option>
+          <select name="groups" class="group-select">
+            <!-- <option value="p-33" selected>П-33</option> -->
           </select>
         </div>
         <div class="card-box">
@@ -111,29 +111,13 @@
                   placeholder="Пошук студентів..."
                 />
               </div>
-              <button type="submit" class="search-btn">Знайти</button>
             </form>
-            <div class="card-row">
-              <div class="student-number">1</div>
-              <div class="icon-box"><i class="bi bi-person"></i></div>
-              <div class="full-name">Кирил Васильович</div>
-            </div>
-            <div class="card-row">
-              <div class="student-number">2</div>
-              <div class="icon-box"><i class="bi bi-person"></i></div>
-              <div class="full-name">Сахнюк Любомир</div>
-            </div>
-            <div class="card-row">
-              <div class="student-number">3</div>
-
-              <div class="icon-box"><i class="bi bi-person"></i></div>
-              <div class="full-name">Шелегатський Степан</div>
-            </div>
-            <div class="card-row">
-              <div class="student-number">4</div>
-
-              <div class="icon-box"><i class="bi bi-person"></i></div>
-              <div class="full-name">Семенчук Максим</div>
+            <div class="student-container">
+              <!-- <div class="card-row">
+                <div class="student-number">1</div>
+                <div class="icon-box"><i class="bi bi-person"></i></div>
+                <div class="full-name">Кирил Васильович</div>
+              </div> -->
             </div>
           </div>
           <div class="card">
@@ -175,5 +159,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/curator.js"></script>
     <script src="/js/global.js"></script>
+    <script src="/js/teacher-curator.js"></script>
   </body>
 </html>
