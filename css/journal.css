@@ -55,13 +55,16 @@ th {
   border-radius: var(--border-radius);
   border: 0.1rem solid var(--border-line);
 }
-th {
+#date-null {
+  text-align: center;
+}
+/* th {
   padding: 1rem;
 }
 td {
   padding: 0;
   vertical-align: middle;
-}
+} */
 td:first-child,
 th:first-child {
   text-align: left;

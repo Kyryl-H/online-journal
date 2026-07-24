@@ -4,6 +4,8 @@ const render = async function () {
   const select = document.querySelector(".group-select");
   const studentContainer = document.querySelector(".student-container");
   const searchInput = document.querySelector(".search-input");
+  const groupGrades = document.querySelector(".group-grades");
+  const groupPasses = document.querySelector(".group-passes");
   try {
     const p1 = await fetch("/data/teachers.json");
     const p2 = await fetch("/data/groups.json");

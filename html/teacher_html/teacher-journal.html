@@ -91,17 +91,17 @@
       <div class="container">
         <div class="card">
           <div class="month-container">
-            <button class="septemberbtn monthbtn">Вересень</button>
-            <button class="octoberbtn monthbtn">Жовтень</button>
-            <button class="novemberbtn monthbtn">Листопад</button>
-            <button class="decemberbtn monthbtn monthbtn-active">
+            <button data-number="8" class="monthbtn">Вересень</button>
+            <button data-number="9" class="monthbtn">Жовтень</button>
+            <button data-number="10" class="monthbtn">Листопад</button>
+            <button data-number="11" class="monthbtn monthbtn-active">
               Грудень
             </button>
-            <button class="januarybtn monthbtn">Січень</button>
-            <button class="februarybtn monthbtn">Лютий</button>
-            <button class="marchbtn monthbtn">Березень</button>
-            <button class="aprilbtn monthbtn">Квітень</button>
-            <button class="maybtn monthbtn">Травень</button>
+            <button data-number="0" class="monthbtn">Січень</button>
+            <button data-number="1" class="monthbtn">Лютий</button>
+            <button data-number="2" class="monthbtn">Березень</button>
+            <button data-number="3" class="monthbtn">Квітень</button>
+            <button data-number="4" class="monthbtn">Травень</button>
           </div>
           <div class="control-unit">
             <button class="comeback">
@@ -119,7 +119,6 @@
                   placeholder="Пошук студентів..."
                 />
               </div>
-              <button type="submit" class="search-btn">Знайти</button>
             </form>
 
             <button class="print-outbtn">Роздрукувати</button>
@@ -127,319 +126,17 @@
           <div class="table-container">
             <table>
               <thead>
-                <tr>
-                  <th class="sticky-corner">Учень/День</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>15.05</th>
-                  <th>16.05</th>
-                  <th>17.05</th>
-                  <th>18.05</th>
-                  <th>19.05</th>
-                  <th>19.05</th>
+                <tr class="date-container">
+                  <!-- <th class="sticky-corner">Учень/День</th>
+                  <th>15.05</th> -->
                 </tr>
               </thead>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-                <td><input type="text" class="grade-input" /></td>
-              </tr>
-              <tr>
-                <td><div>2.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td><div>1.Годлевський Кирил</div></td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-                <td>5</td>
-              </tr>
+              <tbody>
+                <!-- <tr class="row">
+                  <td><div>1.Годлевський Кирил</div></td>
+                  <td><input type="text" class="grade-input" /></td>
+                </tr> -->
+              </tbody>
             </table>
           </div>
         </div>
@@ -455,5 +152,6 @@
     <div class="overlay hidden"></div>
 
     <script src="/js/global.js"></script>
+    <script src="/js/teacher-journal.js"></script>
   </body>
 </html>
