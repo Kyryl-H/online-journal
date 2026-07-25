@@ -20,13 +20,19 @@ html {
   top: 1rem;
   background-color: var(--brand-color);
   height: 3rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 .control-unit {
   margin: 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.infoLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
 }
 .select-group {
   background-color: var(--brand-color);
@@ -48,8 +54,7 @@ table {
 }
 td,
 th {
-  padding: 1rem;
-
+  min-width: 6rem;
   background-color: var(--white);
   text-align: center;
   border-radius: var(--border-radius);
@@ -58,16 +63,17 @@ th {
 #date-null {
   text-align: center;
 }
-/* th {
+th {
   padding: 1rem;
 }
 td {
   padding: 0;
   vertical-align: middle;
-} */
+}
 td:first-child,
 th:first-child {
   text-align: left;
+  padding: 1rem;
 }
 thead th {
   position: sticky;
@@ -93,7 +99,8 @@ thead th.sticky-corner {
   min-width: 22rem;
   text-align: left;
 }
-.print-outbtn {
+.print-outbtn,
+.saveData {
   min-width: 12rem;
   background-color: transparent;
   border-radius: var(--border-radius);
@@ -106,14 +113,18 @@ thead th.sticky-corner {
   transition: all 0.2s ease;
   font-weight: 600;
 }
-.print-outbtn:hover {
+.print-outbtn:active,
+.saveData:active {
+  transform: translateY(2px);
+}
+.print-outbtn:hover,
+.saveData:hover {
   color: var(--white);
   background-color: var(--brand-color);
 }
 tbody tr:hover td {
   background-color: var(--table-line-hover);
 }
-/* Стилізуємо скролбар тільки для контейнера таблиці */
 .table-container::-webkit-scrollbar {
   width: 0.8rem;
   height: 0.8rem;
@@ -208,4 +219,148 @@ td:hover .grade-input {
   background-color: var(--white);
   cursor: text;
   box-shadow: 0 0 0 0.2rem var(--brand-color);
+}
+.date-panel {
+  position: absolute;
+  padding: 1rem;
+  border-radius: 0.8rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  max-width: 20rem;
+  gap: 1rem;
+  background-color: aquamarine;
+
+  box-shadow: 0 4rem 6rem rgb(0, 0, 0, 0.4);
+  background-color: var(--white);
+  transition: all 0.5s;
+}
+.date-panel button {
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--text-muted);
+  background-color: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: rgb(0, 0, 0, 0.3);
+}
+.date-panel button:hover {
+  color: var(--white);
+  background-color: var(--brand-color);
+}
+.hidden {
+  display: none;
+}
+.input-values-error {
+  background-color: crimson;
+  border: 2px solid var(--white);
+  transition: all 0.5s;
+}
+.input-topic-lesson {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 101;
+  transform: translate(-50%, -50%);
+
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.2);
+  background-color: var(--white, #ffffff);
+  width: 100%;
+  max-width: 45rem;
+  padding: 4rem 5rem;
+  border-radius: var(--border-radius, 12px);
+  color: var(--text-main, #333);
+
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-title {
+  font-size: 2.2rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-main, #333);
+}
+
+.input-topic-lesson .btn-close-lessonModal {
+  position: absolute;
+  border: none;
+  background-color: transparent;
+  font-size: 2.4rem;
+  top: 1.5rem;
+  right: 2rem;
+  cursor: pointer;
+  color: var(--text-muted, #888);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.input-topic-lesson .btn-close-lessonModal:hover {
+  transform: scale(1.1);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--text-main, #333);
+}
+
+.select,
+.input {
+  background-color: transparent;
+  border: 0.15rem solid #d1d5db;
+  color: var(--text-main, #333);
+  padding: 1.2rem 1.6rem;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1.5rem;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: text;
+}
+
+.select {
+  cursor: pointer;
+}
+
+.select:focus,
+.input:focus {
+  border-color: var(--text-main);
+  box-shadow: 0 0 0 0.4rem rgb(123, 184, 169, 0.2);
+}
+
+.modal-save-btn {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1.4rem;
+  background-color: #4ea884;
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.modal-save-btn:hover {
+  background-color: #3b8768;
+}
+
+.modal-save-btn:active {
+  transform: translateY(2px);
 }

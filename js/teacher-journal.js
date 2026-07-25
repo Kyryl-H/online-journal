@@ -9,6 +9,12 @@ const monthBtn = document.querySelectorAll(".monthbtn");
 const tbody = document.querySelector("tbody");
 const dateContainer = document.querySelector(".date-container");
 const searchInput = document.querySelector(".search-input");
+const monthfirst = document.querySelector(".monthbtn");
+const datePanel = document.querySelector(".date-panel");
+const insertColumRight = document.querySelector(".insert-colum-right");
+const btnCloseLessonModal = document.querySelector(".btn-close-lessonModal");
+const inputTopicLesson = document.querySelector(".input-topic-lesson");
+const insertTopicBtn = document.querySelector(".insert-topic");
 
 const render = async function () {
   try {
@@ -27,9 +33,17 @@ const render = async function () {
 
     const currentGroup = group.filter((g) => g.id == groupId);
     selectGroup.textContent = `${lessonName} ${currentGroup[0].name}`;
-    //
+    // налаштування вибору місяця
     const date = new Date();
     let month = date.getMonth(); // для рендеренгу оцінок за певний місяць
+    if (month === 6 || month === 7) {
+      month = 8;
+      monthfirst.classList.add("monthbtn-active");
+    }
+
+    const monthActiv = document.querySelector(`[data-number="${month}"]`);
+    monthActiv.classList.add("monthbtn-active");
+
     monthContainer.onclick = function (e) {
       let target = e.target;
       if (!target.classList.contains("monthbtn")) return;
@@ -39,7 +53,8 @@ const render = async function () {
       });
       target.classList.add("monthbtn-active");
       renderTable();
-    }; // рендеринг таблиці
+    };
+    // рендеринг таблиці
     const renderTable = async function (searchQuery = "") {
       dateContainer.innerHTML = "";
       tbody.innerHTML = "";
@@ -59,7 +74,7 @@ const render = async function () {
       if (currentmonth.length === 0) {
         dateContainer.insertAdjacentHTML(
           "beforeend",
-          `<tr><td id="date-null">У цьому місяці занять немає</td></tr>`,
+          `<tr><td id="date-null" class="date-null">У цьому місяці занять немає</td></tr>`,
         );
         return;
       }
@@ -103,11 +118,94 @@ const render = async function () {
         tbody.insertAdjacentHTML("beforeend", html);
       });
     };
+    // пошук студентів
     searchInput.addEventListener("input", () => {
       renderTable(searchInput.value);
     });
 
+    // додавання стовчиків та тем
+    dateContainer.addEventListener("dblclick", function (e) {
+      const target = e.target;
+      if (
+        target.classList.contains("sticky-corner") ||
+        target.classList.contains("date-null")
+      )
+        return;
+      datePanel.classList.remove("hidden");
+
+      const rect = target.getBoundingClientRect();
+      datePanel.style.top = `${rect.bottom + window.scrollY + 5}px`;
+      datePanel.style.left = `${rect.left + window.scrollX + 5}px`;
+    });
+    // ховання вікна
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !datePanel.classList.contains("hidden")) {
+        datePanel.classList.add("hidden");
+      }
+      if (
+        e.key === "Escape" &&
+        !inputTopicLesson.classList.contains("hidden")
+      ) {
+        inputTopicLesson.classList.add("hidden");
+        overlay.classList.add("hidden");
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (!datePanel.contains(e.target)) {
+        datePanel.classList.add("hidden");
+      }
+    });
+    // функціонал кнопок модального вікна
+    //додавання колонки справа
+    insertColumRight.addEventListener("click", function () {
+      dateContainer.insertAdjacentHTML("beforeend", `<th></th>`);
+      const row = document.querySelectorAll(".row");
+
+      row.forEach(function (line) {
+        line.insertAdjacentHTML(
+          "beforeend",
+          `<td><input type="text" class="grade-input" /></td>`,
+        );
+      });
+    });
+    // модальне вікно з темою заняття
+    // показуєм
+    insertTopicBtn.addEventListener("click", function () {
+      inputTopicLesson.classList.remove("hidden");
+      overlay.classList.remove("hidden");
+    });
+    // ховаєм модальне вікно з темою заняття
+    btnCloseLessonModal.addEventListener("click", function () {
+      inputTopicLesson.classList.add("hidden");
+      overlay.classList.add("hidden");
+    });
+    overlay.addEventListener("click", function () {
+      inputTopicLesson.classList.add("hidden");
+      overlay.classList.add("hidden");
+    });
+
     renderTable();
+    // валідаці вводу користувача
+    const gradeInput = document.querySelectorAll(".grade-input");
+    const [currentmonth] = schedule
+      .filter((group) => group.group_id == groupId)
+      .filter((sub) => sub.subject == lessonName);
+    gradeInput.forEach(function (grades) {
+      grades.addEventListener("input", function () {
+        if (
+          (grades.value >= 1 && grades.value <= currentmonth.grading_system) ||
+          grades.value === "н" ||
+          grades.value === "Н"
+        ) {
+        } else {
+          grades.classList.add("input-values-error");
+          setTimeout(() => {
+            grades.value = "";
+            grades.classList.remove("input-values-error");
+          }, 2000);
+        }
+      });
+    });
   } catch (err) {
     console.error(`Помилка: ${err.message}`);
   }

@@ -94,34 +94,37 @@
             <button data-number="8" class="monthbtn">Вересень</button>
             <button data-number="9" class="monthbtn">Жовтень</button>
             <button data-number="10" class="monthbtn">Листопад</button>
-            <button data-number="11" class="monthbtn monthbtn-active">
-              Грудень
-            </button>
+            <button data-number="11" class="monthbtn">Грудень</button>
             <button data-number="0" class="monthbtn">Січень</button>
             <button data-number="1" class="monthbtn">Лютий</button>
             <button data-number="2" class="monthbtn">Березень</button>
             <button data-number="3" class="monthbtn">Квітень</button>
             <button data-number="4" class="monthbtn">Травень</button>
+            <button data-number="5" class="monthbtn">Червень</button>
           </div>
           <div class="control-unit">
-            <button class="comeback">
-              <i class="bi bi-arrow-left comeback-icon"></i>
-            </button>
-            <div class="select-group">Основи програмування П-33</div>
-            <form action="/search" method="GET" class="search-form">
-              <div class="input-wrapper">
-                <i class="bi bi-search search-icon"></i>
-                <input
-                  class="search-input"
-                  type="search"
-                  id="search-input"
-                  name="query "
-                  placeholder="Пошук студентів..."
-                />
-              </div>
-            </form>
-
-            <button class="print-outbtn">Роздрукувати</button>
+            <div class="infoLine">
+              <button class="comeback">
+                <i class="bi bi-arrow-left comeback-icon"></i>
+              </button>
+              <div class="select-group">Основи програмування П-33</div>
+              <form action="/search" method="GET" class="search-form">
+                <div class="input-wrapper">
+                  <i class="bi bi-search search-icon"></i>
+                  <input
+                    class="search-input"
+                    type="search"
+                    id="search-input"
+                    name="query "
+                    placeholder="Пошук студентів..."
+                  />
+                </div>
+              </form>
+            </div>
+            <div>
+              <button class="print-outbtn">Експортувати</button>
+              <button class="saveData">Зберегти зміни</button>
+            </div>
           </div>
           <div class="table-container">
             <table>
@@ -130,6 +133,12 @@
                   <!-- <th class="sticky-corner">Учень/День</th>
                   <th>15.05</th> -->
                 </tr>
+                <div class="date-panel hidden">
+                  <button class="insert-colum-right">
+                    Додати стовпчик справа
+                  </button>
+                  <button class="insert-topic">Заповнити тему</button>
+                </div>
               </thead>
               <tbody>
                 <!-- <tr class="row">
@@ -138,6 +147,46 @@
                 </tr> -->
               </tbody>
             </table>
+            <div class="input-topic-lesson hidden">
+              <button
+                class="btn-close-lessonModal"
+                aria-label="Закрити модальне вікно"
+              >
+                <i class="bi bi-x-circle"></i>
+              </button>
+
+              <h2 class="modal-title">Дані про заняття</h2>
+
+              <div class="form-group">
+                <label for="lesson-type">Тип заняття</label>
+                <select name="lesson-type" id="lesson-type" class="select">
+                  <option value="para">Пара</option>
+                  <option value="notebook">Зошит</option>
+                  <option value="test">Рубіж</option>
+                  <option value="semester">Семестр</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="lesson-date">Дата</label>
+                <select name="lesson-date" id="lesson-date" class="select">
+                  <!-- Тут дати будуть підтягуватися через JS -->
+                  <option value="" disabled selected>Оберіть дату...</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="lesson-topic">Тема</label>
+                <input
+                  type="text"
+                  id="lesson-topic"
+                  class="input"
+                  placeholder="Введіть тему заняття..."
+                />
+              </div>
+
+              <button class="btn modal-save-btn">Зберегти</button>
+            </div>
           </div>
         </div>
       </div>

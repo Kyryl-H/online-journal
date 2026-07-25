@@ -34,7 +34,10 @@ document.addEventListener("DOMContentLoaded", function () {
     lin.classList.remove("nav-active");
 
     if (lin.getAttribute("href") === "#" || !lin.getAttribute("href")) return;
-    if (currentPath === lin.pathname) {
+    if (
+      currentPath === lin.pathname ||
+      (currentPath.includes("journal") && lin.dataset.target === "journal")
+    ) {
       lin.classList.add("nav-active");
     }
   });

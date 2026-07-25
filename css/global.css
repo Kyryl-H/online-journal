@@ -256,6 +256,9 @@ body {
 .btn:hover {
   background-color: var(--sidebar);
 }
+.btn:active {
+  transform: translateY(2px);
+}
 /* Пошуковий рядок */
 .search-form {
   display: flex;
