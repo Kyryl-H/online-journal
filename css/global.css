@@ -22,6 +22,9 @@ html {
   --white: #fff;
   --table-line-hover: #f8fafc;
   --replacement: goldenrod;
+  --primary-color: #0f766e;
+  --primary-hover: #115e59;
+  --transition-speed: 0.2s ease;
 }
 ul {
   list-style: none;
