@@ -1,24 +1,25 @@
 "use strict";
 
-const btnContainer = document.querySelector(".btn-container");
-const userId = localStorage.getItem("userId");
-const render = async function () {
-  const p1 = await fetch("/data/teachers.json");
-  const p2 = await fetch("/data/groups.json");
-  const p3 = await fetch("/data/users.json");
-  const p4 = await fetch("/data/schedule.json");
+import { fetchTeachers, fetchGroups, fetchSchedule } from "./api.js";
+import { renderLayout, renderExit } from "./components.js";
+import { initGlobal } from "./global.js";
 
-  const [teacherRespons, groupsRespons, userRespons, scheduleRespons] =
-    await Promise.all([p1, p2, p3, p4]);
+renderLayout();
+renderExit();
+initGlobal();
 
-  const teacher = await teacherRespons.json();
-  const grop = await groupsRespons.json();
-  const user = await userRespons.json();
-  const shedule = await scheduleRespons.json();
+const renderLesson = async function () {
+  const btnContainer = document.querySelector(".btn-container");
+  const userId = localStorage.getItem("userId");
+
+  const teacher = await fetchTeachers();
+  const grop = await fetchGroups();
+  const shedule = await fetchSchedule();
 
   const [currentTeacher] = teacher.filter(
     (teacher) => teacher.user_id == userId,
   );
+  // пошук груп з предметами в яких викладається
   const lessonSubject = {};
   const lessonAll = shedule
     .filter((lesson) => lesson.teacher_id === currentTeacher.id)
@@ -41,6 +42,7 @@ const render = async function () {
       btnContainer.insertAdjacentHTML("beforeend", html);
     });
   });
+  // відкриття журналу з вибраними даними заняття
   btnContainer.onclick = function (e) {
     let target = e.target;
     if (!target.classList.contains("btn")) return;
@@ -49,4 +51,4 @@ const render = async function () {
     window.location.href = "/html/teacher_html/teacher-journal.html";
   };
 };
-render();
+renderLesson();

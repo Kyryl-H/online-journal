@@ -1,12 +1,20 @@
 "use strict";
+
+import { fetchTeachers, fetchSchedule, fetchGroups } from "./api.js";
+import { renderLayout, renderExit } from "./components.js";
+import { initGlobal } from "./global.js";
+
+renderLayout();
+renderExit();
+initGlobal();
+
 const greeting = document.querySelector(".greeting");
 const labelDate = document.querySelector(".date");
 const scheduleGrid = document.querySelector(".schedule-grid");
 const userId = localStorage.getItem("userId");
 const render = async function (userId) {
   // привітання
-  const teachers = await fetch("/data/teachers.json");
-  const teacher = await teachers.json();
+  const teacher = await fetchTeachers();
 
   const [currentTeacher] = teacher.filter(
     (teacher) => teacher.user_id == userId,
@@ -32,8 +40,7 @@ const render = async function (userId) {
   const todayString = `${day}-${month}-${year}`;
   labelDate.textContent = `${weekday}, ${day}.${month}.${year}`;
   // картки
-  const schedules = await fetch("/data/schedule.json");
-  const schedule = await schedules.json();
+  const schedule = await fetchSchedule();
   const scheduleTeacher = schedule.filter(
     (teacher) => teacher_id == teacher.teacher_id,
   );
@@ -49,8 +56,7 @@ const render = async function (userId) {
     [6, "16:40-18:00"],
   ]);
 
-  const groups = await fetch("/data/groups.json");
-  const group = await groups.json();
+  const group = await fetchGroups();
   selectpara.forEach(async function (lesson) {
     // час пар
     const [groupId] = group.filter((group) => lesson.group_id == group.id);
@@ -102,7 +108,7 @@ const render = async function (userId) {
         statusDadge.textContent = "Наступна";
       }
     };
-    setInterval(cardStatus(), 60000);
+    setInterval(cardStatus, 60000);
   });
   // повідомлення
 };

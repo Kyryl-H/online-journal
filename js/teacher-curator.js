@@ -1,262 +1,255 @@
 "use strict";
-const userId = localStorage.getItem("userId");
-const render = async function () {
-  const select = document.querySelector(".group-select");
-  const studentContainer = document.querySelector(".student-container");
-  const searchInput = document.querySelector(".search-input");
-  const groupGrades = document.querySelector(".group-grades");
-  const groupPasses = document.querySelector(".group-passes");
-  const ctx = document.getElementById("gradesChart");
-  const monthEl = document.querySelector(".month");
-  const legendDiagram = document.querySelector(".legend-diagram");
-  const legendRow = document.querySelectorAll(".legend-row");
-  const modalOverlay = document.querySelector(".modal-overlay");
-  const reportBtn = document.querySelector(".report-btn");
-  const btnCloseModal = document.querySelector(".btn-close-modal");
-  let myChart = null;
 
-  try {
-    const p1 = await fetch("/data/teachers.json");
-    const p2 = await fetch("/data/groups.json");
-    const p3 = await fetch("/data/students.json");
-    const p4 = await fetch("/data/grades.json");
-    const p5 = await fetch("/data/schedule.json");
-    const [res1, res2, res3, res4, res5] = await Promise.all([
-      p1,
-      p2,
-      p3,
-      p4,
-      p5,
-    ]);
+import {
+  fetchTeachers,
+  fetchGroups,
+  fetchStudents,
+  fetchGrades,
+  fetchSchedule,
+} from "./api.js";
+import { renderLayout, renderExit } from "./components.js";
+import { initGlobal } from "./global.js";
 
-    const curator = await res1.json();
-    const group = await res2.json();
-    const student = await res3.json();
-    const grades = await res4.json();
-    const schedule = await res5.json();
+const state = {
+  curatorId: null,
+  groups: [],
+  students: [],
+  grades: [],
+  schedule: [],
+  currentGroupStudents: [],
+  chartInstance: null,
+};
 
-    const [currentcurator] = curator.filter((cur) => cur.user_id == userId);
-    const curatorId = currentcurator.id;
-    // вибір групи
-    const currentgroup = group.filter((group) => group.curator_id == curatorId);
-    currentgroup.forEach(function (g) {
-      const html = `<option value="${g.id}">${g.name}</option>`;
-      select.insertAdjacentHTML("beforeend", html);
-    });
-    //рендеринг картки студента за його ід
-    let groupStudent;
-    const renderStudentList = function (groupid, searchQuery = "") {
-      studentContainer.innerHTML = "";
+//DOM Елементи
+const els = {
+  select: document.querySelector(".group-select"),
+  studentContainer: document.querySelector(".student-container"),
+  searchInput: document.querySelector(".search-input"),
+  groupGrades: document.querySelector(".group-grades"),
+  groupPasses: document.querySelector(".group-passes"),
+  ctx: document.getElementById("gradesChart"),
+  monthEl: document.querySelector(".month"),
+  legendDiagram: document.querySelector(".legend-diagram"),
+  legendRows: document.querySelectorAll(".legend-row"),
+  modalOverlay: document.querySelector(".modal-overlay"),
+  reportBtn: document.querySelector(".report-btn"),
+  btnCloseModal: document.querySelector(".btn-close-modal"),
+};
 
-      groupStudent = student.filter((g) => g.group_id == groupid);
-      groupStudent = groupStudent.filter((s) =>
-        s.full_name.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-      groupStudent.sort((a, b) => a.full_name.localeCompare(b.full_name, "uk"));
-      groupStudent.forEach((stud, i) => {
-        const html = `            <div class="card-row">
-              <div class="student-number">${i + 1}</div>
-              <div class="icon-box"><i class="bi bi-person"></i></div>
-              <div class="full-name">${stud.full_name}</div>
-            </div>
-`;
-        studentContainer.insertAdjacentHTML("beforeend", html);
-      });
-    };
-    // зміна групи в рендеренгу
-    select.addEventListener("change", function (e) {
-      const selectValue = e.target.value;
-      renderStudentList(selectValue);
-      renderStatistics(selectValue);
-    });
-    // перша заргузка
-    renderStudentList(select.value);
-    // пошук студентів
-    searchInput.addEventListener("input", () => {
-      renderStudentList(select.value, searchInput.value);
-    });
-    // right card
-    //current month
-    const date = new Date();
-    const days = [
-      "Січень",
-      "Лютий",
-      "Березень",
-      "Квітень",
-      "Травень",
-      "Червень",
-      "Липень",
-      "Серпень",
-      "Вересень",
-      "Жовтень",
-      "Листопад",
-      "Грудень",
-    ];
-    const year = date.getFullYear();
-    const month = 8;
-    monthEl.textContent = days[month];
+// ЛІВА КАРТКА: Список студентів
+const renderStudentList = (groupId, searchQuery = "") => {
+  els.studentContainer.innerHTML = "";
 
-    //  рендер статистики
-    const renderStatistics = function (selectValue) {
-      const sheduleOfMonth = schedule
-        .filter((group) => group.group_id == selectValue)
-        .filter((lesson) => {
-          const [day, monthD, years] = lesson.date.split("-");
-          return (
-            new Date(years, Number(monthD) - 1, day) >=
-              new Date(year, month, 1) &&
-            new Date(years, Number(monthD) - 1, day) <=
-              new Date(year, month + 1, 0)
-          );
-        })
-        .map((day) => day.id);
-      const currentStudent = groupStudent.map((st) => st.id);
-      const grade = grades.filter(
-        (g) =>
-          sheduleOfMonth.includes(g.schedule_id) &&
-          currentStudent.includes(g.student_id),
-      );
-      let countN = 0;
-      let sum = 0;
-      grade.forEach(function (g) {
-        if (g.value === "н") {
-          countN++;
+  // Фільтруємо студентів для поточної групи та зберігаємо в State для правої картки
+  state.currentGroupStudents = state.students
+    .filter((s) => s.group_id == groupId)
+    .filter((s) =>
+      s.full_name.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => a.full_name.localeCompare(b.full_name, "uk"));
+
+  // Малюємо HTML
+  state.currentGroupStudents.forEach((stud, i) => {
+    const html = `
+      <div class="card-row">
+        <div class="student-number">${i + 1}</div>
+        <div class="icon-box"><i class="bi bi-person"></i></div>
+        <div class="full-name">${stud.full_name}</div>
+      </div>`;
+    els.studentContainer.insertAdjacentHTML("beforeend", html);
+  });
+};
+
+// ПРАВА КАРТКА: Статистика
+const renderStatistics = (groupId) => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = 8; // Вересень
+
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0);
+
+  // Фільтруємо розклад
+  const scheduleIdsOfMonth = state.schedule
+    .filter((lesson) => lesson.group_id == groupId)
+    .filter((lesson) => {
+      const lessonDate = new Date(lesson.date);
+      return lessonDate >= startOfMonth && lessonDate <= endOfMonth;
+    })
+    .map((lesson) => lesson.id);
+
+  const studentIds = state.currentGroupStudents.map((st) => st.id);
+
+  // Знаходимо оцінки потрібних студентів за потрібні заняття
+  const currentGrades = state.grades.filter(
+    (g) =>
+      scheduleIdsOfMonth.includes(g.schedule_id) &&
+      studentIds.includes(g.student_id),
+  );
+
+  let passes = 0;
+  let gradesSum = 0;
+  let dataGradeDiagram = [0, 0, 0, 0];
+
+  // Рахуємо пропуски, середній бал та дані для графіка
+  currentGrades.forEach((g) => {
+    if (g.value.toLowerCase() === "н") {
+      passes++;
+    } else {
+      const val = Number(g.value);
+      gradesSum += val;
+
+      const lesson = state.schedule.find((les) => les.id == g.schedule_id);
+
+      if (lesson.grading_system === 5) {
+        if (val === 5) dataGradeDiagram[0]++;
+        else if (val === 4) dataGradeDiagram[1]++;
+        else if (val === 3) dataGradeDiagram[2]++;
+        else if (val === 2) dataGradeDiagram[3]++;
+      } else if (lesson.grading_system === 12) {
+        if (val >= 10) dataGradeDiagram[0]++;
+        else if (val >= 7) dataGradeDiagram[1]++;
+        else if (val >= 4) dataGradeDiagram[2]++;
+        else if (val >= 1) dataGradeDiagram[3]++;
+      }
+    }
+  });
+
+  // Оновлюємо UI
+  els.groupPasses.textContent = passes;
+  const average =
+    currentGrades.length > passes
+      ? (gradesSum / (currentGrades.length - passes)).toFixed(2)
+      : 0;
+  els.groupGrades.textContent = average;
+
+  renderChart(dataGradeDiagram);
+};
+
+// ДІАГРАМА
+const renderChart = (dataArr) => {
+  if (state.chartInstance) {
+    state.chartInstance.destroy();
+  }
+
+  state.chartInstance = new Chart(els.ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Відмінно", "Добре", "Задовільно", "Незадовільно"],
+      datasets: [
+        {
+          data: dataArr,
+          backgroundColor: ["#0f766e", "#2563eb", "#f59e0b", "#0ea5e9"],
+          borderWidth: 2,
+          borderColor: "#ffffff",
+          hoverOffset: 15,
+        },
+      ],
+    },
+    options: {
+      cutout: "60%",
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      layout: { padding: 15 },
+      onHover: function (event, elements) {
+        if (elements.length > 0) {
+          const activeIndex = elements[0].index;
+          els.legendRows.forEach((row) => {
+            row.classList.toggle("hovered", row.dataset.index == activeIndex);
+          });
         } else {
-          sum += Number(g.value);
+          els.legendRows.forEach((row) => row.classList.remove("hovered"));
         }
-      });
-      groupPasses.textContent = countN;
-      groupGrades.textContent = (sum / (grade.length - countN)).toFixed(2);
-      // підрахунок оцінок для діаграми
-      let dataGradeDiagram = [0, 0, 0, 0];
-      grade.forEach(function (el) {
-        const currentLesson = schedule.find((les) => les.id == el.schedule_id);
-        if (currentLesson.grading_system === 5) {
-          if (Number(el.value) === 5) {
-            dataGradeDiagram[0]++;
-          }
-          if (Number(el.value) === 4) {
-            dataGradeDiagram[1]++;
-          }
-          if (Number(el.value) === 3) {
-            dataGradeDiagram[2]++;
-          }
-          if (Number(el.value) === 2) {
-            dataGradeDiagram[3]++;
-          }
-        }
-        if (currentLesson.grading_system === 12) {
-          if (Number(el.value) >= 10 && Number(el.value) <= 12) {
-            dataGradeDiagram[0]++;
-          }
-          if (Number(el.value) >= 7 && Number(el.value) <= 9) {
-            dataGradeDiagram[1]++;
-          }
-          if (Number(el.value) >= 4 && Number(el.value) <= 6) {
-            dataGradeDiagram[2]++;
-          }
-          if (Number(el.value) >= 1 && Number(el.value) <= 3) {
-            dataGradeDiagram[3]++;
-          }
-        }
-      });
-      //малювання діаграми
-      if (myChart) {
-        myChart.destroy();
-      }
+      },
+    },
+  });
 
-      myChart = new Chart(ctx, {
-        type: "doughnut",
+  // Розміщення кастомної легенди
+  const rect = els.ctx.getBoundingClientRect();
+  els.legendDiagram.style.top = ` ${rect.top + window.scrollY + 35}px`;
+  els.legendDiagram.style.left = `${rect.right + window.scrollX + 10}px`;
+};
 
-        data: {
-          labels: [
-            "Відмінно (10-12 або 5)",
-            "Добре (7-9 або 4)",
-            "Задовільно (4-6 або 3)",
-            "Незадовільно (1-3 або 2)",
-          ],
+// СЛУХАЧІ ПОДІЙ
+const setupEventListeners = () => {
+  // Вибір групи
+  els.select.addEventListener("change", (e) => {
+    els.searchInput.value = "";
+    renderStudentList(e.target.value);
+    renderStatistics(e.target.value);
+  });
 
-          datasets: [
-            {
-              data: dataGradeDiagram,
+  // Пошук
+  els.searchInput.addEventListener("input", (e) => {
+    renderStudentList(els.select.value, e.target.value);
+  });
 
-              backgroundColor: ["#0f766e", "#2563eb", "#f59e0b", "#0ea5e9"],
-
-              borderWidth: 2,
-
-              borderColor: "#ffffff",
-              hoverOffset: 15,
-            },
-          ],
-        },
-
-        options: {
-          cutout: "60%",
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              enabled: false,
-            },
-          },
-          layout: {
-            padding: 15,
-          },
-          onHover: function (event, elements) {
-            if (elements.length > 0) {
-              const activeIndex = elements[0].index;
-              legendRow.forEach((row) => {
-                row.classList.remove("hovered");
-                if (row.dataset.index == activeIndex) {
-                  row.classList.add("hovered");
-                }
-              });
-            } else {
-              legendRow.forEach((row) => row.classList.remove("hovered"));
-            }
-          },
-        },
-      });
-    };
-    // розташування легенди
-    const rect = ctx.getBoundingClientRect();
-    legendDiagram.style.top = `${rect.top + window.scrollY + 30}px`;
-    legendDiagram.style.left = `${rect.left + window.scrollX + 220}px`;
-    // підсвітка вибраного сектора
-    legendRow.forEach((row) => {
-      row.addEventListener("mouseenter", function () {
-        const index = this.getAttribute("data-index");
-
-        myChart.setActiveElements([{ datasetIndex: 0, index: Number(index) }]);
-        myChart.update();
-      });
-      row.addEventListener("mouseleave", function () {
-        myChart.setActiveElements([]);
-        myChart.update();
-      });
+  // Підсвітка секторів при наведенні на легенду
+  els.legendRows.forEach((row) => {
+    row.addEventListener("mouseenter", function () {
+      const index = Number(this.getAttribute("data-index"));
+      state.chartInstance.setActiveElements([{ datasetIndex: 0, index }]);
+      state.chartInstance.update();
     });
-    // кнопка експорту
-    reportBtn.addEventListener("click", function () {
-      modalOverlay.classList.remove("hidden");
+    row.addEventListener("mouseleave", function () {
+      state.chartInstance.setActiveElements([]);
+      state.chartInstance.update();
     });
-    modalOverlay.addEventListener("click", function (e) {
-      const target = e.target;
-      if (target.classList.contains("modal-overlay")) {
-        modalOverlay.classList.add("hidden");
-      }
-    });
-    btnCloseModal.addEventListener("click", function () {
-      modalOverlay.classList.add("hidden");
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") {
-        modalOverlay.classList.add("hidden");
-      }
-    });
-    renderStatistics(select.value);
-  } catch (err) {
-    console.error(`Помилка: ${err.message}`);
+  });
+
+  // Модальне вікно
+  els.reportBtn.addEventListener("click", () =>
+    els.modalOverlay.classList.remove("hidden"),
+  );
+  els.btnCloseModal.addEventListener("click", () =>
+    els.modalOverlay.classList.add("hidden"),
+  );
+  els.modalOverlay.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal-overlay"))
+      els.modalOverlay.classList.add("hidden");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") els.modalOverlay.classList.add("hidden");
+  });
+};
+
+// ГОЛОВНА ФУНКЦІЯ: Запуск додатку
+const initApp = async () => {
+  renderLayout();
+  renderExit();
+  initGlobal();
+
+  const userId = localStorage.getItem("userId");
+
+  const [teachers, groups, students, grades, schedule] = await Promise.all([
+    fetchTeachers(),
+    fetchGroups(),
+    fetchStudents(),
+    fetchGrades(),
+    fetchSchedule(),
+  ]);
+
+  state.groups = groups;
+  state.students = students;
+  state.grades = grades;
+  state.schedule = schedule;
+
+  const currentCurator = teachers.find((t) => t.user_id == userId);
+  state.curatorId = currentCurator.id;
+
+  const curatorGroups = groups.filter((g) => g.curator_id == state.curatorId);
+  curatorGroups.forEach((g) => {
+    els.select.insertAdjacentHTML(
+      "beforeend",
+      `<option value="${g.id}">${g.name}</option>`,
+    );
+  });
+
+  //Ставимо слухачі та робимо перший рендер
+  setupEventListeners();
+
+  if (els.select.value) {
+    renderStudentList(els.select.value);
+    renderStatistics(els.select.value);
   }
 };
-render();
+initApp();
