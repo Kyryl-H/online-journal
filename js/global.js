@@ -1,76 +1,84 @@
 "use strict";
 export const initGlobal = function () {
-  //бокове меню
-  const sidebar = document.querySelector(".sidebar");
-  const btnToggle = document.querySelector(".toggle-btn");
-  let collapse = localStorage.getItem("collapse");
-  // запамятовування стану згортання
-  if (btnToggle && sidebar) {
-    sidebar.classList.toggle("collapsed");
-    if (typeof Storage !== "undefined") {
-      if (sidebar.classList.contains("collapsed") === true) {
-        localStorage.setItem("collapse", "true");
+  // DOM елементи
+  const els = {
+    sidebar: document.querySelector(".sidebar"),
+    btnToggle: document.querySelector(".toggle-btn"),
+    links: document.querySelectorAll(".nav-link"),
+    exitBtn: document.querySelector(".exit"),
+    overlay: document.querySelector(".overlay"),
+    modal: document.querySelector(".modal"),
+    btnCloseModal: document.querySelector(".btn-close-modal"),
+    btnCloseNo: document.querySelector(".exitBtnNo"),
+    btnCloseYes: document.querySelector(".exitBtnYes"),
+    collapse: localStorage.getItem("collapse"),
+  };
+  // Бокове меню
+  const nav = function () {
+    // Запамятовування стану згортання
+    if (els.btnToggle && els.sidebar) {
+      els.btnToggle.addEventListener("click", function () {
+        els.sidebar.classList.toggle("collapsed");
+        if (els.sidebar.classList.contains("collapsed")) {
+          localStorage.setItem("collapse", "true");
+        } else {
+          localStorage.setItem("collapse", "false");
+        }
+      });
+
+      // Згортання бокового меню з localStorage
+      if (els.collapse === "false") {
+        els.sidebar.classList.remove("collapsed");
       } else {
-        localStorage.setItem("collapse", "false");
+        els.sidebar.classList.add("collapsed");
       }
-    } else {
-      console.log("Error not working Web storage");
+      setTimeout(() => document.body.classList.remove("stop-animation"), 10);
     }
-    // згортання бокового меню з localStorage
-    if (collapse === "false") {
-      sidebar.classList.remove("collapsed");
-    } else {
-      sidebar.classList.add("collapsed");
-    }
-    setTimeout(() => document.body.classList.remove("stop-animation"), 10);
-  }
-  // додати відображення(підсвітку) перебування на панелі керування
-  const currentPath = window.location.pathname;
-  const links = document.querySelectorAll(".nav-link");
+    // Додати відображення(підсвітку) перебування на панелі керування
+    const currentPath = window.location.pathname;
 
-  links.forEach((lin) => {
-    lin.classList.remove("nav-active");
-
-    if (lin.getAttribute("href") === "#" || !lin.getAttribute("href")) return;
-    if (
-      currentPath === lin.pathname ||
-      (currentPath.includes("journal") && lin.dataset.target === "journal")
-    ) {
-      lin.classList.add("nav-active");
-    }
-  });
-  // реалізувати функціонал виходу з акаунту точніше поки немає бекенда то аналог виходу
-  const exitBtn = document.querySelector(".exit");
-  const overlay = document.querySelector(".overlay");
-  const modal = document.querySelector(".modal");
-  const btnCloseModal = document.querySelector(".btn-close-modal");
-  const btnCloseNo = document.querySelector(".exitBtnNo");
-  const btnCloseYes = document.querySelector(".exitBtnYes");
-
-  const openModal = function () {
-    overlay.classList.remove("hidden");
-    modal.classList.remove("hidden");
+    els.links.forEach((lin) => {
+      lin.classList.remove("nav-active");
+      const href = lin.getAttribute("href");
+      if (href === "#" || !href) return;
+      if (
+        currentPath === lin.pathname ||
+        (currentPath.includes("journal") && lin.dataset.target === "journal")
+      ) {
+        lin.classList.add("nav-active");
+      }
+    });
   };
-  const closeModal = function () {
-    overlay.classList.add("hidden");
-    modal.classList.add("hidden");
-  };
+  // Вихід через модальне вікно
+  const setupExit = function () {
+    const openModal = function () {
+      els.overlay.classList.remove("hidden");
+      els.modal.classList.remove("hidden");
+    };
+    const closeModal = function () {
+      els.overlay.classList.add("hidden");
+      els.modal.classList.add("hidden");
+    };
 
-  overlay.addEventListener("click", closeModal);
-  btnCloseModal.addEventListener("click", closeModal);
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Bacspace" || !modal.classList.contains("hidden")) {
+    els.overlay.addEventListener("click", closeModal);
+    els.btnCloseModal.addEventListener("click", closeModal);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Bacspace" && !els.modal.classList.contains("hidden")) {
+        closeModal();
+      }
+    });
+    els.exitBtn.addEventListener("click", function () {
+      openModal();
+    });
+    els.btnCloseNo.addEventListener("click", function () {
       closeModal();
-    }
-  });
-  exitBtn.addEventListener("click", function () {
-    openModal();
-  });
-  btnCloseNo.addEventListener("click", function () {
-    closeModal();
-  });
-  btnCloseYes.addEventListener("click", function () {
-    closeModal();
-    window.location.href = "/index.html";
-  });
+    });
+    els.btnCloseYes.addEventListener("click", function () {
+      closeModal();
+      window.location.href = "/index.html";
+    });
+  };
+
+  nav();
+  setupExit();
 };

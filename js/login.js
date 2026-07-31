@@ -2,17 +2,19 @@
 
 import { fetchUsers } from "/js/api.js";
 
-const loginForm = document.querySelector("form");
-const email = document.querySelector(".email");
-const password = document.querySelector(".password");
+const els = {
+  loginForm: document.querySelector("form"),
+  email: document.querySelector(".email"),
+  password: document.querySelector(".password"),
+};
 
-loginForm.addEventListener("submit", async function (e) {
+els.loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   // логін за ролями
   // пізніше буде переписуватися
   const user = await fetchUsers();
   console.log(user);
-  const currentUser = user.find((u) => u.login === email.value);
+  const currentUser = user.find((u) => u.login === els.email.value);
   console.log(currentUser);
   if (currentUser) {
     if (currentUser.role === "student") {

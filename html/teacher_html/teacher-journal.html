@@ -54,18 +54,28 @@
             </div>
           </div>
           <div class="table-container">
+            <div class="table-container">
+              <div class="date-panel hidden">
+                <button class="insert-colum-right">
+                  Додати стовпчик справа
+                </button>
+                <button class="insert-topic">Заповнити тему</button>
+              </div>
+
+              <table>
+                <thead>
+                  <tr class="date-container"></tr>
+                </thead>
+
+                <tbody></tbody>
+              </table>
+            </div>
             <table>
               <thead>
                 <tr class="date-container">
                   <!-- <th class="sticky-corner">Учень/День</th>
                   <th>15.05</th> -->
                 </tr>
-                <div class="date-panel hidden">
-                  <button class="insert-colum-right">
-                    Додати стовпчик справа
-                  </button>
-                  <button class="insert-topic">Заповнити тему</button>
-                </div>
               </thead>
               <tbody>
                 <!-- <tr class="row">
@@ -74,7 +84,9 @@
                 </tr> -->
               </tbody>
             </table>
-            <div class="input-topic-lesson hidden">
+          </div>
+          <div class="modal-overlay hidden">
+            <div class="input-topic-lesson">
               <button
                 class="btn-close-lessonModal"
                 aria-label="Закрити модальне вікно"
@@ -97,7 +109,6 @@
               <div class="form-group">
                 <label for="lesson-date">Дата</label>
                 <select name="lesson-date" id="lesson-date" class="select">
-                  <!-- Тут дати будуть підтягуватися через JS -->
                   <option value="" disabled selected>Оберіть дату...</option>
                 </select>
               </div>

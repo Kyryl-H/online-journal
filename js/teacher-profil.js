@@ -13,35 +13,43 @@ renderLayout();
 renderExit();
 initGlobal();
 
-const userId = localStorage.getItem("userId");
-const render = async function () {
-  const teacher = await fetchTeachers();
-  const grop = await fetchGroups();
-  const user = await fetchUsers();
-  const sheduleDate = await fetchSchedule();
+// DOM елементи
+const els = {
+  fullName: document.querySelector(".fullName"),
+  valueGrop: document.querySelector(".group"),
+  gmail: document.querySelector(".gmail"),
+  subjectsTaught: document.querySelector(".subjects-taught"),
+  userId: localStorage.getItem("userId"),
+};
 
-  const [currentTeacher] = teacher.filter(
-    (teacher) => teacher.user_id == userId,
-  );
-  //ПІБ
-  const fullName = document.querySelector(".fullName");
-  fullName.textContent = currentTeacher.full_name;
-  const curatodId = currentTeacher.id;
-  // посада
-  //Група
-  const selectgrop = grop.filter((grop) => grop.curator_id == curatodId);
+const state = {
+  teacher: [],
+  grop: [],
+  user: [],
+  sheduleDate: [],
+  currentTeacher: [],
+};
+// Особиста інформація
+const renderInfo = function () {
+  // ПІБ
+  els.fullName.textContent = state.currentTeacher.full_name;
+  const curatodId = state.currentTeacher.id;
+  // Посада
+
+  // Група
+  const selectgrop = state.grop.filter((grop) => grop.curator_id == curatodId);
   const nameGroup = selectgrop.map((grop) => grop.name);
-  const valueGrop = document.querySelector(".group");
-  valueGrop.textContent = nameGroup.join(", ");
-  //пошта
-  const gmail = document.querySelector(".gmail");
-  const [currentUser] = user.filter((user) => user.id == userId);
-  gmail.textContent = currentUser.login;
-  // предмети які викладаються
-  const subjectsTaught = document.querySelector(".subjects-taught");
+  els.valueGrop.textContent = nameGroup.join(", ");
+  // Пошта
+  const [currentUser] = state.user.filter((user) => user.id == els.userId);
+  els.gmail.textContent = currentUser.login;
+};
+
+// Предмети які викладаються
+const renderLesson = function () {
   const teacherSubjects = {};
-  sheduleDate
-    .filter((lesson) => lesson.teacher_id == currentTeacher.id)
+  state.sheduleDate
+    .filter((lesson) => lesson.teacher_id == state.currentTeacher.id)
     .forEach((lesson) => {
       if (!teacherSubjects[lesson.subject]) {
         teacherSubjects[lesson.subject] = new Set();
@@ -50,7 +58,7 @@ const render = async function () {
     });
   Object.entries(teacherSubjects).forEach(([subjectName, groupIdsSet]) => {
     const groupNamesArray = [...groupIdsSet].map((id) => {
-      const foundGroup = grop.find((g) => g.id === id);
+      const foundGroup = state.grop.find((g) => g.id === id);
 
       return foundGroup ? foundGroup.name : "Невідома група";
     });
@@ -64,8 +72,30 @@ const render = async function () {
       </div>
     `;
 
-    subjectsTaught.insertAdjacentHTML("beforeend", html);
+    els.subjectsTaught.insertAdjacentHTML("beforeend", html);
   });
+};
+
+const render = async function () {
+  const [teacher, grop, user, sheduleDate] = await Promise.all([
+    fetchTeachers(),
+    fetchGroups(),
+    fetchUsers(),
+    fetchSchedule(),
+  ]);
+
+  const [currentTeacher] = teacher.filter(
+    (teacher) => teacher.user_id == els.userId,
+  );
+
+  state.teacher = teacher;
+  state.grop = grop;
+  state.user = user;
+  state.sheduleDate = sheduleDate;
+  state.currentTeacher = currentTeacher;
+
+  renderInfo();
+  renderLesson();
 };
 render();
 // скидання пароля

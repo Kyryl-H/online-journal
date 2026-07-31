@@ -9,17 +9,21 @@ renderExit();
 initGlobal();
 
 const renderLesson = async function () {
-  const btnContainer = document.querySelector(".btn-container");
-  const userId = localStorage.getItem("userId");
+  const els = {
+    btnContainer: document.querySelector(".btn-container"),
+    userId: localStorage.getItem("userId"),
+  };
 
-  const teacher = await fetchTeachers();
-  const grop = await fetchGroups();
-  const shedule = await fetchSchedule();
+  const [teacher, grop, shedule] = await Promise.all([
+    fetchTeachers(),
+    fetchGroups(),
+    fetchSchedule(),
+  ]);
 
   const [currentTeacher] = teacher.filter(
-    (teacher) => teacher.user_id == userId,
+    (teacher) => teacher.user_id == els.userId,
   );
-  // пошук груп з предметами в яких викладається
+  // Пошук груп з предметами в яких викладається
   const lessonSubject = {};
   const lessonAll = shedule
     .filter((lesson) => lesson.teacher_id === currentTeacher.id)
@@ -39,11 +43,11 @@ const renderLesson = async function () {
       const html = `
             <button class="btn" data-lesson-name="${subjectName}" data-group="${[...groupIdsSet]}">${subjectName} ${group}</button>`;
 
-      btnContainer.insertAdjacentHTML("beforeend", html);
+      els.btnContainer.insertAdjacentHTML("beforeend", html);
     });
   });
-  // відкриття журналу з вибраними даними заняття
-  btnContainer.onclick = function (e) {
+  // Відкриття журналу з вибраними даними заняття
+  els.btnContainer.onclick = function (e) {
     let target = e.target;
     if (!target.classList.contains("btn")) return;
     localStorage.setItem("lessonName", e.target.dataset.lessonName);

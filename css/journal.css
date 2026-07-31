@@ -39,6 +39,7 @@
   font-weight: 600;
 }
 .table-container {
+  position: relative;
   max-width: 100%;
   max-height: 60vh;
   overflow: auto;
@@ -218,19 +219,15 @@ td:hover .grade-input {
   box-shadow: 0 0 0 0.2rem var(--brand-color);
 }
 .date-panel {
-  position: absolute;
-  padding: 1rem;
-  border-radius: 0.8rem;
-  z-index: 5;
+  position: fixed;
   display: flex;
   flex-direction: column;
-  max-width: 20rem;
   gap: 1rem;
-  background-color: aquamarine;
-
-  box-shadow: 0 4rem 6rem rgb(0, 0, 0, 0.4);
-  background-color: var(--white);
-  transition: all 0.5s;
+  padding: 1rem;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+  z-index: 200;
 }
 .date-panel button {
   padding: 0.5rem;
@@ -247,7 +244,7 @@ td:hover .grade-input {
   background-color: var(--brand-color);
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 .input-values-error {
   background-color: crimson;
@@ -255,21 +252,14 @@ td:hover .grade-input {
   transition: all 0.5s;
 }
 .input-topic-lesson {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 101;
-  transform: translate(-50%, -50%);
-
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.2);
-  background-color: var(--white, #ffffff);
+  position: relative;
   width: 100%;
   max-width: 45rem;
+  background: var(--white);
   padding: 4rem 5rem;
-  border-radius: var(--border-radius, 12px);
-  color: var(--text-main, #333);
-
-  transition: all 0.3s ease-in-out;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.2);
+  z-index: 1001;
 }
 
 .modal-title {
@@ -360,4 +350,16 @@ td:hover .grade-input {
 
 .modal-save-btn:active {
   transform: translateY(2px);
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 1000;
 }

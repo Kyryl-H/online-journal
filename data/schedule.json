@@ -1,33 +1,36 @@
 [
   {
     "id": 101,
-    "date": "2026-07-30",
+    "date": "2026-07-31",
     "group_id": 1,
     "subject": "Основи програмування",
     "lesson_number": 1,
     "room": "306",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 102,
-    "date": "2026-09-29",
+    "date": "2026-09-30",
     "group_id": 1,
     "subject": "Основи програмування",
     "lesson_number": 2,
     "room": "306",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 103,
-    "date": "2026-09-21",
+    "date": "2026-09-30",
     "group_id": 1,
     "subject": "Алгоритми та структури даних",
     "lesson_number": 1,
     "room": "413",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 104,
@@ -37,17 +40,19 @@
     "lesson_number": 2,
     "room": "205",
     "teacher_id": 2,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 105,
-    "date": "2026-09-20",
+    "date": "2026-07-30",
     "group_id": 1,
     "subject": "Основи програмування",
     "lesson_number": 1,
     "room": "306",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 106,
@@ -57,7 +62,8 @@
     "lesson_number": 3,
     "room": "112",
     "teacher_id": 3,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 107,
@@ -67,7 +73,8 @@
     "lesson_number": 1,
     "room": "306",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 108,
@@ -77,7 +84,8 @@
     "lesson_number": 2,
     "room": "413",
     "teacher_id": 1,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 109,
@@ -87,7 +95,8 @@
     "lesson_number": 1,
     "room": "205",
     "teacher_id": 2,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   },
   {
     "id": 110,
@@ -97,6 +106,7 @@
     "lesson_number": 2,
     "room": "112",
     "teacher_id": 3,
-    "grading_system": 5
+    "grading_system": 5,
+    "topic": ""
   }
 ]
