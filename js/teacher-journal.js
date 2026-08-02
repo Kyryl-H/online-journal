@@ -24,6 +24,7 @@ const state = {
 
 // DOM елементи
 const els = {
+  href: localStorage.getItem("href"),
   lessonName: localStorage.getItem("lessonName"),
   groupId: localStorage.getItem("groupId"),
   selectGroup: document.querySelector(".select-group"),
@@ -275,13 +276,11 @@ const initGradeValidation = function () {
 // Кнопка "Назад"
 const initNavigation = function () {
   els.comeback.addEventListener("click", function () {
-    window.location.href = "/html/teacher_html/journal-main.html";
+    window.location.href = `${els.href}`;
   });
 };
 
-// ==========================
 // Ініціалізація функціоналу сторінки
-// ==========================
 const moreFunctionality = function () {
   initSearch();
   initDatePanel();

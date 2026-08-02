@@ -147,7 +147,7 @@ const renderMessage = function () {
                 <i class="bi bi-exclamation-circle-fill"></i
                 ><span>У вас не заповнений журнал в групі ${nameGroup.name} за ${les.date}</span>
               </div>
-              <div class="message-btn"><button data-lessonName=${les.subject} data-group=${les.group_id}>Перейти до журналу</button></div>
+              <div class="message-btn" data-lesson-name='${les.subject}' data-group='${les.group_id}'><button >Перейти до журналу</button></div>
             </div>
 
 `;
@@ -181,6 +181,7 @@ const render = async function () {
     btn.addEventListener("click", function () {
       localStorage.setItem("lessonName", btn.dataset.lessonName);
       localStorage.setItem("groupId", btn.dataset.group);
+      localStorage.setItem("href", window.location.href);
       window.location.href = "/html/teacher_html/teacher-journal.html";
     });
   });

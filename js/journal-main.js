@@ -52,6 +52,7 @@ const renderLesson = async function () {
     if (!target.classList.contains("btn")) return;
     localStorage.setItem("lessonName", e.target.dataset.lessonName);
     localStorage.setItem("groupId", e.target.dataset.group);
+    localStorage.setItem("href", window.location.href);
     window.location.href = "/html/teacher_html/teacher-journal.html";
   };
 };
