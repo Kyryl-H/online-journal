@@ -1,0 +1,26 @@
+{
+  "name": "online-journal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kyryl-H/online-journal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kyryl-H/online-journal/issues"
+  },
+  "homepage": "https://github.com/Kyryl-H/online-journal#readme",
+  "dependencies": {
+    "body-parser": "^2.3.0",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
