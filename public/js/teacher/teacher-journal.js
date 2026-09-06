@@ -5,9 +5,9 @@ import {
   fetchSchedule,
   fetchStudents,
   fetchGrades,
-} from "./api.js";
-import { renderLayout, renderExit } from "./components.js";
-import { initGlobal } from "./global.js";
+} from "../api.js";
+import { renderLayout, renderExit } from "../components.js";
+import { initGlobal } from "../global.js";
 
 renderLayout();
 renderExit();

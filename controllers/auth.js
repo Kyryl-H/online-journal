@@ -21,19 +21,9 @@ exports.postLogin = (req, res, next) => {
     if (CurrentUser) {
       if (CurrentUser.password === fpassword) {
         if (CurrentUser.role === "teacher") {
-          res.sendFile(
-            path.join(
-              __dirname,
-              "../",
-              "views",
-              "teacher",
-              "teacher-main.html",
-            ),
-          );
+          res.redirect("/teacher/main");
         } else if (CurrentUser.role === "student") {
-          res.sendFile(
-            path.join(__dirname, "../", "views", "student", "main.html"),
-          );
+          res.redirect("/student/main");
         }
       } else {
         return res.status(500).json({ err: "Користувача не знайдено" });

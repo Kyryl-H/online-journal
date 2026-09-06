@@ -1,23 +1,16 @@
 "use strict";
 
-import { fetchGroups, fetchSchedule, fetchTeachers } from "./api.js";
 import { renderLayout, renderExit } from "./components.js";
 import { initGlobal } from "./global.js";
 
-renderLayout();
-renderExit();
-initGlobal();
-
+const currentPath = window.location.pathname;
+const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
 const state = {
-  group: [],
-  schedule: [],
-  teacher: [],
   date: new Date(),
   monday: "",
   sunday: "",
-  groupListLesson: new Map(),
-  currentSchedule: [],
   count: 0,
+  groupListLesson: new Map(),
 };
 
 const els = {
@@ -29,16 +22,15 @@ const els = {
 
 // Селект вибору груп
 // Генерація груп в селекті
-const renderGroupSelect = function () {
-  state.group.forEach(function (g) {
+const renderGroupSelect = function (groups) {
+  groups.forEach(function (g) {
     const html = `<option value="${g.id}">${g.name}</option>`;
     els.groupSelect.insertAdjacentHTML("beforeend", html);
   });
 };
 // Передача вибраної групи на рендеринг
-// Передача вибраної групи на рендеринг
 const setupEventListeners = function () {
-  els.groupSelect.addEventListener("change", function (e) {
+  els.groupSelect.addEventListener("change", async function (e) {
     // Вираховуємо поточний понеділок та неділю від базової дати
     const dayNumber = state.date.getDay();
     const currentDay = dayNumber === 0 ? 7 : dayNumber;
@@ -57,19 +49,46 @@ const setupEventListeners = function () {
     els.comebackBtn.classList.remove("none");
 
     // Генеруємо розклад для нової групи
-    renderWeek(e.target.value, state.monday, state.sunday);
-    renderSchedule();
+    const groupId = e.target.value;
+    const weekSchedule = await fetchWeekSchedule(
+      groupId,
+      state.monday,
+      state.sunday,
+    );
+    const groupedData = renderWeek(weekSchedule);
+    renderSchedule(groupedData);
   });
 };
 
+const fetchWeekSchedule = async function (groupId, mon, sun) {
+  const start = mon.toISOString().split("T")[0];
+  const end = sun.toISOString().split("T")[0];
+
+  // const response = await fetch(`/api/schedule?groupId=${groupId}&start=${start}&end=${end}`);
+  // const data = await response.json();
+
+  return [
+    {
+      id: 101,
+      date: "2026-09-08",
+      subject: "Основи програмування",
+      lesson_number: 2,
+      room: "306",
+      teacherName: "Дашкевич В.В.",
+    },
+    {
+      id: 102,
+      date: "2026-09-09",
+      subject: "Алгоритми",
+      lesson_number: 1,
+      room: "413",
+      teacherName: "Дашкевич В.В.",
+    },
+  ];
+};
+
 // Всі пари на поточний тиждень
-const renderWeek = function (group, mon, sun) {
-  state.currentSchedule = state.schedule.filter(
-    (el) =>
-      el.group_id == group &&
-      new Date(el.date) >= mon &&
-      new Date(el.date) <= sun,
-  );
+const renderWeek = function (fetchWeekSchedule) {
   // Групуємо пари по днях тижнів
   state.groupListLesson.set(1, []);
   state.groupListLesson.set(2, []);
@@ -77,21 +96,18 @@ const renderWeek = function (group, mon, sun) {
   state.groupListLesson.set(4, []);
   state.groupListLesson.set(5, []);
 
-  state.currentSchedule.forEach(function (d) {
-    const dayOfWeek = new Date(d.date).getDay();
+  fetchWeekSchedule.forEach(function (lesson) {
+    const dayOfWeek = new Date(lesson.date).getDay();
     if (state.groupListLesson.has(dayOfWeek)) {
-      state.groupListLesson.get(dayOfWeek).push(d);
+      state.groupListLesson.get(dayOfWeek).push(lesson);
     }
   });
 
-  // Сортуємо порядок пар кожного дня
-  state.groupListLesson.forEach(function (day) {
-    day.sort((a, b) => a.lesson_number - b.lesson_number);
-  });
+  return state.groupListLesson;
 };
 
 // Генерація розкладу
-const renderSchedule = function () {
+const renderSchedule = function (groupListLesson) {
   // Вставляємо пари у відповідні блоки
   if (els.lessonContainer) {
     els.lessonContainer.forEach(function (container) {
@@ -113,18 +129,13 @@ const renderSchedule = function () {
       dayBlock.insertAdjacentHTML("beforeend", html);
     } else {
       lessonsList.forEach(function (les) {
-        const [currentTeacher] = state.teacher.filter(
-          (t) => t.id == les.teacher_id,
-        );
-        const teacherName = currentTeacher.full_name.split(" ");
-
         const html = `
                       <div class="lesson-card">
                   <div class="lesson-number">${les.lesson_number}</div>
 
                   <div class="lesson-info">
                     <div class="lesson-name">${les.subject}</div>
-                    <div class="lesson-teacher">${teacherName[0]} ${teacherName[1][0]}.${teacherName[2][0]}. </div>
+                    <div class="lesson-teacher">${les.teacherName}. </div>
                   </div>
 
                   <div class="lesson-room">${les.room}</div>
@@ -154,43 +165,70 @@ const weeksBtn = function () {
 
   checkButtons();
 
-  els.nextBtn.addEventListener("click", function () {
+  els.nextBtn.addEventListener("click", async function () {
     if (state.count < 4) {
       state.count++;
       state.monday.setDate(state.monday.getDate() + 7);
       state.sunday.setDate(state.sunday.getDate() + 7);
 
-      renderWeek(els.groupSelect.value, state.monday, state.sunday);
-      renderSchedule();
-
+      const weekSchedule = await fetchWeekSchedule(
+        els.groupSelect.value,
+        state.monday,
+        state.sunday,
+      );
+      const groupedData = renderWeek(weekSchedule);
+      renderSchedule(groupedData);
       checkButtons();
     }
   });
 
-  els.comebackBtn.addEventListener("click", function () {
+  els.comebackBtn.addEventListener("click", async function () {
     if (state.count > -4) {
       state.count--;
       state.monday.setDate(state.monday.getDate() - 7);
       state.sunday.setDate(state.sunday.getDate() - 7);
 
-      renderWeek(els.groupSelect.value, state.monday, state.sunday);
-      renderSchedule();
-
+      const weekSchedule = await fetchWeekSchedule(
+        els.groupSelect.value,
+        state.monday,
+        state.sunday,
+      );
+      const groupedData = renderWeek(weekSchedule);
+      renderSchedule(groupedData);
       checkButtons();
     }
   });
 };
 const render = async function () {
-  const [group, schedule, teacher] = await Promise.all([
-    fetchGroups(),
-    fetchSchedule(),
-    fetchTeachers(),
-  ]);
+  renderLayout(currentRole);
+  renderExit();
+  initGlobal();
 
-  state.group = group;
-  state.schedule = schedule;
-  state.teacher = teacher;
-
+  // const groupRespons = await fetch("/api/group");
+  // const groups = await groupRespons.json();
+  const mockGroups = [
+    { id: 1, name: "П-13" },
+    { id: 2, name: "К-49" },
+    { id: 3, name: "С-15" },
+  ];
+  const mockScheduleResponse = [
+    {
+      id: 101,
+      date: "2026-09-08",
+      subject: "Основи програмування",
+      lesson_number: 2,
+      room: "306",
+      teacherName: "Дашкевич В.В.",
+    },
+    {
+      id: 102,
+      date: "2026-09-09",
+      subject: "Алгоритми та структури даних",
+      lesson_number: 1,
+      room: "413",
+      teacherName: "Дашкевич В.В.",
+    },
+  ];
   const dayNumber = state.date.getDay();
   const currentDay = dayNumber === 0 ? 7 : dayNumber;
 
@@ -202,10 +240,15 @@ const render = async function () {
   state.sunday = new Date(state.monday);
   state.sunday.setDate(state.sunday.getDate() + 6);
 
-  renderGroupSelect();
+  renderGroupSelect(mockGroups);
   setupEventListeners();
-  renderWeek(els.groupSelect.value, state.monday, state.sunday);
-  renderSchedule();
+  const initialSchedule = await fetchWeekSchedule(
+    els.groupSelect.value,
+    state.monday,
+    state.sunday,
+  );
+  const initialGroupedData = renderWeek(initialSchedule);
+  renderSchedule(initialGroupedData);
   weeksBtn();
 };
 render();

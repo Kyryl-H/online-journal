@@ -1,8 +1,8 @@
 "use strict";
 
-import { fetchTeachers, fetchGroups, fetchSchedule } from "./api.js";
-import { renderLayout, renderExit } from "./components.js";
-import { initGlobal } from "./global.js";
+import { fetchTeachers, fetchGroups, fetchSchedule } from "../api.js";
+import { renderLayout, renderExit } from "../components.js";
+import { initGlobal } from "../global.js";
 
 renderLayout();
 renderExit();

@@ -6,9 +6,9 @@ import {
   fetchStudents,
   fetchGrades,
   fetchSchedule,
-} from "./api.js";
-import { renderLayout, renderExit } from "./components.js";
-import { initGlobal } from "./global.js";
+} from "../api.js";
+import { renderLayout, renderExit } from "../components.js";
+import { initGlobal } from "../global.js";
 
 const state = {
   curatorId: null,
