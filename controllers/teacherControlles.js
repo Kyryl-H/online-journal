@@ -20,6 +20,9 @@ exports.getTeacherProfil = (req, res, next) => {
 exports.getTeacherJournalMain = (req, res, next) => {
   createRout(res, "journal-main.html");
 };
+exports.getTeacherJournal = (req, res, next) => {
+  createRout(res, "teacher-journal.html");
+};
 exports.getTeacherSchedule = (req, res, next) => {
   createRout(res, "teacher-schedule.html");
 };

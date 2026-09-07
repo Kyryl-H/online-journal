@@ -200,7 +200,7 @@ const weeksBtn = function () {
   });
 };
 const render = async function () {
-  renderLayout(currentRole);
+  renderLayout(currentRole, true);
   renderExit();
   initGlobal();
 

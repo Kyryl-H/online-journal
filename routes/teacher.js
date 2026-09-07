@@ -7,6 +7,7 @@ const Controllers = require("../controllers/teacherControlles");
 rout.get("/teacher/main", Controllers.getTeacherMain);
 rout.get("/teacher/profil", Controllers.getTeacherProfil);
 rout.get("/teacher/journal/main", Controllers.getTeacherJournalMain);
+rout.get("/teacher/teacher-journal", Controllers.getTeacherJournal);
 rout.get("/teacher/schedule", Controllers.getTeacherSchedule);
 rout.get("/teacher/profil-curator", Controllers.getTeacherProfilCurator);
 

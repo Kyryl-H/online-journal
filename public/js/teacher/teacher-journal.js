@@ -1,17 +1,7 @@
 "use strict";
 
-import {
-  fetchGroups,
-  fetchSchedule,
-  fetchStudents,
-  fetchGrades,
-} from "../api.js";
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
-
-renderLayout();
-renderExit();
-initGlobal();
 
 const state = {
   group: [],
@@ -290,17 +280,11 @@ const moreFunctionality = function () {
   initNavigation();
 };
 const render = async function () {
-  const [group, schedule, student, grades] = await Promise.all([
-    fetchGroups(),
-    fetchSchedule(),
-    fetchStudents(),
-    fetchGrades(),
-  ]);
-
-  state.group = group;
-  state.schedule = schedule;
-  state.student = student;
-  state.grades = grades;
+  const path = window.location.pathname;
+  const currentRole = path.includes("teacher") ? "teacher" : "student";
+  renderLayout(currentRole, true);
+  renderExit();
+  initGlobal();
 
   renderMonthHeader();
   renderTable();

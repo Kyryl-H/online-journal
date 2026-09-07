@@ -1,23 +1,11 @@
 "use strict";
 
-import {
-  fetchTeachers,
-  fetchGroups,
-  fetchStudents,
-  fetchGrades,
-  fetchSchedule,
-} from "../api.js";
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
 
 const state = {
-  curatorId: null,
-  groups: [],
-  students: [],
-  grades: [],
-  schedule: [],
-  currentGroupStudents: [],
   chartInstance: null,
+  currentSudents: [],
 };
 
 //DOM Елементи
@@ -37,93 +25,33 @@ const els = {
 };
 
 // ЛІВА КАРТКА: Список студентів
-const renderStudentList = (groupId, searchQuery = "") => {
+const renderStudentList = (students, searchQuery = "") => {
   els.studentContainer.innerHTML = "";
 
-  // Фільтруємо студентів для поточної групи та зберігаємо в State для правої картки
-  state.currentGroupStudents = state.students
-    .filter((s) => s.group_id == groupId)
-    .filter((s) =>
-      s.full_name.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort((a, b) => a.full_name.localeCompare(b.full_name, "uk"));
+  // Пошук студентів
+  students = students
+    .filter((s) => s.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.fullName.localeCompare(b.fullName, "uk"));
 
   // Малюємо HTML
-  state.currentGroupStudents.forEach((stud, i) => {
+  students.forEach((stud, i) => {
     const html = `
       <div class="card-row">
         <div class="student-number">${i + 1}</div>
         <div class="icon-box"><i class="bi bi-person"></i></div>
-        <div class="full-name">${stud.full_name}</div>
+        <div class="full-name">${stud.fullName}</div>
       </div>`;
     els.studentContainer.insertAdjacentHTML("beforeend", html);
   });
 };
 
 // ПРАВА КАРТКА: Статистика
-const renderStatistics = (groupId) => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = 8; // Вересень
-
-  const startOfMonth = new Date(year, month, 1);
-  const endOfMonth = new Date(year, month + 1, 0);
-
-  // Фільтруємо розклад
-  const scheduleIdsOfMonth = state.schedule
-    .filter((lesson) => lesson.group_id == groupId)
-    .filter((lesson) => {
-      const lessonDate = new Date(lesson.date);
-      return lessonDate >= startOfMonth && lessonDate <= endOfMonth;
-    })
-    .map((lesson) => lesson.id);
-
-  const studentIds = state.currentGroupStudents.map((st) => st.id);
-
-  // Знаходимо оцінки потрібних студентів за потрібні заняття
-  const currentGrades = state.grades.filter(
-    (g) =>
-      scheduleIdsOfMonth.includes(g.schedule_id) &&
-      studentIds.includes(g.student_id),
-  );
-
-  let passes = 0;
-  let gradesSum = 0;
-  let dataGradeDiagram = [0, 0, 0, 0];
-
-  // Рахуємо пропуски, середній бал та дані для графіка
-  currentGrades.forEach((g) => {
-    if (g.value.toLowerCase() === "н") {
-      passes++;
-    } else {
-      const val = Number(g.value);
-      gradesSum += val;
-
-      const lesson = state.schedule.find((les) => les.id == g.schedule_id);
-
-      if (lesson.grading_system === 5) {
-        if (val === 5) dataGradeDiagram[0]++;
-        else if (val === 4) dataGradeDiagram[1]++;
-        else if (val === 3) dataGradeDiagram[2]++;
-        else if (val === 2) dataGradeDiagram[3]++;
-      } else if (lesson.grading_system === 12) {
-        if (val >= 10) dataGradeDiagram[0]++;
-        else if (val >= 7) dataGradeDiagram[1]++;
-        else if (val >= 4) dataGradeDiagram[2]++;
-        else if (val >= 1) dataGradeDiagram[3]++;
-      }
-    }
-  });
-
+const renderStatistics = (statistics) => {
   // Оновлюємо UI
-  els.groupPasses.textContent = passes;
-  const average =
-    currentGrades.length > passes
-      ? (gradesSum / (currentGrades.length - passes)).toFixed(2)
-      : 0;
-  els.groupGrades.textContent = average;
+  els.groupPasses.textContent = statistics.totalPasses;
+  els.groupGrades.textContent = statistics.averageGrade;
 
-  renderChart(dataGradeDiagram);
+  renderChart(statistics.diagramData);
 };
 
 // ДІАГРАМА
@@ -168,19 +96,46 @@ const renderChart = (dataArr) => {
   els.legendDiagram.style.top = ` ${rect.top + window.scrollY + 35}px`;
   els.legendDiagram.style.left = `${rect.right + window.scrollX + 10}px`;
 };
+// Завантаження даних
+const loadDashboardForGroup = async function (groupId) {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = 8; // Вересень
+
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0);
+
+  // const responsStudent = await fetch(`/api/curator-profil?${currentGroup}&start=${startOfMonth}&end=${endOfMonth}`);
+  // const students = await responsStudent.json();
+  const mockDataStudent = {
+    students: [
+      { id: 101, fullName: "Астонюк Віталій Володимирович" },
+      { id: 102, fullName: "Беляк Олександра Григорієвна" },
+      { id: 103, fullName: "Волощенко Сергій Миколайович" },
+      { id: 104, fullName: "Годлевський Кирил Васильович" },
+    ],
+    statistics: {
+      averageGrade: 4.2,
+      totalPasses: 6,
+      diagramData: [4, 5, 2, 6],
+    },
+  };
+  state.currentSudents = mockDataStudent.students;
+  renderStudentList(state.currentSudents);
+  renderStatistics(mockDataStudent.statistics);
+};
 
 // СЛУХАЧІ ПОДІЙ
 const setupEventListeners = () => {
   // Вибір групи
   els.select.addEventListener("change", (e) => {
     els.searchInput.value = "";
-    renderStudentList(e.target.value);
-    renderStatistics(e.target.value);
+    loadDashboardForGroup(e.target.value);
   });
 
   // Пошук
   els.searchInput.addEventListener("input", (e) => {
-    renderStudentList(els.select.value, e.target.value);
+    renderStudentList(state.currentSudents, e.target.value);
   });
 
   // Підсвітка секторів при наведенні на легенду
@@ -214,30 +169,21 @@ const setupEventListeners = () => {
 
 // ГОЛОВНА ФУНКЦІЯ: Запуск додатку
 const initApp = async () => {
-  renderLayout();
+  const currentPath = window.location.pathname;
+  const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
+  renderLayout(currentRole, true);
   renderExit();
   initGlobal();
 
   const userId = localStorage.getItem("userId");
+  // const responsGroup = await fetch(`/api/curator-profil?${userId}`);
+  // const groups = await responsGroup.json();
+  const mockDataGroups = [
+    { id: 1, name: "П-13" },
+    { id: 3, name: "С-15" },
+  ];
 
-  const [teachers, groups, students, grades, schedule] = await Promise.all([
-    fetchTeachers(),
-    fetchGroups(),
-    fetchStudents(),
-    fetchGrades(),
-    fetchSchedule(),
-  ]);
-
-  state.groups = groups;
-  state.students = students;
-  state.grades = grades;
-  state.schedule = schedule;
-
-  const currentCurator = teachers.find((t) => t.user_id == userId);
-  state.curatorId = currentCurator.id;
-
-  const curatorGroups = groups.filter((g) => g.curator_id == state.curatorId);
-  curatorGroups.forEach((g) => {
+  mockDataGroups.forEach((g) => {
     els.select.insertAdjacentHTML(
       "beforeend",
       `<option value="${g.id}">${g.name}</option>`,
@@ -248,8 +194,7 @@ const initApp = async () => {
   setupEventListeners();
 
   if (els.select.value) {
-    renderStudentList(els.select.value);
-    renderStatistics(els.select.value);
+    loadDashboardForGroup(els.select.value);
   }
 };
 initApp();
