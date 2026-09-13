@@ -27,7 +27,6 @@ export const renderLayout = function (role, isCurator = false) {
       </div>
       <ul class="nav-list-top">
         <li class="nav-el-top"><div class="el"><i class="bi bi-bell-fill"></i></div></li>
-        <li class="nav-el-top"><div class="el"><i class="bi bi-gear-fill"></i></div></li>
       </ul>
     </header>
 

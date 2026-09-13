@@ -3,20 +3,21 @@
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
 
+const bla = new URLSearchParams(window.location.search);
+
 const state = {
-  group: [],
+  groupId: bla.get("groupID"),
+  lessonName: bla.get("lessonName"),
+  path: bla.get("path"),
+
   schedule: [],
   student: [],
   grades: [],
   date: new Date(),
   month: "",
 };
-
-// DOM елементи
+// DOM елемен
 const els = {
-  href: localStorage.getItem("href"),
-  lessonName: localStorage.getItem("lessonName"),
-  groupId: localStorage.getItem("groupId"),
   selectGroup: document.querySelector(".select-group"),
   comeback: document.querySelector(".comeback"),
   monthContainer: document.querySelector(".month-container"),
@@ -34,11 +35,10 @@ const els = {
 };
 
 // Рендеринг блока з місяцями
-const renderMonthHeader = function () {
+const renderMonthHeader = function (lessonName, groupName) {
   state.month = state.date.getMonth();
 
-  const currentGroup = state.group.filter((g) => g.id == els.groupId);
-  els.selectGroup.textContent = `${els.lessonName} ${currentGroup[0].name}`;
+  els.selectGroup.textContent = `${lessonName} ${groupName}`;
   // Налаштування вибору місяця
   if (state.month === 6 || state.month === 7) {
     state.month = 8;
@@ -48,7 +48,7 @@ const renderMonthHeader = function () {
   const monthActiv = document.querySelector(`[data-number="${state.month}"]`);
   monthActiv.classList.add("monthbtn-active");
   // Навігація по місяцях
-  els.monthContainer.onclick = function (e) {
+  els.monthContainer.onclick = async function (e) {
     let target = e.target;
     if (!target.classList.contains("monthbtn")) return;
     state.month = Number(target.dataset.number);
@@ -56,6 +56,12 @@ const renderMonthHeader = function () {
       btn.classList.remove("monthbtn-active");
     });
     target.classList.add("monthbtn-active");
+    // const respons = fetch(
+    //   `/api/journal?groupId=${state.groupId}&lessonName=${state.lessonName}&month=${state.month}`,
+    // );
+    // const data = await respons.json();
+    // state.schedule = data.lesson;
+    // state.grades = data.grades;
     renderTable();
   };
 };
@@ -66,22 +72,7 @@ const renderTable = function (searchQuery = "") {
   els.dateContainer.innerHTML = "";
   els.tbody.innerHTML = "";
   // Обрахунок знаходження поточного місяця
-  const years = state.date.getFullYear();
-  const beginningOfTheMonth = new Date(years, state.month, 1);
-  const endOfTheMonth = new Date(years, state.month + 1, 0);
-  const currentmonth = state.schedule
-    .filter(
-      (elment) =>
-        elment.group_id == els.groupId && elment.subject == els.lessonName,
-    )
-    .filter((elment) => {
-      const [years, monthD, day] = elment.date.split("-");
-      return (
-        new Date(years, Number(monthD) - 1, day) >= beginningOfTheMonth &&
-        new Date(years, Number(monthD) - 1, day) <= endOfTheMonth
-      );
-    });
-  if (currentmonth.length === 0) {
+  if (state.schedule.length === 0) {
     els.dateContainer.insertAdjacentHTML(
       "beforeend",
       `<tr><td id="date-null" class="date-null">У цьому місяці занять немає</td></tr>`,
@@ -93,29 +84,22 @@ const renderTable = function (searchQuery = "") {
     "beforeend",
     `<th class="sticky-corner">Учень/День</th>`,
   );
-  currentmonth.forEach(function (lesson) {
+  state.schedule.forEach(function (lesson) {
     const [years, monthD, day] = lesson.date.split("-");
     const html = `<th>${day}/${monthD}</th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
-  // Генерування студентів поточної групи
-  let studentByGroup = state.student.filter(
-    (stud) => stud.group_id == els.groupId,
-  );
   // Пошук студентів
-  studentByGroup = studentByGroup.filter((s) =>
-    s.full_name.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filterStudent = state.student.filter((s) =>
+    s.fullName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  // Сортування студентів по алфавіту
-  studentByGroup.sort((a, b) => a.full_name.localeCompare(b.full_name, "uk"));
-
-  studentByGroup.forEach(function (student, i) {
+  filterStudent.forEach(function (student, i) {
     let html = `                <tr class="row">
-                        <td><div>${i + 1}.${student.full_name}</div></td>
+                        <td><div>${i + 1}.${student.fullName}</div></td>
                       
       `;
     // Якщо є оцінка в базі інпут малюємо з оцінкою, немає малюємо пустий інпут
-    currentmonth.forEach(function (lesson) {
+    state.schedule.forEach(function (lesson) {
       const gradesValue = state.grades.find(
         (stud) =>
           stud.student_id == student.id && stud.schedule_id == lesson.id,
@@ -232,11 +216,6 @@ const initColumnActions = function () {
 
 // Перевірка введених оцінок
 const initGradeValidation = function () {
-  const currentLesson = state.schedule.find(
-    (lesson) =>
-      lesson.group_id == els.groupId && lesson.subject == els.lessonName,
-  );
-
   document.addEventListener("input", function (e) {
     if (!e.target.classList.contains("grade-input")) return;
 
@@ -247,26 +226,20 @@ const initGradeValidation = function () {
       value === "" ||
       value === "н" ||
       value === "Н" ||
-      (Number(value) >= 1 && Number(value) <= currentLesson.grading_system);
+      (Number(value) >= 1 && Number(value) <= state.schedule[0].grading_system);
 
-    if (valid) {
+    if (!valid) {
+      input.classList.add("input-values-error");
+    } else {
       input.classList.remove("input-values-error");
-      return;
     }
-
-    input.classList.add("input-values-error");
-
-    setTimeout(function () {
-      input.value = "";
-      input.classList.remove("input-values-error");
-    }, 1500);
   });
 };
 
 // Кнопка "Назад"
 const initNavigation = function () {
   els.comeback.addEventListener("click", function () {
-    window.location.href = `${els.href}`;
+    window.location.href = `${state.path}`;
   });
 };
 
@@ -286,7 +259,38 @@ const render = async function () {
   renderExit();
   initGlobal();
 
-  renderMonthHeader();
+  const mockData = {
+    lessonName: "Алгоритми та структура даних",
+    nameGroup: "П-13",
+    lesson: [
+      {
+        id: 101,
+        date: "2026-07-31",
+        subject: "Основи програмування",
+        grading_system: 5,
+      },
+    ],
+    student: [{ id: 1, fullName: "Годлевський Кирил Васильович" }],
+    grades: [
+      { id: 501, student_id: 1, schedule_id: 101, value: "5" },
+      { id: 502, student_id: 2, schedule_id: 101, value: "4" },
+      { id: 503, student_id: 3, schedule_id: 101, value: "н" },
+      { id: 504, student_id: 4, schedule_id: 101, value: "5" },
+      { id: 505, student_id: 5, schedule_id: 101, value: "3" },
+      { id: 506, student_id: 6, schedule_id: 101, value: "4" },
+      { id: 507, student_id: 1, schedule_id: 102, value: "5" },
+      { id: 508, student_id: 2, schedule_id: 102, value: "5" },
+      { id: 509, student_id: 3, schedule_id: 102, value: "4" },
+      { id: 510, student_id: 7, schedule_id: 102, value: "5" },
+      { id: 511, student_id: 8, schedule_id: 102, value: "н" },
+    ],
+  };
+
+  state.schedule = mockData.lesson;
+  state.student = mockData.student;
+  state.grades = mockData.grades;
+
+  renderMonthHeader(mockData.lessonName, mockData.nameGroup);
   renderTable();
   moreFunctionality();
 };
