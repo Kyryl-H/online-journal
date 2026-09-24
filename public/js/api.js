@@ -1,50 +1,59 @@
 "use strict";
 
-export const fetchGrades = async function () {
+// ТИМЧАСОВІ ЗМІННІ (видалимо, коли з'явиться JWT)
+const tempUserId = 1;
+const tempRole = "teacher";
+
+export const showErrorToast = function (message) {
+  const errorDiv = document.createElement("div");
+
+  errorDiv.classList.add("error-msg");
+
+  errorDiv.textContent = message;
+
+  document.body.appendChild(errorDiv);
+
+  setTimeout(() => {
+    errorDiv.remove();
+  }, 5000);
+};
+
+export const fetchScheduleForDay = async function () {
   try {
-    const response = await fetch("/api/grades");
+    const response = await fetch("/api/teacher/scheduleForDay", {
+      method: "GET",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Помилка сервера");
+    }
+
     return await response.json();
   } catch (err) {
-    console.error(`Помилка завантаження оцінок: ${err}`);
+    console.error(err);
+    showErrorToast(err.message);
+    return null;
   }
 };
-export const fetchGroups = async function () {
+
+export const fetchTeacherProfile = async function () {
   try {
-    const response = await fetch("/api/groups");
-    return await response.json();
+    const respons = await fetch("/api/teacher/profil", {
+      method: "GET",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+      },
+    });
+    return await respons.json();
   } catch (err) {
-    console.error(`Помилка завантаження груп: ${err}`);
-  }
-};
-export const fetchSchedule = async function () {
-  try {
-    const response = await fetch("/api/schedule");
-    return await response.json();
-  } catch (err) {
-    console.error(`Помилка завантаження розкладу: ${err}`);
-  }
-};
-export const fetchStudents = async function () {
-  try {
-    const response = await fetch("/api/students");
-    return await response.json();
-  } catch (err) {
-    console.error(`Помилка завантаження студентів: ${err}`);
-  }
-};
-export const fetchTeachers = async function () {
-  try {
-    const response = await fetch("/api/teachers");
-    return await response.json();
-  } catch (err) {
-    console.error(`Помилка завантаження викладачів: ${err}`);
-  }
-};
-export const fetchUsers = async function () {
-  try {
-    const response = await fetch("/api/users");
-    return await response.json();
-  } catch (err) {
-    console.error(`Помилка завантаження користувачів: ${err}`);
+    console.error(err);
+    showErrorToast(err.message);
+    return null;
   }
 };

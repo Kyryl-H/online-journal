@@ -2,6 +2,7 @@
 
 import { renderLayout, renderExit } from "./components.js";
 import { initGlobal } from "./global.js";
+import { fetchTeacherProfile } from "./api.js";
 
 const currentPath = window.location.pathname;
 const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
@@ -17,7 +18,7 @@ const els = {
 };
 
 // Особиста інформація
-const renderInfo = function (fullName, grops, email, curator) {
+const renderInfo = function (fullName, groups, email, curator) {
   // ПІБ
   els.fullName.textContent = fullName;
   // Посада / Куратор
@@ -25,7 +26,7 @@ const renderInfo = function (fullName, grops, email, curator) {
     els.curator.textContent = curator;
   }
   // Група
-  els.valueGrop.textContent = grops.join(", ");
+  els.valueGrop.textContent = groups.join(", ");
   // Пошта
   els.gmail.textContent = email;
 };
@@ -37,7 +38,7 @@ const renderLesson = function (subject) {
       <div class="info-row">
         <div class="icon-box"><i class="bi bi-database"></i></div>
         <div class="info-label">${s.name}:</div>
-        <div class="info-value">${s.grop}</div>
+        <div class="info-value">${s.group}</div>
       </div>
     `;
 
@@ -71,49 +72,37 @@ const renderStatistic = function (statistics) {
 };
 
 const render = async function () {
-  // const userId = localStorage.getItem("userId");
-  // const respons = await fetch(`/api/profil/${currentRole}/${userId}`);
-  // const data = await respons.json();
-  const mockData =
-    currentRole === "teacher"
-      ? {
-          role: "teacher",
-          isCurator: true,
-          fullName: "Дашкевич Володимр Володимирович",
-          group: ["P-13", "K-49"],
-          email: "v.kdskfdkm.gmail.com",
-          subject: [{ name: "Алгоритми й структура даних", grop: "P-13" }],
-        }
-      : {
-          role: "student",
-          isCurator: false,
-          fullName: "Годлевський Кирил Васильович",
-          curator: "Імператриця",
-          group: ["P-43"],
-          email: "h.sfdsdfd.gmail.com",
-          statistics: {
-            overallAcademicPerformance: 4.9,
-            monthAcademicPerformance: 32,
-            totalNumberOfPasses: 4.5,
-            monthNumberOfPasses: 8,
-          },
-        };
+  const data = await fetchTeacherProfile();
+  // const data =
+  //     {
+  //         role: "student",
+  //         isCurator: false,
+  //         fullName: "Годлевський Кирил Васильович",
+  //         curator: "Імператриця",
+  //         group: ["P-43"],
+  //         email: "h.sfdsdfd.gmail.com",
+  //         statistics: {
+  //           overallAcademicPerformance: 4.9,
+  //           monthAcademicPerformance: 32,
+  //           totalNumberOfPasses: 4.5,
+  //           monthNumberOfPasses: 8,
+  //         }
 
-  renderLayout(currentRole, mockData.isCurator);
+  renderLayout(currentRole, data.isCurator);
   renderExit();
   initGlobal();
 
   renderInfo(
-    mockData.fullName,
-    mockData.group,
-    mockData.email,
-    currentRole === "student" ? mockData.curator : "",
+    data.fullName,
+    data.group,
+    data.email,
+    currentRole === "student" ? data.curator : "",
   );
 
   if (currentRole === "teacher") {
-    renderLesson(mockData.subject);
+    renderLesson(data.subject);
   } else if (currentRole === "student") {
-    renderStatistic(mockData.statistics);
+    renderStatistic(data.statistics);
   }
 };
 render();

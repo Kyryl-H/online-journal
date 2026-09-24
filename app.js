@@ -16,6 +16,7 @@ const Group = require("./models/group");
 const Grades = require("./models/grades");
 const Schedule = require("./models/schedule");
 const Subject = require("./models/subject");
+const { stat } = require("fs");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -25,7 +26,14 @@ app.use(teacherRout);
 app.use(studentRout);
 
 app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, "views", "404.html"));
+  res.sendFile(path.join(__dirname, "public", "404.html"));
+});
+
+app.use((error, req, res, next) => {
+  console.log(error);
+  const status = error.statusCode || 500;
+  const message = error.message;
+  res.status(status).json({ message: message });
 });
 // asisting(звязки)
 User.hasOne(Student);
@@ -48,7 +56,7 @@ Subject.hasMany(Schedule);
 Schedule.belongsTo(Subject);
 
 sequelize
-  .sync({ force: true })
+  .sync()
   .then((result) => {
     app.listen(3000);
   })

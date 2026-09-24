@@ -5,18 +5,18 @@ export const renderLayout = function (role, isCurator = false) {
 
   if (role === "teacher") {
     navLinks = `
-        <li><a href="/teacher/main" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
-        <li><a href="/teacher/profil" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Особистий кабінет</span></a></li>
-        <li><a href="/teacher/journal/main" data-target="journal" class="nav-link"><i class="bi bi-book icon"></i><span class="link-name">Журнал</span></a></li>
-        <li><a href="/teacher/schedule" data-target="schedule" class="nav-link"><i class="bi bi-journal-text icon"></i><span class="link-name">Розклад</span></a></li>`;
+        <li><a href="/teacher/teacher-main.html" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
+        <li><a href="/teacher/teacher-profil.html" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Особистий кабінет</span></a></li>
+        <li><a href="/teacher/journal-main.html" data-target="journal" class="nav-link"><i class="bi bi-book icon"></i><span class="link-name">Журнал</span></a></li>
+        <li><a href="/teacher/teacher-schedule.html" data-target="schedule" class="nav-link"><i class="bi bi-journal-text icon"></i><span class="link-name">Розклад</span></a></li>`;
     if (isCurator) {
-      navLinks += `<li><a href="/teacher/profil-curator" data-target="profil-curator" class="nav-link"><i class="bi bi-people icon"></i><span class="link-name">Кабінет куратора</span></a></li>`;
+      navLinks += `<li><a href="/teacher/teacher-profil-curator.html" data-target="profil-curator" class="nav-link"><i class="bi bi-people icon"></i><span class="link-name">Кабінет куратора</span></a></li>`;
     }
   } else if (role === "student") {
     navLinks = `
-        <li><a href="/student/main" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
-        <li><a href="/student/profil" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Мій профіль</span></a></li>
-        <li><a href="/student/schedule" data-target="schedule" class="nav-link"><i class="bi bi-journal-text icon"></i><span class="link-name">Розклад</span></a></li>
+        <li><a href="/student/student-main.html" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
+        <li><a href="/student/student-profil.html" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Мій профіль</span></a></li>
+        <li><a href="/student/student-schedule.html" data-target="schedule" class="nav-link"><i class="bi bi-journal-text icon"></i><span class="link-name">Розклад</span></a></li>
     `;
   }
 

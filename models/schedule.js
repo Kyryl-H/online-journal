@@ -17,6 +17,10 @@ const Schedule = sequelize.define("schedule", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  room: {
+    type: Sequelize.STRING,
+    allowNull: true,
+  },
   topic: {
     type: Sequelize.TEXT,
   },

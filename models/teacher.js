@@ -13,6 +13,11 @@ const Teacher = sequelize.define("teacher", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  isCurator: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
 });
 
 module.exports = Teacher;

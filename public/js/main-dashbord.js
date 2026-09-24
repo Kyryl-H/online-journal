@@ -1,6 +1,7 @@
 "use strict";
 import { renderLayout, renderLessonCard, renderExit } from "./components.js";
 import { initGlobal } from "./global.js";
+import { fetchScheduleForDay } from "./api.js";
 
 const els = {
   greeting: document.querySelector(".greeting"),
@@ -33,47 +34,41 @@ const renderHeader = function (fullName) {
 };
 
 const initTeacherPage = async function () {
-  // const userId = localStorage.getItem("userId");
-  // const respons = await fetch(`/api/main/${currentRole}/${userId}`);
-  // const data = await respons.json();
-  const mockData =
-    currentRole === "teacher"
-      ? {
-          role: "teacher",
-          isCurator: true,
-          fullName: "Дашкевич Володимир",
-          schedule: [
-            {
-              time: "8:30-9:50",
-              subject: "Основи програмування",
-              room: "403",
-              groupName: "П-23",
-            },
-          ],
-        }
-      : {
-          role: "student",
-          isCurator: false,
-          fullName: "Годлевський Кирил",
-          schedule: [
-            {
-              time: "8:30-9:50",
-              subject: "Основи програмування",
-              room: "403",
-              teacherName: "Дашкевич В.",
-            },
-          ],
-        };
+  const data = await fetchScheduleForDay();
+  //     : {
+  //         role: "student",
+  //         isCurator: false,
+  //         fullName: "Годлевський Кирил",
+  //         schedule: [
+  //           {
+  //             time: "8:30-9:50",
+  //             subject: "Основи програмування",
+  //             room: "403",
+  //             teacherName: "Дашкевич В.",
+  //           },
+  //         ],
+  //       };
+  if (!data) {
+    renderLayout(currentRole, false);
+    renderExit();
+    initGlobal();
 
-  renderLayout(mockData.role, mockData.isCurator);
+    els.greeting.textContent = "Помилка завантаження даних";
+    return;
+  }
+  renderLayout(data.role, data.isCurator);
   renderExit();
   initGlobal();
 
-  renderHeader(mockData.fullName);
-
-  mockData.schedule.forEach((lesson) => {
-    renderLessonCard(lesson, mockData.role, els.scheduleGrid);
-  });
+  renderHeader(data.fullName);
+  if (data.schedule.length !== 0) {
+    data.schedule.forEach((lesson) => {
+      renderLessonCard(lesson, data.role, els.scheduleGrid);
+    });
+  } else {
+    const html = `<div class="schedule-card"><h1 >${data.message}</h1></div>`;
+    els.scheduleGrid.insertAdjacentHTML("afterbegin", html);
+  }
 };
 
 initTeacherPage();

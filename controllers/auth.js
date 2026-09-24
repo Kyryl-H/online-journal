@@ -3,11 +3,11 @@ const fs = require("fs");
 const { json } = require("body-parser");
 
 exports.getLogin = (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "views", "login.html"));
+  res.sendFile(path.join(__dirname, "../", "public", "login.html"));
 };
 
 exports.getRootLogin = (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "views", "login.html"));
+  res.sendFile(path.join(__dirname, "../", "public", "login.html"));
 };
 exports.postLogin = (req, res, next) => {
   const { fgmail, fpassword } = req.body;
@@ -21,9 +21,9 @@ exports.postLogin = (req, res, next) => {
     if (CurrentUser) {
       if (CurrentUser.password === fpassword) {
         if (CurrentUser.role === "teacher") {
-          res.redirect("/teacher/main");
+          res.redirect("/teacher/teacher-main.html");
         } else if (CurrentUser.role === "student") {
-          res.redirect("/student/main");
+          res.redirect("/student/student-main.html");
         }
       } else {
         return res.status(500).json({ err: "Користувача не знайдено" });
