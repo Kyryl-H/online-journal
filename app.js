@@ -19,6 +19,7 @@ const Subject = require("./models/subject");
 const { stat } = require("fs");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(authRout);

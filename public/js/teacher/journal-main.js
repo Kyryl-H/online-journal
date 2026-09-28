@@ -2,12 +2,10 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
-
-const currentPath = window.location.pathname;
-const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
+import { fetchTeacherJournalMain } from "../api.js";
 
 const renderLesson = async function () {
-  renderLayout(currentRole, true);
+  renderLayout("teacher", true);
   renderExit();
   initGlobal();
 
@@ -16,15 +14,9 @@ const renderLesson = async function () {
     userId: localStorage.getItem("userId"),
   };
 
-  // const respons = await fetch(`/api/journalMain/${currentRole}/${userId}`);
-  // const data = respons.json();
-  const mockData = [
-    { subjectName: "Алгоритми та структури даних", group: "P-13", groupID: 1 },
-    { subjectName: "Бази даних", group: "k-49", groupID: 2 },
-    { subjectName: "Графічний дизайн", group: "S-15", groupID: 3 },
-  ];
+  const data = await fetchTeacherJournalMain();
   // Пошук груп з предметами в яких викладається
-  mockData.forEach((group) => {
+  data.subjects.forEach((group) => {
     const html = `
             <button class="btn" data-lesson-name="${group.subjectName}" data-group="${group.groupID}">${group.subjectName} ${group.group}</button>`;
 
@@ -32,7 +24,7 @@ const renderLesson = async function () {
   });
 
   // Відкриття журналу з вибраними даними заняття
-  els.btnContainer.onclick = function (e) {
+  els.btnContainer.onclick = async function (e) {
     let target = e.target;
     if (!target.classList.contains("btn")) return;
 
@@ -41,7 +33,7 @@ const renderLesson = async function () {
     const path = window.location.pathname;
 
     const safeLessonName = encodeURIComponent(lessonName);
-    window.location.href = `/teacher/teacher-journal?groupID=${groupId}&lessonName=${safeLessonName}&path=${path}`;
+    window.location.href = `/teacher/teacher-journal.html?groupId=${groupId}&lessonName=${safeLessonName}&path=${path}`;
   };
 };
 renderLesson();

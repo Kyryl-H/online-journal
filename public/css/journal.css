@@ -120,6 +120,21 @@ thead th.sticky-corner {
   color: var(--white);
   background-color: var(--brand-color);
 }
+.saveData:disabled,
+.saveData.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveData:disabled:hover,
+.saveData.disabled:hover,
+.saveData:disabled:active,
+.saveData.disabled:active {
+  cursor: not-allowed;
+  background-color: transparent;
+  color: var(--text-muted);
+  transform: none;
+}
 tbody tr:hover td {
   background-color: var(--table-line-hover);
 }

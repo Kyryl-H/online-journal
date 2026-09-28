@@ -2,13 +2,15 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
+import { fetchJournalData, postGrades, showToast } from "../api.js";
 
-const bla = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
 
 const state = {
-  groupId: bla.get("groupID"),
-  lessonName: bla.get("lessonName"),
-  path: bla.get("path"),
+  groupId: urlParams.get("groupId"),
+  lessonName: urlParams.get("lessonName"),
+  path: urlParams.get("path"),
+  newGrades: [],
 
   schedule: [],
   student: [],
@@ -32,6 +34,8 @@ const els = {
   inputTopicLesson: document.querySelector(".input-topic-lesson"),
   insertTopicBtn: document.querySelector(".insert-topic"),
   modalOverlay: document.querySelector(".modal-overlay"),
+  saveData: document.querySelector(".saveData"),
+  printOutbtn: document.querySelector(".print-outbtn"),
 };
 
 // Рендеринг блока з місяцями
@@ -52,17 +56,26 @@ const renderMonthHeader = function (lessonName, groupName) {
     let target = e.target;
     if (!target.classList.contains("monthbtn")) return;
     state.month = Number(target.dataset.number);
-    els.monthBtn.forEach((btn) => {
-      btn.classList.remove("monthbtn-active");
-    });
-    target.classList.add("monthbtn-active");
-    // const respons = fetch(
-    //   `/api/journal?groupId=${state.groupId}&lessonName=${state.lessonName}&month=${state.month}`,
-    // );
-    // const data = await respons.json();
-    // state.schedule = data.lesson;
-    // state.grades = data.grades;
-    renderTable();
+    // Потрібно оптимізувати
+    const data = await fetchJournalData(
+      state.groupId,
+      state.lessonName,
+      state.month,
+      true,
+    );
+    if (data) {
+      state.schedule = data.schedule;
+      state.grades = data.grades;
+
+      els.monthBtn.forEach((btn) => {
+        btn.classList.remove("monthbtn-active");
+      });
+
+      target.classList.add("monthbtn-active");
+      renderTable(els.searchInput.value);
+    } else {
+      return;
+    }
   };
 };
 
@@ -85,7 +98,10 @@ const renderTable = function (searchQuery = "") {
     `<th class="sticky-corner">Учень/День</th>`,
   );
   state.schedule.forEach(function (lesson) {
-    const [years, monthD, day] = lesson.date.split("-");
+    const d = new Date(lesson.date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const monthD = String(d.getMonth() + 1).padStart(2, "0");
+
     const html = `<th>${day}/${monthD}</th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
@@ -101,13 +117,13 @@ const renderTable = function (searchQuery = "") {
     // Якщо є оцінка в базі інпут малюємо з оцінкою, немає малюємо пустий інпут
     state.schedule.forEach(function (lesson) {
       const gradesValue = state.grades.find(
-        (stud) =>
-          stud.student_id == student.id && stud.schedule_id == lesson.id,
+        (grade) =>
+          grade.studentId == student.id && grade.scheduleId == lesson.id,
       );
       if (gradesValue) {
-        html += `<td><input type="text" class="grade-input" value="${gradesValue.value}"/></td>`;
+        html += `<td><input type="text" class="grade-input" data-studentId=${student.id} data-scheduleId = ${lesson.id} value="${gradesValue.value}"/></td>`;
       } else {
-        html += `<td><input type="text" class="grade-input" /></td>`;
+        html += `<td><input type="text" class="grade-input" data-studentId=${student.id} data-scheduleId = ${lesson.id} /></td>`;
       }
     });
     html += "</tr>";
@@ -216,7 +232,7 @@ const initColumnActions = function () {
 
 // Перевірка введених оцінок
 const initGradeValidation = function () {
-  document.addEventListener("input", function (e) {
+  document.addEventListener("change", function (e) {
     if (!e.target.classList.contains("grade-input")) return;
 
     const input = e.target;
@@ -226,16 +242,55 @@ const initGradeValidation = function () {
       value === "" ||
       value === "н" ||
       value === "Н" ||
-      (Number(value) >= 1 && Number(value) <= state.schedule[0].grading_system);
+      (Number(value) >= 1 && Number(value) <= state.subject.gradingSystem);
 
     if (!valid) {
       input.classList.add("input-values-error");
     } else {
       input.classList.remove("input-values-error");
     }
+
+    if (els.tbody.querySelector(".input-values-error")) {
+      els.saveData.disabled = true;
+    } else {
+      els.saveData.disabled = false;
+    }
+
+    if (valid) {
+      if (
+        state.newGrades.find(
+          (v) =>
+            v.studentId === input.dataset.studentid &&
+            v.scheduleId === input.dataset.scheduleid,
+        )
+      ) {
+        const i = state.newGrades.findIndex(
+          (v) =>
+            v.studentId === input.dataset.studentid &&
+            v.scheduleId === input.dataset.scheduleid,
+        );
+        state.newGrades[i].value = value;
+      } else {
+        state.newGrades.push({
+          value: `${value}`,
+          studentId: input.dataset.studentid,
+          scheduleId: input.dataset.scheduleid,
+        });
+        console.log(state.newGrades);
+      }
+    }
   });
 };
-
+// Відправка оцінок в БД
+els.saveData.addEventListener("click", async function () {
+  try {
+    const gradesPush = await postGrades(state.newGrades);
+    state.newGrades = [];
+    showToast(gradesPush.message, "info-msg");
+  } catch (err) {
+    console.error("Помилка при збереженні:", err);
+  }
+});
 // Кнопка "Назад"
 const initNavigation = function () {
   els.comeback.addEventListener("click", function () {
@@ -253,44 +308,33 @@ const moreFunctionality = function () {
   initNavigation();
 };
 const render = async function () {
-  const path = window.location.pathname;
-  const currentRole = path.includes("teacher") ? "teacher" : "student";
-  renderLayout(currentRole, true);
+  if (!state.groupId || !state.lessonName) {
+    console.error("Помилка: не передано параметри групи");
+    window.location.href = "/teacher/journal-main.html";
+    return;
+  }
+
+  const data = await fetchJournalData(
+    state.groupId,
+    state.lessonName,
+    state.date.getMonth(),
+  );
+
+  if (!data) {
+    console.log("Помилка завантаження даних");
+    window.location.href = "/teacher/journal-main.html";
+  }
+
+  renderLayout("teacher", true);
   renderExit();
   initGlobal();
 
-  const mockData = {
-    lessonName: "Алгоритми та структура даних",
-    nameGroup: "П-13",
-    lesson: [
-      {
-        id: 101,
-        date: "2026-07-31",
-        subject: "Основи програмування",
-        grading_system: 5,
-      },
-    ],
-    student: [{ id: 1, fullName: "Годлевський Кирил Васильович" }],
-    grades: [
-      { id: 501, student_id: 1, schedule_id: 101, value: "5" },
-      { id: 502, student_id: 2, schedule_id: 101, value: "4" },
-      { id: 503, student_id: 3, schedule_id: 101, value: "н" },
-      { id: 504, student_id: 4, schedule_id: 101, value: "5" },
-      { id: 505, student_id: 5, schedule_id: 101, value: "3" },
-      { id: 506, student_id: 6, schedule_id: 101, value: "4" },
-      { id: 507, student_id: 1, schedule_id: 102, value: "5" },
-      { id: 508, student_id: 2, schedule_id: 102, value: "5" },
-      { id: 509, student_id: 3, schedule_id: 102, value: "4" },
-      { id: 510, student_id: 7, schedule_id: 102, value: "5" },
-      { id: 511, student_id: 8, schedule_id: 102, value: "н" },
-    ],
-  };
+  state.schedule = data.schedule;
+  state.student = data.student;
+  state.grades = data.grades;
+  state.subject = data.subject;
 
-  state.schedule = mockData.lesson;
-  state.student = mockData.student;
-  state.grades = mockData.grades;
-
-  renderMonthHeader(mockData.lessonName, mockData.nameGroup);
+  renderMonthHeader(state.subject.name, data.subject.group.name);
   renderTable();
   moreFunctionality();
 };

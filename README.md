@@ -115,16 +115,16 @@ http://localhost:3000
 
 ## 🚧 Plans for the Future (Roadmap)
 
-- [ ] Integrating a real relational database (**PostgreSQL / MySQL**).
+- [x] Integrating a real relational database (**PostgreSQL / MySQL**).
 - [ ] Creating a **RESTful API** for client-server communication.
-- [ ] Importing test JSON data into the database.
+- [x] Importing test JSON data into the database.
 - [ ] Implement CRUD operations for core entities.
 - [ ] Set up a secure authentication system.
 - [ ] Hash passwords.
 - [ ] Implement JWT or session-based authentication.
 - [ ] Middleware for verifying roles and access rights.
 - [ ] Full-featured electronic grade book.
-- [ ] Adding and editing grades.
+- [x] Adding and editing grades.
 - [ ] Attendance tracking.
 - [ ] Expanding the functionality of the user dashboard.
 - [ ] Optimizing and refactoring CSS.

@@ -2,9 +2,7 @@
 
 import { renderLayout, renderExit } from "./components.js";
 import { initGlobal } from "./global.js";
-
-const currentPath = window.location.pathname;
-const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
+import { getGroup, getSchedule } from "./api.js";
 const state = {
   date: new Date(),
   monday: "",
@@ -64,27 +62,9 @@ const fetchWeekSchedule = async function (groupId, mon, sun) {
   const start = mon.toISOString().split("T")[0];
   const end = sun.toISOString().split("T")[0];
 
-  // const response = await fetch(`/api/schedule?groupId=${groupId}&start=${start}&end=${end}`);
-  // const data = await response.json();
-
-  return [
-    {
-      id: 101,
-      date: "2026-09-08",
-      subject: "Основи програмування",
-      lesson_number: 2,
-      room: "306",
-      teacherName: "Дашкевич В.В.",
-    },
-    {
-      id: 102,
-      date: "2026-09-09",
-      subject: "Алгоритми",
-      lesson_number: 1,
-      room: "413",
-      teacherName: "Дашкевич В.В.",
-    },
-  ];
+  const res = await getSchedule(groupId, start, end);
+  console.log(res);
+  return res;
 };
 
 // Всі пари на поточний тиждень
@@ -131,11 +111,11 @@ const renderSchedule = function (groupListLesson) {
       lessonsList.forEach(function (les) {
         const html = `
                       <div class="lesson-card">
-                  <div class="lesson-number">${les.lesson_number}</div>
+                  <div class="lesson-number">${les.lessonNumber}</div>
 
                   <div class="lesson-info">
-                    <div class="lesson-name">${les.subject}</div>
-                    <div class="lesson-teacher">${les.teacherName}. </div>
+                    <div class="lesson-name">${les.subjectName}</div>
+                    <div class="lesson-teacher">${les.teacherFullName}. </div>
                   </div>
 
                   <div class="lesson-room">${les.room}</div>
@@ -200,17 +180,12 @@ const weeksBtn = function () {
   });
 };
 const render = async function () {
-  renderLayout(currentRole, true);
+  renderLayout("teacher", true);
   renderExit();
   initGlobal();
 
-  // const groupRespons = await fetch("/api/group");
-  // const groups = await groupRespons.json();
-  const mockGroups = [
-    { id: 1, name: "П-13" },
-    { id: 2, name: "К-49" },
-    { id: 3, name: "С-15" },
-  ];
+  const groups = await getGroup();
+  console.log(groups);
   const mockScheduleResponse = [
     {
       id: 101,
@@ -240,7 +215,7 @@ const render = async function () {
   state.sunday = new Date(state.monday);
   state.sunday.setDate(state.sunday.getDate() + 6);
 
-  renderGroupSelect(mockGroups);
+  renderGroupSelect(groups.group);
   setupEventListeners();
   const initialSchedule = await fetchWeekSchedule(
     els.groupSelect.value,
