@@ -1,5 +1,45 @@
 "use strict";
 
+const MOBILE_QUERY = "(max-width: 768px)";
+
+// Бургер-меню, затемнення, Esc та кнопки з data-action="logout"
+const initLayoutEvents = function () {
+  const body = document.body;
+  const burger = document.querySelector("[data-sidebar-toggle]");
+
+  const setSidebar = function (open) {
+    body.classList.toggle("sidebar-open", open);
+    burger?.setAttribute("aria-expanded", String(open));
+    const icon = burger?.querySelector(".bi");
+    icon?.classList.toggle("bi-list", !open);
+    icon?.classList.toggle("bi-x-lg", open);
+  };
+
+  burger?.addEventListener("click", () =>
+    setSidebar(!body.classList.contains("sidebar-open")),
+  );
+  document
+    .querySelector(".sidebar-backdrop")
+    ?.addEventListener("click", () => setSidebar(false));
+  document
+    .querySelectorAll(".sidebar .nav-link")
+    .forEach((link) => link.addEventListener("click", () => setSidebar(false)));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setSidebar(false);
+  });
+  window.matchMedia(MOBILE_QUERY).addEventListener("change", (e) => {
+    if (!e.matches) setSidebar(false);
+  });
+
+  // Кнопка «Вийти» поза навігацією (профіль на мобільному) відкриває
+  // ту саму модалку, що й пункт у sidebar
+  document.addEventListener("click", (e) => {
+    if (e.target.closest('[data-action="logout"]')) {
+      document.querySelector(".exit .nav-link")?.click();
+    }
+  });
+};
+
 export const renderLayout = function (role, isCurator = false) {
   let navLinks = "";
 
@@ -23,11 +63,70 @@ export const renderLayout = function (role, isCurator = false) {
   const html = `
     <header class="header">
       <div class="logo-header">
+        <button class="icon-btn burger-btn" data-sidebar-toggle aria-label="Меню" aria-expanded="false">
+          <i class="bi bi-list"></i>
+        </button>
         <i class="bi bi-book"></i><h4>Онлайн журнал</h4>
       </div>
       <ul class="nav-list-top">
-        <li class="nav-el-top"><div class="el"><i class="bi bi-bell-fill"></i></div></li>
-      </ul>
+        <li>
+          <button class="icon-btn" data-theme-toggle aria-label="Змінити тему">
+            <i class="bi bi-moon-stars"></i>
+          </button>
+        </li>
+        <li class="nav-el-top notif">
+          <div class="el" aria-haspopup="true" aria-label="Повідомлення">
+            <i class="bi bi-bell-fill"></i>
+            <span class="notif-badge">5</span>
+          </div>
+
+          <div class="notif-dropdown" role="dialog" aria-label="Повідомлення">
+            <div class="notif-header">
+              <h3 class="notif-title">Повідомлення</h3>
+              <span class="notif-count">5</span>
+            </div>
+
+            <ul class="notif-list">
+              <li class="notif-item notif-item--unread">
+                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div class="notif-body">
+                  <p class="notif-text">Не заповнено тему до уроку: Вища математика, П-13</p>
+                  <span class="notif-time">Сьогодні, 10:30</span>
+                </div>
+              </li>
+              <li class="notif-item notif-item--unread">
+                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div class="notif-body">
+                  <p class="notif-text">Не заповнено тему до уроку: Фізика, П-11</p>
+                  <span class="notif-time">Сьогодні, 08:45</span>
+                </div>
+              </li>
+              <li class="notif-item">
+                <div class="notif-icon notif-icon--info"><i class="bi bi-arrow-left-right"></i></div>
+                <div class="notif-body">
+                  <p class="notif-text">Заміна в розкладі: Інформатика, ауд. 214, П-13</p>
+                  <span class="notif-time">Вчора, 16:20</span>
+                </div>
+              </li>
+              <li class="notif-item">
+                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div class="notif-body">
+                  <p class="notif-text">Не виставлено оцінки: Програмування, П-12</p>
+                  <span class="notif-time">26 вер, 14:10</span>
+                </div>
+              </li>
+              <li class="notif-item">
+                <div class="notif-icon notif-icon--info"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="notif-body">
+                  <p class="notif-text">Оцінки за вересень збережено</p>
+                  <span class="notif-time">25 вер, 12:05</span>
+                </div>
+              </li>
+            </ul>
+
+            <button class="notif-clear" type="button">Позначити всі як прочитані</button>
+          </div>
+        </li>      </ul>
     </header>
 
     <nav class="sidebar">
@@ -39,8 +138,11 @@ export const renderLayout = function (role, isCurator = false) {
         </li>
       </ul>
     </nav>
+    <div class="sidebar-backdrop"></div>
   `;
   document.body.insertAdjacentHTML("afterbegin", html);
+  if (window.syncThemeButtons) window.syncThemeButtons();
+  initLayoutEvents();
 };
 
 export const renderLessonCard = function (lesson, role, containerElement) {

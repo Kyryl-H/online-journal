@@ -1,77 +1,81 @@
-.card {
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
+/* Шапка розкладу */
 .schedule-header {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   padding: 1rem;
-}
-.selector-label {
-  font-size: 2.4rem;
-  font-weight: bold;
-  margin: 0 1rem;
 }
 .group-selector {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+.selector-label {
+  margin: 0 1rem;
+  font-size: 2.4rem;
+  font-weight: bold;
+}
 .week-navigation {
-  width: 100%;
   display: flex;
   justify-content: flex-start;
+  width: 100%;
 }
 .current-week {
+  margin: 1rem 0;
+  padding: 0.8rem 1.6rem;
   font-weight: bold;
   color: var(--text-muted);
-  padding: 0.8rem 1.6rem;
-  margin: 1rem 0;
 }
+
+/* Сітка днів */
 .schedule-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(35rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(35rem, 100%), 1fr));
   gap: 2rem;
+  align-items: start;
   padding: 1rem 2rem;
   overflow-wrap: break-word;
-  align-items: start;
+}
+.day-column {
+  width: 100%;
+  max-width: 35rem;
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+}
+
+/* Рядки «день» і «урок» мають однакову триколонкову сітку */
+.day-header,
+.lesson-card {
+  display: grid;
+  grid-template-columns: 4rem 1fr 6rem;
+  box-sizing: border-box;
 }
 .day-header {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 4rem 1fr 6rem;
-  text-align: center;
   align-items: center;
   font-size: 1.4rem;
+  text-align: center;
 }
-.lesson-card {
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 4rem 1fr 6rem;
-  border-top: 0.1rem solid var(--border-line);
-  align-items: stretch;
+.day-header h5,
+.day-header h3,
+.day-header span {
+  padding: 0 0.5rem;
 }
 .day-name {
   padding: 1rem;
-  border-left: 0.1rem solid var(--border-line);
-  border-right: 0.1rem solid var(--border-line);
+  border-inline: 0.1rem solid var(--border-line);
+}
+.lesson-card {
+  align-items: stretch;
+  border-top: 0.1rem solid var(--border-line);
 }
 .lesson-info {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 0.5rem;
   padding: 1rem;
-  border-left: 0.1rem solid var(--border-line);
-  border-right: 0.1rem solid var(--border-line);
-  align-items: stretch;
-}
-.day-column {
-  width: 35rem;
-  border: 0.1rem solid var(--border-line);
-  border-radius: var(--border-radius);
+  border-inline: 0.1rem solid var(--border-line);
 }
 .lesson-number,
 .lesson-room {
@@ -79,45 +83,37 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  width: auto;
 }
 .lesson-name,
 .lesson-teacher {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  text-align: center;
-  width: auto;
   font-size: 1.4rem;
+  text-align: center;
   word-break: break-word;
 }
 .lesson-name {
   font-weight: 500;
 }
 .lesson-teacher {
+  padding-top: 0.5rem;
   font-size: 1.3rem;
   color: var(--text-muted);
   border-top: 0.1rem dashed var(--border-line);
-  padding-top: 0.5rem;
-}
-.day-header h5,
-.day-header h3,
-.day-header span {
-  padding: 0 0.5rem;
 }
 .replacement {
   background-color: var(--replacement);
 }
 
-.lesson-card.lesson-card--empty {
+/* Порожній день */
+.lesson-card--empty {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 12rem;
   background-color: transparent;
 }
-
 .empty-info {
   display: flex;
   flex-direction: column;
@@ -125,18 +121,34 @@
   gap: 1rem;
   color: var(--text-muted);
 }
-
 .empty-info i {
   font-size: 2.4rem;
   opacity: 0.6;
 }
-
 .empty-info p {
-  margin: 0;
   font-size: 1.5rem;
   font-weight: 500;
 }
-.none {
-  display: none;
-  pointer-events: none;
+
+@media (max-width: 768px) {
+  .schedule-header {
+    padding: 1rem 0;
+  }
+  .group-selector {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  .selector-label {
+    margin: 0;
+    font-size: 2rem;
+  }
+  .schedule-grid {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+  .day-column {
+    max-width: none;
+  }
 }

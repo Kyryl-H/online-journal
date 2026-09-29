@@ -126,10 +126,10 @@ http://localhost:3000
 - [ ] Full-featured electronic grade book.
 - [x] Adding and editing grades.
 - [ ] Attendance tracking.
-- [ ] Expanding the functionality of the user dashboard.
-- [ ] Optimizing and refactoring CSS.
-- [ ] Full responsiveness for mobile devices.
-- [ ] UX/UI improvements.
+- [x] Expanding the functionality of the user dashboard.
+- [x] Optimizing and refactoring CSS.
+- [x] Full responsiveness for mobile devices.
+- [x] UX/UI improvements.
 - [ ] Testing and error handling.
 - [ ] REST API documentation.
 - [ ] Preparing the application for deployment.

@@ -1,44 +1,237 @@
+/* ==========================================================================
+   Змінні (єдине місце, де живуть кольори й тіні — тут же буде темна тема)
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  /* Бренд і акценти */
+  --brand-color: #7bb8a9;
+  --brand-ring: rgb(123 184 169 / 0.2);
+  --primary-color: #0f766e;
+  --primary-hover: #14877e;
+  --primary-ring: rgb(15 118 110 / 0.1);
+  --primary-shadow: 0 0.5rem 1.5rem rgb(15 118 110 / 0.3);
+  --error-color: #e74c3c;
+  --error-overlay: rgb(231 76 60 / 0.1);
+  --danger-color: crimson;
+  --active-card: rgb(16 205 16);
+  --replacement: goldenrod;
+
+  /* Поверхні */
+  --sidebar: #f3f4f6;
+  --card-bg: #ffffff;
+  --table-line-hover: #f8fafc;
+  --hover-overlay: rgb(15 23 42 / 0.06);
+  --message-color: #fce3cd;
+  --exclamation-color: #ee9b60;
+
+  /* Текст */
+  --text-main: #334155;
+  --text-muted: #64748b;
+  --on-accent: #ffffff; /* текст на кольоровому фоні (бренд, кнопки, бейджі) */
+
+  /* Лінії й рамки */
+  --border-line: #e2e8f0;
+  --input-border: #d1d5db;
+  --header-border: #9ae6d3;
+
+  /* Оверлеї */
+  --overlay-bg: rgb(0 0 0 / 0.5);
+  --modal-overlay-bg: rgb(0 0 0 / 0.4);
+
+  /* Тіні */
+  --shadow-sm: 0 0.2rem 0.8rem rgb(0 0 0 / 0.08);
+  --shadow-toast: 0 0.4rem 1rem rgb(0 0 0 / 0.15);
+  --shadow-popup: 0 1rem 3rem rgb(0 0 0 / 0.2);
+  --shadow-dialog: 0 2rem 5rem rgb(0 0 0 / 0.2);
+  --shadow-modal: 0 4rem 6rem rgb(0 0 0 / 0.3);
+
+  /* Діаграма оцінок */
+  --chart-perfect: #0f766e;
+  --chart-good: #2563eb;
+  --chart-satisfactory: #f59e0b;
+  --chart-unsatisfactory: #0ea5e9;
+
+  /* Сторінка входу */
+  --login-bg-start: #000000;
+  --login-bg-mid: #1a1a2e;
+  --login-text: #ffffff;
+  --login-border: rgb(255 255 255 / 0.2);
+  --login-shadow: 0 0 1rem rgb(0 0 0 / 0.2);
+  --login-btn-bg: #ffffff;
+  --login-btn-bg-hover: #e2e8f0;
+  --login-btn-text: #334155;
+
+  /* Розміри й анімації */
+  --border-radius: 1rem;
+  --radius-sm: 0.8rem;
+  --radius-xs: 0.6rem;
+  --transition-speed: 0.2s ease;
+}
+
+/* ==========================================================================
+   Темна тема
+   Значення у двох блоках нижче мають бути ІДЕНТИЧНІ:
+   1) авто-режим за системою (якщо користувач не обрав тему вручну),
+   2) ручний вибір через <html data-theme="dark">.
+   Змінні --on-accent, --white та --login-* не перевизначаються навмисно.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    /* Бренд і акценти (трохи приглушені, щоб білий текст на них читався) */
+    --brand-color: #35806f;
+    --brand-ring: rgb(94 190 170 / 0.28);
+    --primary-color: #0d9488;
+    --primary-hover: #12a294;
+    --primary-ring: rgb(45 212 191 / 0.18);
+    --primary-shadow: 0 0.5rem 1.5rem rgb(13 148 136 / 0.35);
+    --error-color: #ef5350;
+    --error-overlay: rgb(239 83 80 / 0.15);
+    --active-card: #16a34a;
+    --replacement: #78590f;
+
+    /* Поверхні: фон сторінки < картки < підсвітка рядка */
+    --sidebar: #0f172a;
+    --card-bg: #1e293b;
+    --table-line-hover: #273549;
+    --hover-overlay: rgb(255 255 255 / 0.1);
+    --message-color: #4a3728;
+    --exclamation-color: #f0a56d;
+
+    /* Текст */
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+
+    /* Лінії й рамки */
+    --border-line: #334155;
+    --input-border: #475569;
+    --header-border: #2a6b5d;
+
+    /* Оверлеї */
+    --overlay-bg: rgb(2 6 23 / 0.7);
+    --modal-overlay-bg: rgb(2 6 23 / 0.65);
+
+    /* Тіні (на темному фоні мають бути густішими) */
+    --shadow-sm: 0 0.2rem 0.8rem rgb(0 0 0 / 0.3);
+    --shadow-toast: 0 0.4rem 1rem rgb(0 0 0 / 0.4);
+    --shadow-popup: 0 1rem 3rem rgb(0 0 0 / 0.5);
+    --shadow-dialog: 0 2rem 5rem rgb(0 0 0 / 0.5);
+    --shadow-modal: 0 4rem 6rem rgb(0 0 0 / 0.6);
+
+    /* Діаграма оцінок */
+    --chart-perfect: #14b8a6;
+    --chart-good: #3b82f6;
+    --chart-satisfactory: #fbbf24;
+    --chart-unsatisfactory: #38bdf8;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Бренд і акценти (трохи приглушені, щоб білий текст на них читався) */
+  --brand-color: #35806f;
+  --brand-ring: rgb(94 190 170 / 0.28);
+  --primary-color: #0d9488;
+  --primary-hover: #12a294;
+  --primary-ring: rgb(45 212 191 / 0.18);
+  --primary-shadow: 0 0.5rem 1.5rem rgb(13 148 136 / 0.35);
+  --error-color: #ef5350;
+  --error-overlay: rgb(239 83 80 / 0.15);
+  --active-card: #16a34a;
+  --replacement: #78590f;
+
+  /* Поверхні: фон сторінки < картки < підсвітка рядка */
+  --sidebar: #0f172a;
+  --card-bg: #1e293b;
+  --table-line-hover: #273549;
+  --hover-overlay: rgb(255 255 255 / 0.1);
+  --message-color: #4a3728;
+  --exclamation-color: #f0a56d;
+
+  /* Текст */
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+
+  /* Лінії й рамки */
+  --border-line: #334155;
+  --input-border: #475569;
+  --header-border: #2a6b5d;
+
+  /* Оверлеї */
+  --overlay-bg: rgb(2 6 23 / 0.7);
+  --modal-overlay-bg: rgb(2 6 23 / 0.65);
+
+  /* Тіні (на темному фоні мають бути густішими) */
+  --shadow-sm: 0 0.2rem 0.8rem rgb(0 0 0 / 0.3);
+  --shadow-toast: 0 0.4rem 1rem rgb(0 0 0 / 0.4);
+  --shadow-popup: 0 1rem 3rem rgb(0 0 0 / 0.5);
+  --shadow-dialog: 0 2rem 5rem rgb(0 0 0 / 0.5);
+  --shadow-modal: 0 4rem 6rem rgb(0 0 0 / 0.6);
+
+  /* Діаграма оцінок */
+  --chart-perfect: #14b8a6;
+  --chart-good: #3b82f6;
+  --chart-satisfactory: #fbbf24;
+  --chart-unsatisfactory: #38bdf8;
+}
+
+/* ==========================================================================
+   Базові стилі
+   ========================================================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  color: var(--text-main);
 }
 html {
   font-size: 62.5%;
 }
-:root {
-  --brand-color: #7bb8a9;
-  --sidebar: #f3f4f6;
-  --text-main: #334155;
-  --text-muted: #64748b;
-  --card-bg: #ffffff;
-  --message-color: #fce3cd;
-  --exclamation-color: #ee9b60;
-  --border-radius: 1rem;
-  --active-card: rgb(16, 205, 16);
-  --border-line: #e2e8f0;
-  --white: #fff;
-  --table-line-hover: #f8fafc;
-  --replacement: goldenrod;
-  --primary-color: #0f766e;
-  --primary-hover: #115e59;
-  --transition-speed: 0.2s ease;
+body {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.6rem;
+  color: var(--text-main);
+  background-color: var(--sidebar);
+  overflow-x: hidden; /* сторінка ніколи не скролиться вбік */
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+a {
+  color: inherit;
+  text-decoration: none;
 }
 ul {
   list-style: none;
 }
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
 
-body {
-  background-color: var(--sidebar);
-  color: var(--text-main);
-  font-size: 1.6rem;
+/* ==========================================================================
+   Утиліти
+   ========================================================================== */
+.hidden,
+.none {
+  display: none !important;
 }
 .stop-animation * {
   transition: none !important;
   animation: none !important;
 }
+
+/* ==========================================================================
+   Розмітка
+   ========================================================================== */
 .container {
   width: 100%;
   max-width: 150rem;
@@ -47,22 +240,91 @@ body {
 .main-content {
   min-height: 100vh;
   padding: 8rem 3rem 3rem;
+  margin-left: 25rem;
+  transition: all 0.4s ease;
 }
-/* Бокова панель керування */
+.sidebar.collapsed ~ .main-content {
+  margin-left: 7rem;
+}
+
+/* ==========================================================================
+   Верхня панель
+   ========================================================================== */
+.header {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 6rem;
+  background-color: var(--brand-color);
+  border-bottom: 0.1rem solid var(--header-border);
+}
+.logo-header {
+  display: flex;
+  align-items: center;
+  min-width: 4rem;
+  padding: 0 2rem;
+  font-size: 3rem;
+}
+.logo-header h4 {
+  margin: 0 2rem;
+}
+.nav-list-top {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 4rem;
+  font-size: 3rem;
+  line-height: 1;
+}
+.nav-list-top li {
+  display: flex;
+  align-items: center;
+}
+
+.nav-el-top {
+  padding: 0 2rem;
+  overflow: hidden;
+}
+.nav-el-top .el {
+  display: flex;
+  align-items: center;
+}
+
+/* Кнопки-іконки (верхня панель, бокова панель) */
+.icon-btn,
+.toggle-btn {
+  min-width: 4rem;
+  font-size: 3rem;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-speed);
+}
+.icon-btn:hover,
+.toggle-btn:hover {
+  background-color: var(--hover-overlay);
+}
+
+/* ==========================================================================
+   Бокова панель
+   ========================================================================== */
 .sidebar {
   position: fixed;
   top: 6rem;
   left: 0;
   z-index: 100;
-  width: 25rem;
-  height: calc(100vh - 6rem);
-  background-color: var(--sidebar);
-  color: var(--text-main);
-  transition: all 0.4s ease;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 25rem;
+  height: calc(100vh - 6rem);
+  overflow: hidden;
+  background-color: var(--sidebar);
   border-right: 0.1rem solid var(--text-muted);
+  transition: all 0.4s ease;
 }
 .sidebar.collapsed {
   width: 7rem;
@@ -70,197 +332,185 @@ body {
 .sidebar a {
   display: flex;
   align-items: center;
-  color: var(--text-main);
-  text-decoration: none;
   padding: 1.5rem;
   white-space: nowrap;
 }
 .sidebar .icon {
-  color: var(--text-main);
   display: flex;
   justify-content: center;
   min-width: 4rem;
   font-size: 3rem;
 }
-.sidebar .link-name {
-  margin-left: 1rem;
-  font-size: 1.8rem;
+.sidebar .toggle-btn {
+  margin: 1.5rem;
+}
+.link-name,
+.logo-text {
   opacity: 1;
   transition: opacity 0.4s ease;
+}
+.link-name {
+  margin-left: 1rem;
+  font-size: 1.8rem;
+}
+.logo-text {
+  padding-left: 1.9rem;
+  font-size: 3rem;
+  font-weight: bold;
 }
 .sidebar.collapsed .link-name,
 .sidebar.collapsed .logo-text {
   opacity: 0;
   pointer-events: none;
 }
-.main-content {
-  margin-left: 25rem;
-  transition: all 0.4s ease;
-}
-.sidebar.collapsed ~ .main-content {
-  margin-left: 7rem;
-}
-.sidebar .toggle-btn {
-  min-width: 4rem;
-  font-size: 3rem;
-  margin: 1.5rem;
-}
-.logo-text {
-  opacity: 1;
-  transition: opacity 0.4s ease;
-  font-size: 3rem;
-  font-weight: bold;
-  padding-left: 1.9rem;
-}
 .logo-section {
   display: flex;
   align-items: center;
 }
-.sidebar .nav-list {
+.nav-list {
   display: flex;
   flex-direction: column;
-  height: 100%;
   flex-grow: 1;
+  height: 100%;
 }
-
-.sidebar .nav-list .exit {
+.nav-list .exit {
   margin-top: auto;
-}
-.toggle-btn {
-  background-color: transparent;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  color: var(--text-main);
 }
 .nav-active {
   background-color: var(--brand-color);
   border-radius: 4rem;
 }
 .nav-active .icon {
-  color: var(--card-bg);
+  color: var(--on-accent);
 }
-/* верхня панель */
-.header {
+
+/* ==========================================================================
+   Картки й рядки
+   ========================================================================== */
+.card,
+.info-card {
+  overflow: hidden;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+}
+.card-row,
+.info-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  position: fixed;
-  background-color: var(--brand-color);
-  height: 6rem;
-  width: 100%;
-  z-index: 100;
-  border-bottom: 0.1rem solid #9ae6d3;
+  border-top: 0.1rem solid var(--border-line);
 }
-.logo-header {
+.icon-box {
   display: flex;
-  color: var(--text-main);
-  min-width: 4rem;
-  font-size: 3rem;
-  padding: 0 2rem;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  font-size: 2rem;
 }
-.logo-header h4 {
-  margin: 0 2rem;
-}
-.nav-list-top {
-  display: flex;
-  color: var(--text-main);
-  min-width: 4rem;
-  font-size: 3rem;
-}
-.nav-el-top {
-  overflow: hidden;
-  padding: 2rem;
-}
-.icon-btn {
-  min-width: 4rem;
-  font-size: 3rem;
+
+/* ==========================================================================
+   Кнопки
+   Secondary (контур) — за замовчуванням. Primary — .btn-primary, а також
+   .modal-save-btn і .saveData. Кольори керуються локальними змінними --btn-*,
+   тож варіанти й сторінки перевизначають лише змінні, а не всі стани.
+   ========================================================================== */
+:is(
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .exitBtn,
+  .resetPassword,
+  .print-outbtn,
+  .saveData,
+  .modal-save-btn,
+  .comeback,
+  :where(.btn-container, .date-panel) > button
+) {
+  --btn-bg: transparent;
+  --btn-bg-hover: var(--hover-overlay);
+  --btn-color: var(--text-main);
+  --btn-border: var(--input-border);
+  --btn-border-hover: var(--text-muted);
+  --btn-shadow: none;
+  --btn-shadow-hover: var(--btn-shadow);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 0.8rem 1.6rem;
+  font-weight: 600;
+  color: var(--btn-color);
   cursor: pointer;
-  background-color: transparent;
-  border: none;
-  color: var(--text-main);
-}
-/* модальне вікно для виходу */
-.hidden {
-  display: none;
-}
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 101;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 4rem 6rem rgb(0, 0, 0, 0.3);
-  background-color: var(--white);
-  max-width: 60rem;
-  padding: 5rem 6rem;
-  transition: all 0.5s;
+  background-color: var(--btn-bg);
+  border: 0.1rem solid var(--btn-border);
   border-radius: var(--border-radius);
+  box-shadow: var(--btn-shadow);
+  transition:
+    background-color var(--transition-speed),
+    border-color var(--transition-speed),
+    color var(--transition-speed),
+    box-shadow var(--transition-speed),
+    transform var(--transition-speed);
+
+  &:not(:disabled, .disabled):hover {
+    background-color: var(--btn-bg-hover);
+    border-color: var(--btn-border-hover);
+    box-shadow: var(--btn-shadow-hover);
+  }
+  &:not(:disabled, .disabled):active {
+    transform: translateY(0.1rem);
+  }
+  &:focus-visible {
+    outline: 0.2rem solid var(--primary-color);
+    outline-offset: 0.2rem;
+  }
+  &:is(:disabled, .disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
+
+/* Primary: суцільна заливка, без рамки, при hover — світліший фон */
+:is(.btn-primary, .modal-save-btn, .saveData) {
+  --btn-bg: var(--primary-color);
+  --btn-bg-hover: var(--primary-hover);
+  --btn-color: var(--on-accent);
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
+  --btn-shadow-hover: var(--primary-shadow);
+}
+
+/* Danger: контур із червоним акцентом (вихід, видалення) */
+.btn-danger {
+  --btn-color: var(--error-color);
+  --btn-border: var(--error-color);
+  --btn-border-hover: var(--error-color);
+  --btn-bg-hover: var(--error-overlay);
+}
+
+.btn {
   width: 100%;
-  background-color: rgb(0, 0, 0, 0.5);
-  backdrop-filter: blur(0.4rem);
-  z-index: 100;
-  transition: all 0.5s;
-}
-.modal .btn-close-modal {
-  position: absolute;
-  border: none;
-  background-color: transparent;
-  font-size: 2rem;
-  top: 0.5rem;
-  right: 1rem;
-  cursor: pointer;
-}
-.modal .exitBtn {
-  border-radius: var(--border-radius);
-  height: 3rem;
-  width: 10rem;
-  cursor: pointer;
-  margin: 1rem 5rem;
-  box-shadow: rgb(0, 0, 0, 0.3);
-  text-align: center;
-}
-.modal .exitBtn:hover {
-  background-color: var(--brand-color);
-  color: var(--white);
-}
-.modal h2 {
-  font-size: 2rem;
-  text-align: center;
+  margin: 1rem 0;
 }
 .group-select {
-  background-color: transparent;
-  border: 0.1rem solid var(--text-muted);
-  color: var(--text-main);
-  cursor: pointer;
-  padding: 0.8rem 1.6rem;
-  border-radius: var(--border-radius);
-  font-weight: 600;
   margin: 1rem 0;
-}
-.btn {
-  background-color: transparent;
-  border: 0.1rem solid var(--text-muted);
-  color: var(--text-main);
-  cursor: pointer;
   padding: 0.8rem 1.6rem;
-  border-radius: var(--border-radius);
   font-weight: 600;
-  margin: 1rem 0;
-  width: 100%;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0.1rem solid var(--input-border);
+  border-radius: var(--border-radius);
 }
-.btn:hover {
-  background-color: var(--sidebar);
-}
-.btn:active {
-  transform: translateY(2px);
+
+/* ==========================================================================
+   Форми й пошук
+   ========================================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 .search-form {
   display: flex;
@@ -269,12 +519,11 @@ body {
 .input-wrapper {
   display: flex;
   align-items: center;
-  border-right: none;
   flex-grow: 1;
-  background-color: var(--white);
+  padding: 0 1.5rem;
+  background-color: var(--card-bg);
   border: 0.1rem solid var(--text-muted);
   border-radius: var(--border-radius);
-  padding: 0 1.5rem;
 }
 .search-icon {
   margin: 1rem;
@@ -282,50 +531,116 @@ body {
   color: var(--text-muted);
 }
 .search-input {
+  width: 100%;
+  padding: 1rem 0;
+  font-size: 1.5rem;
   background-color: transparent;
   border: none;
   outline: none;
-  color: var(--text-main);
-  padding: 1rem 0;
+}
+
+/* ==========================================================================
+   Модальні вікна
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
   width: 100%;
-  font-size: 1.5rem;
+  height: 100%;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(0.4rem);
+  transition: all 0.5s;
+}
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 101;
+  max-width: 60rem;
+  padding: 5rem 6rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-modal);
+  transform: translate(-50%, -50%);
+  transition: all 0.5s;
+}
+.modal h2 {
+  font-size: 2rem;
+  text-align: center;
+}
+.exitBtn {
+  width: 10rem;
+  height: 3.8rem;
+  margin: 1rem 5rem;
+}
+
+/* Модалка-діалог зі сторінок (журнал, звіти) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 1.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--modal-overlay-bg);
+  backdrop-filter: blur(0.4rem);
+}
+.modal-title {
+  margin-bottom: 2.5rem;
+  font-size: 2.2rem;
+  font-weight: 600;
+  text-align: center;
+}
+.btn-close-modal,
+.btn-close-lessonModal {
+  position: absolute;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  transition:
+    color var(--transition-speed),
+    transform var(--transition-speed);
+}
+.btn-close-modal:hover,
+.btn-close-lessonModal:hover {
+  transform: scale(1.1);
+}
+.btn-close-modal {
+  top: 0.5rem;
+  right: 1rem;
+  font-size: 2rem;
+}
+.modal-save-btn {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Повідомлення (toast)
+   ========================================================================== */
+.error-msg,
+.info-msg {
+  position: fixed;
+  top: 8rem;
+  left: 50%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 3rem;
+  color: var(--on-accent);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-toast);
+  animation: slideDownAndFade 5s ease-in-out forwards;
 }
 .error-msg {
-  z-index: 9999;
-  background-color: #e74c3c;
-  color: var(--white);
-  height: 3rem;
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--border-radius);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-
-  position: fixed;
-  top: 80px;
-  left: 50%;
-
-  animation: slideDownAndFade 5s ease-in-out forwards;
+  background-color: var(--error-color);
 }
-
 .info-msg {
-  z-index: 9999;
   background-color: var(--brand-color);
-  color: var(--white);
-  height: 3rem;
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--border-radius);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-
-  position: fixed;
-  top: 80px;
-  left: 50%;
-
-  animation: slideDownAndFade 5s ease-in-out forwards;
 }
 
 @keyframes slideDownAndFade {
@@ -333,10 +648,7 @@ body {
     opacity: 0;
     transform: translate(-50%, -20px);
   }
-  10% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
+  10%,
   90% {
     opacity: 1;
     transform: translate(-50%, 0);
@@ -344,5 +656,526 @@ body {
   100% {
     opacity: 0;
     transform: translate(-50%, -20px);
+  }
+}
+
+/* ==========================================================================
+   Кастомний select (див. select.js)
+   Оригінальний <select> ховається, його класи копіюються на .cselect,
+   тому існуючі стилі (.select, .select-styled, .group-select …) працюють.
+   ========================================================================== */
+select[data-cselect] {
+  display: none !important;
+}
+
+/* Базовий вигляд (нульова специфічність — будь-який клас із select його перебиває) */
+:where(.cselect) {
+  padding: 0.8rem 1.6rem;
+  color: var(--text-main);
+  background-color: var(--card-bg);
+  border: 0.1rem solid var(--input-border);
+  border-radius: var(--border-radius);
+  transition:
+    border-color var(--transition-speed),
+    box-shadow var(--transition-speed);
+}
+:where(.cselect:hover, .cselect[data-open="true"]) {
+  border-color: var(--text-muted);
+}
+
+.cselect {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+.cselect[hidden] {
+  display: none;
+}
+
+.cselect__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.cselect__trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cselect__trigger:focus-visible {
+  outline: 0.2rem solid var(--primary-color);
+  outline-offset: 0.4rem;
+  border-radius: var(--radius-xs);
+}
+.cselect__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cselect__trigger.is-placeholder .cselect__value {
+  color: var(--text-muted);
+}
+/* Шеврон малюється рамками, тому автоматично підхоплює тему */
+.cselect__trigger::after {
+  content: "";
+  flex-shrink: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: -0.3rem 0.2rem 0 0;
+  border-right: 0.2rem solid var(--text-muted);
+  border-bottom: 0.2rem solid var(--text-muted);
+  transform: rotate(45deg);
+  transition: transform var(--transition-speed);
+}
+.cselect[data-open="true"] .cselect__trigger::after {
+  transform: translateY(0.3rem) rotate(-135deg);
+}
+
+/* Випадаючий список (у <body>, координати задає JS) */
+.cselect__list {
+  position: fixed;
+  z-index: 2000;
+  width: max-content;
+  min-width: 12rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.6rem;
+  overflow-y: auto;
+  color: var(--text-main);
+  background-color: var(--card-bg);
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-popup);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
+  animation: cselectIn 0.15s ease-out;
+}
+.cselect__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 0.9rem 1.2rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition:
+    background-color var(--transition-speed),
+    color var(--transition-speed);
+}
+.cselect__option.is-active {
+  background-color: var(--hover-overlay);
+}
+.cselect__option[aria-selected="true"] {
+  font-weight: 600;
+  color: var(--primary-color);
+  background-color: var(--primary-ring);
+}
+.cselect__option[aria-selected="true"]::after {
+  content: "";
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.9rem;
+  border: solid currentColor;
+  border-width: 0 0.2rem 0.2rem 0;
+  transform: rotate(45deg);
+}
+.cselect__option[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.cselect__group {
+  padding: 1rem 1.2rem 0.4rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+@keyframes cselectIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cselect__list {
+    animation: none;
+  }
+}
+/* ==========================================================================
+   Випадаюче вікно повідомлень (під дзвіночком у шапці)
+   Показується, коли на .notif є клас .is-open
+   ========================================================================== */
+.nav-el-top.notif {
+  position: relative;
+  overflow: visible; /* інакше .nav-el-top обріже випадаюче вікно */
+}
+.notif .el {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Лічильник на дзвіночку (сховати: додати атрибут hidden) */
+.notif-badge {
+  position: absolute;
+  top: -0.4rem;
+  right: -0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--on-accent);
+  background-color: var(--error-color);
+  border: 0.2rem solid var(--brand-color);
+  border-radius: 10rem;
+}
+.notif-badge[hidden] {
+  display: none;
+}
+
+/* Контейнер */
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 2.2rem);
+  right: 1.6rem;
+  z-index: 1;
+  width: 38rem;
+  max-width: calc(100vw - 2.4rem);
+  /* шапка задає font-size: 3rem — скидаємо для вмісту */
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-main);
+  text-align: left;
+  cursor: default;
+  background-color: var(--card-bg);
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-popup);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-0.8rem);
+  transition:
+    opacity var(--transition-speed),
+    transform var(--transition-speed),
+    visibility var(--transition-speed);
+}
+.notif.is-open .notif-dropdown {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+/* Стрілка під дзвіночком */
+.notif-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -0.7rem;
+  right: 1.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  background-color: var(--card-bg);
+  border-top: 0.1rem solid var(--border-line);
+  border-left: 0.1rem solid var(--border-line);
+  transform: rotate(45deg);
+}
+
+/* Заголовок */
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.4rem 1.8rem 1.2rem;
+  border-bottom: 0.1rem solid var(--border-line);
+}
+.notif-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+.notif-count {
+  min-width: 2.4rem;
+  padding: 0.2rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: center;
+  background-color: var(--primary-ring);
+  border-radius: 10rem;
+}
+
+/* Список зі скролом */
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 36rem;
+  padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--input-border) transparent;
+}
+.notif-list::-webkit-scrollbar {
+  width: 0.6rem;
+}
+.notif-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.notif-list::-webkit-scrollbar-thumb {
+  background-color: var(--input-border);
+  border-radius: 1rem;
+}
+.notif-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
+
+/* Картка повідомлення (.notif-list > — щоб перебити загальне .nav-list-top li) */
+.notif-list > .notif-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: 1.2rem;
+  background-color: var(--sidebar);
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed);
+}
+.notif-list > .notif-item:hover {
+  background-color: var(--table-line-hover);
+}
+
+/* Непрочитане: крапка справа */
+.notif-list > .notif-item--unread {
+  padding-right: 2.8rem;
+}
+.notif-item--unread::after {
+  content: "";
+  position: absolute;
+  top: 1.4rem;
+  right: 1.2rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+}
+
+/* Іконка: за замовчуванням «увага», --info — нейтральна */
+.notif-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3.6rem;
+  height: 3.6rem;
+  font-size: 1.8rem;
+  color: var(--exclamation-color);
+  background-color: var(--message-color);
+  border-radius: var(--radius-sm);
+}
+.notif-icon--info {
+  color: var(--primary-color);
+  background-color: var(--primary-ring);
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+.notif-text {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.notif-time {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+/* Порожній стан (виводьте замість списку) */
+.notif-empty {
+  padding: 3rem 1.6rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Нижня кнопка */
+.notif-clear {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-top: 0.1rem solid var(--border-line);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  transition: background-color var(--transition-speed);
+}
+.notif-clear:hover {
+  background-color: var(--hover-overlay);
+}
+
+/* ==========================================================================
+   Мобільна навігація (стани й логіка — components.js)
+   ========================================================================== */
+.burger-btn,
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ==========================================================================
+   Адаптивність
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 8rem 2rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Розмітка: контент на всю ширину, sidebar більше не займає місце */
+  .main-content,
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0;
+  }
+  .main-content {
+    padding: 7.6rem 1.6rem 2rem;
+  }
+
+  /* Шапка */
+  .burger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+  }
+  .logo-header {
+    align-items: center;
+    padding: 0 1rem;
+    font-size: 2.4rem;
+  }
+  .logo-header h4 {
+    margin: 0 1rem;
+    font-size: 1.8rem;
+    white-space: nowrap;
+  }
+  .nav-list-top {
+    align-items: center;
+    font-size: 2.4rem;
+  }
+  .nav-el-top {
+    padding: 1rem;
+  }
+
+  /* Sidebar → висувна панель зліва (перебиває і стан .collapsed) */
+  .sidebar,
+  .sidebar.collapsed {
+    width: 28rem;
+    max-width: 85vw;
+    height: calc(100dvh - 6rem);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .sidebar.collapsed .link-name,
+  .sidebar.collapsed .logo-text {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+    box-shadow: var(--shadow-modal);
+  }
+  .sidebar .logo-section,
+  .nav-list .exit {
+    display: none; /* «Вийти» на мобільному — у профілі (.logout-row) */
+  }
+
+  /* Затемнення під панеллю */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 6rem 0 0;
+    z-index: 99;
+    display: block;
+    visibility: hidden;
+    background-color: var(--overlay-bg);
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s;
+  }
+  body.sidebar-open .sidebar-backdrop {
+    visibility: visible;
+    opacity: 1;
+  }
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  /* Модалка виходу */
+  .modal {
+    width: calc(100% - 3.2rem);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .modal h2 {
+    font-size: 1.8rem;
+  }
+  .exitBtn {
+    margin: 1rem 0.5rem;
+  }
+
+  /*Спливаючі повідомлення повідомлення */
+  .error-msg,
+  .info-msg {
+    width: 90%;
+    height: auto;
+    min-height: 3rem;
+    padding: 0.6rem 1rem;
+    text-align: center;
+  }
+
+  /*Повідомлення*/
+  .notif-dropdown {
+    position: fixed;
+    top: 6.8rem;
+    right: 1.2rem;
+    left: 1.2rem;
+    width: auto;
+    max-width: none;
+  }
+  .notif-dropdown::before {
+    display: none;
+  }
+  .notif-list {
+    max-height: calc(100dvh - 22rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-header > .bi-book {
+    display: none;
   }
 }

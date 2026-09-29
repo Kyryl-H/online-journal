@@ -1,177 +1,88 @@
+/* ==========================================================================
+   Вкладки місяців
+   ========================================================================== */
 .month-container {
   display: flex;
-  justify-content: center;
-  width: 100%;
   gap: 1rem;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden; /* активна вкладка зсувається на 1rem — не даємо з'явитись вертикальному скролу */
+  scrollbar-width: none; /* Firefox */
   border-bottom: 0.1rem solid var(--border-line);
 }
+/* Центрування, яке не ріже початок при горизонтальному скролі */
+.month-container > :first-child {
+  margin-left: auto;
+}
+.month-container > :last-child {
+  margin-right: auto;
+}
+.month-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
 .monthbtn {
+  flex: 0 0 auto;
   width: 10rem;
   height: 4rem;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  border: 0.1rem solid var(--border-line);
   cursor: pointer;
+  background-color: var(--sidebar);
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  transition: all var(--transition-speed);
+}
+.monthbtn:not(.monthbtn-active):hover {
+  background-color: var(--border-line);
 }
 .monthbtn-active {
   position: relative;
   top: 1rem;
-  background-color: var(--brand-color);
   height: 3rem;
-  transition: all 0.3s ease;
+  background-color: var(--brand-color);
 }
+
+/* ==========================================================================
+   Панель керування
+   ========================================================================== */
 .control-unit {
-  margin: 2rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 1.2rem;
+  margin: 2rem;
 }
 .infoLine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
 }
 .select-group {
-  background-color: var(--brand-color);
-  padding: 1rem 1rem;
-  border-radius: var(--border-radius);
+  padding: 1rem;
   font-size: 1.6rem;
   font-weight: 600;
-}
-.table-container {
-  position: relative;
-  max-width: 100%;
-  max-height: 60vh;
-  overflow: auto;
-}
-table {
-  width: 100%;
-  background-color: transparent;
-  border-collapse: separate;
-  border-spacing: 0.4rem;
-}
-td,
-th {
-  min-width: 6rem;
-  background-color: var(--white);
-  text-align: center;
+  background-color: var(--brand-color);
   border-radius: var(--border-radius);
-  border: 0.1rem solid var(--border-line);
 }
-#date-null {
-  text-align: center;
-}
-th {
-  padding: 1rem;
-}
-td {
-  padding: 0;
-  vertical-align: middle;
-}
-td:first-child,
-th:first-child {
-  text-align: left;
-  padding: 1rem;
-}
-thead th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background-color: var(--white);
-}
-tbody td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background-color: var(--white);
-  text-align: left;
-  min-width: 22rem;
-  white-space: nowrap;
-}
-thead th.sticky-corner {
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  background-color: var(--white);
-  min-width: 22rem;
-  text-align: left;
-}
+
+/* Вигляд кнопок (primary/secondary) — у global.css, тут лише розміри */
 .print-outbtn,
 .saveData {
   min-width: 12rem;
-  background-color: transparent;
-  border-radius: var(--border-radius);
-  border: 0.1rem solid var(--text-muted);
-
   padding: 1rem;
-  text-align: center;
   font-size: 1.6rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 600;
-}
-.print-outbtn:active,
-.saveData:active {
-  transform: translateY(2px);
-}
-.print-outbtn:hover,
-.saveData:hover {
-  color: var(--white);
-  background-color: var(--brand-color);
-}
-.saveData:disabled,
-.saveData.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.saveData:disabled:hover,
-.saveData.disabled:hover,
-.saveData:disabled:active,
-.saveData.disabled:active {
-  cursor: not-allowed;
-  background-color: transparent;
-  color: var(--text-muted);
-  transform: none;
-}
-tbody tr:hover td {
-  background-color: var(--table-line-hover);
-}
-.table-container::-webkit-scrollbar {
-  width: 0.8rem;
-  height: 0.8rem;
-}
-.table-container::-webkit-scrollbar-thumb {
-  background-color: var(--brand-color);
-  border-radius: 1rem;
-}
-.table-container::-webkit-scrollbar-track {
-  background-color: var(--white);
-  border-radius: 1rem;
 }
 .comeback {
-  background-color: transparent;
+  --btn-color: var(--brand-color);
   width: 3.8rem;
   height: 3.8rem;
-  border: 0.1rem solid var(--text-muted);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  color: var(--brand-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-.comeback:hover,
-.comeback-icon:hover {
-  background-color: var(--brand-color);
-  color: var(--white);
+  padding: 0;
 }
 .comeback-icon {
   width: 100%;
-  font-weight: bold;
   font-size: 2.2rem;
+  font-weight: bold;
 }
 .btn-container {
   display: flex;
@@ -181,200 +92,274 @@ tbody tr:hover td {
 }
 .btn-container button {
   width: 50%;
-  background-color: transparent;
-  color: var(--text-main);
-
-  border: 0.1rem solid var(--text-muted);
-  cursor: pointer;
-  padding: 1rem;
-  border-radius: var(--border-radius);
   margin: 1rem 0;
-  transition: all 0.2s ease;
+  padding: 1rem;
   font-size: 1.6rem;
-  font-weight: 600;
-  box-shadow: rgb(0, 0, 0, 0.3);
 }
-.btn-container button:hover {
+
+/* ==========================================================================
+   Таблиця
+   ========================================================================== */
+.table-container {
+  position: relative;
+  max-width: 100%;
+  max-height: 60vh;
+  overflow: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.table-container::-webkit-scrollbar {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.table-container::-webkit-scrollbar-thumb {
   background-color: var(--brand-color);
-  color: var(--white);
+  border-radius: var(--border-radius);
 }
-.message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.table-container::-webkit-scrollbar-track {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0.4rem;
+}
+th,
+td {
+  min-width: 6rem;
+  text-align: center;
+  background-color: var(--card-bg);
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+}
+th {
   padding: 1rem;
-  margin: 1rem;
 }
-.message h2,
-h3 {
-  margin: 1rem;
+td {
+  padding: 0;
+  vertical-align: middle;
 }
+th:first-child,
+td:first-child {
+  padding: 1rem;
+  text-align: left;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 22rem;
+  white-space: nowrap;
+}
+.sticky-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  min-width: 22rem;
+}
+tbody tr:hover td {
+  background-color: var(--table-line-hover);
+}
+#date-null {
+  text-align: center;
+}
+
 .grade-input {
-  font-size: 1.6rem;
-  padding: 1rem;
   width: 100%;
   height: 100%;
   min-height: 3.8rem;
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-  background-color: transparent;
+  padding: 1rem;
+  font-size: 1.6rem;
   text-align: center;
-  color: var(--text-main);
   cursor: pointer;
+  background-color: transparent;
+  border: none;
   border-radius: var(--border-radius);
+  outline: none;
 }
 td:hover .grade-input {
   background-color: var(--sidebar);
 }
 .grade-input:focus {
-  background-color: var(--white);
   cursor: text;
+  background-color: var(--card-bg);
   box-shadow: 0 0 0 0.2rem var(--brand-color);
 }
+.input-values-error {
+  background-color: var(--danger-color);
+  border: 0.2rem solid var(--on-accent);
+  transition: all 0.5s;
+}
+
+/* Панель вибору дати */
 .date-panel {
   position: fixed;
+  z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  background: var(--white);
+  background-color: var(--card-bg);
   border-radius: var(--border-radius);
-  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
-  z-index: 200;
+  box-shadow: var(--shadow-popup);
 }
 .date-panel button {
   padding: 0.5rem;
-  border-radius: 0.6rem;
-  border: 1px solid var(--text-muted);
-  background-color: transparent;
-  color: var(--text-main);
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: rgb(0, 0, 0, 0.3);
+  border-radius: var(--radius-xs);
 }
-.date-panel button:hover {
-  color: var(--white);
-  background-color: var(--brand-color);
+
+/* ==========================================================================
+   Повідомлення
+   ========================================================================== */
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem;
+  padding: 1rem;
+  text-align: center;
 }
-.hidden {
-  display: none !important;
+.message h2,
+.message h3 {
+  margin: 1rem;
 }
-.input-values-error {
-  background-color: crimson;
-  border: 2px solid var(--white);
-  transition: all 0.5s;
-}
+
+/* ==========================================================================
+   Модальне вікно теми уроку
+   (оверлей, .modal-title, .form-group, .btn-close-lessonModal — у global.css)
+   ========================================================================== */
 .input-topic-lesson {
   position: relative;
+  z-index: 1001;
   width: 100%;
   max-width: 45rem;
-  background: var(--white);
   padding: 4rem 5rem;
+  background-color: var(--card-bg);
   border-radius: var(--border-radius);
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.2);
-  z-index: 1001;
+  box-shadow: var(--shadow-dialog);
 }
-
-.modal-title {
-  font-size: 2.2rem;
-  margin-bottom: 2.5rem;
-  text-align: center;
-  font-weight: 700;
-  color: var(--text-main, #333);
-}
-
-.input-topic-lesson .btn-close-lessonModal {
-  position: absolute;
-  border: none;
-  background-color: transparent;
-  font-size: 2.4rem;
+.btn-close-lessonModal {
   top: 1.5rem;
   right: 2rem;
-  cursor: pointer;
-  color: var(--text-muted, #888);
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.input-topic-lesson .btn-close-lessonModal:hover {
-  transform: scale(1.1);
+  font-size: 2.4rem;
+  color: var(--text-muted);
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
   margin-bottom: 2rem;
 }
-
 .form-group label {
-  font-weight: 600;
   font-size: 1.4rem;
-  color: var(--text-main, #333);
+  font-weight: 600;
 }
 
 .select,
 .input {
-  background-color: transparent;
-  border: 0.15rem solid #d1d5db;
-  color: var(--text-main, #333);
-  padding: 1.2rem 1.6rem;
-  border-radius: var(--border-radius, 8px);
-  font-size: 1.5rem;
-  font-family: inherit;
   width: 100%;
+  padding: 1.2rem 1.6rem;
+  font-size: 1.5rem;
+  cursor: text;
+  background-color: transparent;
+  border: 0.15rem solid var(--input-border);
+  border-radius: var(--border-radius);
   outline: none;
   transition:
     border-color 0.3s ease,
     box-shadow 0.3s ease;
-  cursor: text;
 }
-
 .select {
   cursor: pointer;
 }
-
-.select:focus,
+.select:focus-within,
 .input:focus {
   border-color: var(--text-main);
-  box-shadow: 0 0 0 0.4rem rgb(123, 184, 169, 0.2);
+  box-shadow: 0 0 0 0.4rem var(--brand-ring);
 }
 
+/* Вигляд кнопки (primary) — у global.css, тут лише розміри */
 .modal-save-btn {
-  width: 100%;
   margin-top: 1rem;
   padding: 1.4rem;
-  background-color: #4ea884;
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius, 8px);
   font-size: 1.6rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    transform 0.1s ease;
 }
 
-.modal-save-btn:hover {
-  background-color: #3b8768;
+@media (max-width: 1024px) {
+  .control-unit {
+    margin: 1.6rem 1rem;
+  }
 }
 
-.modal-save-btn:active {
-  transform: translateY(2px);
-}
-.modal-overlay {
-  position: fixed;
-  inset: 0;
+@media (max-width: 768px) {
+  .control-unit {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .comeback {
+    align-self: flex-start;
+  }
+  .infoLine {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.2rem;
+  }
+  .print-outbtn,
+  .saveData,
+  .btn-container button {
+    width: 100%;
+  }
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* Таблиця: скрол усередині контейнера, перша колонка компактніша */
+  .table-container {
+    max-height: 65vh;
+  }
+  th,
+  td {
+    min-width: 5rem;
+  }
+  th:first-child,
+  td:first-child {
+    padding: 0.8rem;
+  }
+  tbody td:first-child,
+  .sticky-corner {
+    min-width: 14rem;
+  }
+  tbody td:first-child {
+    white-space: normal;
+  }
 
-  background: rgba(0, 0, 0, 0.45);
+  /* Модалка теми уроку */
+  .input-topic-lesson {
+    max-height: 100%;
+    padding: 3.5rem 2rem 2.5rem;
+    overflow-y: auto;
+  }
+  .btn-close-lessonModal {
+    top: 1rem;
+    right: 1.2rem;
+  }
 
-  z-index: 1000;
+  /* Безпечні відступи: стрічка місяців і початок прокрутки */
+  .month-container {
+    padding-inline: 1rem;
+    scroll-padding-inline: 1rem;
+  }
+
+  /* Кнопки «Експортувати» / «Зберегти зміни» — проміжок між ними,
+     незалежно від того, який клас має їхній контейнер */
+  :has(> .print-outbtn, > .saveData) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
 }
