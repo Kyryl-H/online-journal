@@ -57,7 +57,7 @@ Subject.hasMany(Schedule);
 Schedule.belongsTo(Subject);
 
 sequelize
-  .sync()
+  .sync() // { alter: true }
   .then((result) => {
     app.listen(3000);
   })

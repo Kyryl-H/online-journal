@@ -68,10 +68,16 @@
 
 /* Вигляд кнопок (primary/secondary) — у global.css, тут лише розміри */
 .print-outbtn,
-.saveData {
+.saveData,
+.create-lesson {
   min-width: 12rem;
   padding: 1rem;
   font-size: 1.6rem;
+}
+:has(> .print-outbtn, > .saveData, > .create-lesson) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 .comeback {
   --btn-color: var(--brand-color);
@@ -165,6 +171,42 @@ tbody td:first-child {
   z-index: 3;
   min-width: 22rem;
 }
+/* Комірка дати з кнопкою: симетричні поля, щоб дата лишалася по центру */
+th:has(.insert-lesson) {
+  padding-inline: 3.2rem;
+  white-space: nowrap;
+}
+
+/* thead th вже position: sticky, тому absolute позиціонується відносно комірки */
+.insert-lesson {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  transform: translateY(-50%);
+  transition:
+    color var(--transition-speed),
+    background-color var(--transition-speed);
+}
+.insert-lesson:hover {
+  color: var(--primary-color);
+  background-color: var(--hover-overlay);
+}
+.insert-lesson:focus-visible {
+  outline: 0.2rem solid var(--primary-color);
+  outline-offset: 0.1rem;
+}
 tbody tr:hover td {
   background-color: var(--table-line-hover);
 }
@@ -197,23 +239,6 @@ td:hover .grade-input {
   background-color: var(--danger-color);
   border: 0.2rem solid var(--on-accent);
   transition: all 0.5s;
-}
-
-/* Панель вибору дати */
-.date-panel {
-  position: fixed;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-popup);
-}
-.date-panel button {
-  padding: 0.5rem;
-  border-radius: var(--radius-xs);
 }
 
 /* ==========================================================================
@@ -285,6 +310,29 @@ td:hover .grade-input {
   box-shadow: 0 0 0 0.4rem var(--brand-ring);
 }
 
+/* Нативне поле дати у стилі наших селектів */
+.input[type="date"] {
+  min-height: 5rem; /* вирівнює висоту з .select і текстовим .input */
+  text-align: left;
+  appearance: none;
+}
+.input[type="date"]::-webkit-date-and-time-value {
+  text-align: left; /* iOS Safari центрує значення */
+}
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: 0.8rem;
+  padding: 0.4rem;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  opacity: 0.7;
+  transition:
+    opacity var(--transition-speed),
+    background-color var(--transition-speed);
+}
+.input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--hover-overlay);
+  opacity: 1;
+}
 /* Вигляд кнопки (primary) — у global.css, тут лише розміри */
 .modal-save-btn {
   margin-top: 1rem;
@@ -313,6 +361,7 @@ td:hover .grade-input {
   }
   .print-outbtn,
   .saveData,
+  .create-lesson,
   .btn-container button {
     width: 100%;
   }
@@ -353,11 +402,17 @@ td:hover .grade-input {
     padding-inline: 1rem;
     scroll-padding-inline: 1rem;
   }
-
+  th:has(.insert-lesson) {
+    padding-inline: 2.6rem;
+  }
+  .insert-lesson {
+    right: 0.2rem;
+    width: 2.4rem;
+    height: 2.4rem;
+  }
   /* Кнопки «Експортувати» / «Зберегти зміни» — проміжок між ними,
      незалежно від того, який клас має їхній контейнер */
-  :has(> .print-outbtn, > .saveData) {
-    display: flex;
+  :has(> .print-outbtn, > .saveData, > .create-lesson) {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;

@@ -13,5 +13,7 @@ rout.get(
 rout.post("/api/teacher/post/grades", Controllers.postGrades);
 rout.get("/api/groups", Controllers.getGroups);
 rout.get("/api/schedule/:groupId/:start/:end", Controllers.getSchedule);
-
+rout.get("/api/curator/groups", Controllers.getCuratorGroup);
+rout.get("/api/curator/:groupId/:year/:month", Controllers.getCuratorStudent);
+rout.patch("/api/teacher/journal/updateLesson", Controllers.updateLesson);
 module.exports = rout;

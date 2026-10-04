@@ -2,7 +2,12 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
-import { fetchJournalData, postGrades, showToast } from "../api.js";
+import {
+  fetchJournalData,
+  postGrades,
+  showToast,
+  updateTopic,
+} from "../api.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -11,6 +16,7 @@ const state = {
   lessonName: urlParams.get("lessonName"),
   path: urlParams.get("path"),
   newGrades: [],
+  editLessonId: "",
 
   schedule: [],
   student: [],
@@ -28,14 +34,19 @@ const els = {
   dateContainer: document.querySelector(".date-container"),
   searchInput: document.querySelector(".search-input"),
   monthfirst: document.querySelector(".monthbtn"),
-  datePanel: document.querySelector(".date-panel"),
-  insertColumRight: document.querySelector(".insert-colum-right"),
+  createLessonBtn: document.querySelector(".create-lesson"),
   btnCloseLessonModal: document.querySelector(".btn-close-lessonModal"),
   inputTopicLesson: document.querySelector(".input-topic-lesson"),
-  insertTopicBtn: document.querySelector(".insert-topic"),
   modalOverlay: document.querySelector(".modal-overlay"),
   saveData: document.querySelector(".saveData"),
   printOutbtn: document.querySelector(".print-outbtn"),
+  lessonType: document.querySelector(".lesson-type"),
+  lessonDate: document.querySelector(".lesson-date"),
+  lessonTopic: document.querySelector(".lesson-topic"),
+  lessonRoom: document.querySelector(".lesson-room"),
+  lessonHomework: document.querySelector(".lesson-homework"),
+  lessonNumber: document.querySelector(".lesson-number"),
+  modalSaveBtn: document.querySelector(".modal-save-btn"),
 };
 
 // Рендеринг блока з місяцями
@@ -102,9 +113,11 @@ const renderTable = function (searchQuery = "") {
     const day = String(d.getDate()).padStart(2, "0");
     const monthD = String(d.getMonth() + 1).padStart(2, "0");
 
-    const html = `<th>${day}/${monthD}</th>`;
+    const html = `<th data-id=${lesson.id}>${day}/${monthD} <button class="insert-lesson"><i class="bi bi-pencil-square"></i></button>
+</th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
+
   // Пошук студентів
   const filterStudent = state.student.filter((s) =>
     s.fullName.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -138,66 +151,63 @@ const initSearch = function () {
   });
 };
 
-// Контекстне меню дат
-const showDatePanel = function (target) {
-  const rect = target.getBoundingClientRect();
-
-  els.datePanel.style.top = `${rect.bottom + 5}px`;
-  els.datePanel.style.left = `${rect.left}px`;
-
-  els.datePanel.classList.remove("hidden");
-};
-
-const hideDatePanel = function () {
-  els.datePanel.classList.add("hidden");
-};
-
-const initDatePanel = function () {
-  // Відкрити меню
-  els.dateContainer.addEventListener("dblclick", function (e) {
-    const target = e.target.closest("th");
-
-    if (
-      !target ||
-      target.classList.contains("sticky-corner") ||
-      target.classList.contains("date-null")
-    )
-      return;
-
-    showDatePanel(target);
-  });
-
-  // Закрити при кліку поза меню
-  document.addEventListener("click", function (e) {
-    if (
-      els.datePanel.contains(e.target) ||
-      e.target.closest(".date-container th")
-    )
-      return;
-
-    hideDatePanel();
-  });
-
-  // Закрити по Escape
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") hideDatePanel();
-  });
-};
-
-// Модальне вікно заняття
 const showLessonModal = function () {
   els.modalOverlay.classList.remove("hidden");
 };
-
 const hideLessonModal = function () {
   els.modalOverlay.classList.add("hidden");
+  els.modalSaveBtn.classList.remove("edit");
+  els.modalSaveBtn.classList.remove("create");
 };
 
+// Валідація модального вікна
+const validateLessonForm = function () {
+  const topicLength = els.lessonTopic.value.trim().length;
+  const type = els.lessonType.value;
+
+  let isDateValid = true;
+  if (!els.lessonDate.disabled) {
+    isDateValid = els.lessonDate.value !== "" && els.lessonDate.checkValidity();
+  }
+
+  if (type === "Зошит" || type === "Рубіж" || type === "Семестр") {
+    els.modalSaveBtn.disabled = topicLength > 255 || !isDateValid;
+  } else {
+    els.modalSaveBtn.disabled =
+      !(topicLength > 5 && topicLength < 255) || !isDateValid;
+  }
+};
+
+els.lessonTopic.addEventListener("input", validateLessonForm);
+
+els.lessonType.addEventListener("change", validateLessonForm);
+
 const initLessonModal = function () {
-  // Відкрити
-  els.insertTopicBtn.addEventListener("click", function () {
-    hideDatePanel();
+  // Редагування заняття
+  els.dateContainer.addEventListener("click", function (e) {
+    const btn = e.target.closest(".insert-lesson");
+
+    if (!btn) return;
+
+    const parent = btn.parentElement;
+    const lesson = state.schedule.find(
+      (l) => l.id === Number(parent.dataset.id),
+    );
+    if (!lesson) {
+      console.error("Заняття не знайдено");
+      showToast("Заняття не знайдено");
+      return;
+    }
+    state.editLessonId = lesson.id;
+    window.customSelect.set(els.lessonType, lesson.lessonType);
+    els.lessonDate.value = lesson.date?.split("T")[0] ?? "";
+    window.customSelect.set(els.lessonNumber, lesson.lessonNumber ?? "1");
+    els.lessonRoom.value = lesson.room ?? "";
+    els.lessonTopic.value = lesson.topic ?? "";
+    els.lessonHomework.value = lesson.homework ?? "";
+
     showLessonModal();
+    els.modalSaveBtn.classList.add("edit");
   });
 
   // Закрити кнопкою
@@ -214,19 +224,19 @@ const initLessonModal = function () {
   });
 };
 
-// Робота зі стовпцями
-const initColumnActions = function () {
-  els.insertColumRight.addEventListener("click", function () {
-    hideDatePanel();
+// Створення нового зайняття
+const createLesson = function () {
+  els.createLessonBtn.addEventListener("click", function () {
+    window.customSelect.set(els.lessonType, "Пара");
+    els.lessonType.disabled = false;
 
-    els.dateContainer.insertAdjacentHTML("beforeend", "<th>Нове заняття</th>");
+    els.lessonDate.value = currentLesson.date?.split("T")[0] ?? "";
+    els.lessonDate.disabled = true;
+    els.lessonTopic.value = "";
 
-    document.querySelectorAll(".row").forEach(function (row) {
-      row.insertAdjacentHTML(
-        "beforeend",
-        `<td><input type="text" class="grade-input"></td>`,
-      );
-    });
+    els.modalSaveBtn.classList.add("create");
+    showLessonModal();
+    // Додати валідацію дат з клавіатури
   });
 };
 
@@ -291,21 +301,122 @@ els.saveData.addEventListener("click", async function () {
     console.error("Помилка при збереженні:", err);
   }
 });
+// Кнопка створення/оновлення заняття
+els.modalSaveBtn.addEventListener("click", async function () {
+  if (els.modalSaveBtn.classList.contains("edit")) {
+    const topic = {
+      id: state.editLessonId,
+      lessonType: els.lessonType.value,
+      date: els.lessonDate.value,
+      lessonNumber: els.lessonNumber.value,
+      room: els.lessonRoom.value,
+      topic: els.lessonTopic.value,
+      homework: els.lessonHomework.value,
+    };
+    try {
+      const update = await updateTopic(topic);
+
+      const lessonIndex = state.schedule.findIndex(
+        (l) => l.id === Number(state.editLessonId),
+      );
+      if (lessonIndex !== -1) {
+        console.log("Дані оновлені!");
+        state.schedule[lessonIndex].lessonType = update.lesson.lessonType;
+        state.schedule[lessonIndex].date = update.lesson.date;
+        state.schedule[lessonIndex].lessonNumber = update.lesson.lessonNumber;
+        state.schedule[lessonIndex].room = update.lesson.room;
+        state.schedule[lessonIndex].topic = update.lesson.topic;
+        state.schedule[lessonIndex].homework = update.lesson.homework;
+      }
+
+      hideLessonModal();
+      renderTable();
+      showToast(update.message, "info-msg");
+    } catch (err) {
+      console.error("Помилка при збереженні:", err);
+      showToast("Помилка при збереженні");
+    }
+  } else if (els.modalSaveBtn.classList.contains("create")) {
+    console.log(currentLesson);
+    const lesson = {
+      subjectId: currentLesson.subject,
+      date: els.lessonDate.value,
+      lessonNumber: 0,
+      topic: els.lessonTopic.value,
+      room: null,
+      lessonType: els.lessonType.value,
+    };
+    try {
+      const create = await createLesson(lesson);
+    } catch (err) {
+      console.error("Помилка при збереженні:", err);
+      showToast("Помилка при збереженні");
+    }
+  }
+});
+
 // Кнопка "Назад"
 const initNavigation = function () {
   els.comeback.addEventListener("click", function () {
     window.location.href = `${state.path}`;
   });
 };
+// Валідація дат
+const setDateLimits = function () {
+  const dateInput = document.getElementById("lesson-date");
+  if (!dateInput) return;
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  let startYear, endYear;
+
+  // Якщо зараз вересень (8) або пізніше - навчальний рік почався цього року
+  // Якщо січень-серпень - навчальний рік почався минулого року
+  if (currentMonth >= 8) {
+    startYear = currentYear;
+    endYear = currentYear + 1;
+  } else {
+    startYear = currentYear - 1;
+    endYear = currentYear;
+  }
+
+  dateInput.min = `${startYear}-09-01`;
+  dateInput.max = `${endYear}-06-30`;
+};
+const initModalValidation = function () {
+  const modalContainer = document.querySelector(".input-topic-lesson");
+
+  const validate = () => {
+    const isTypeValid = els.lessonType.value.trim() !== "";
+    const isDateValid = els.lessonDate.value.trim() !== "";
+    const isRoomValid = els.lessonRoom.value.trim() !== "";
+    const isTimeValid = els.lessonNumber.value.trim() !== "";
+
+    // Якщо хоч одне з обов'язкових полів порожнє блокуємо кнопку
+    if (isTypeValid && isDateValid && isRoomValid && isTimeValid) {
+      els.modalSaveBtn.disabled = false;
+    } else {
+      els.modalSaveBtn.disabled = true;
+    }
+  };
+
+  // Делегування для запуску перевірки при змінах
+  modalContainer.addEventListener("input", validate);
+  modalContainer.addEventListener("change", validate);
+
+  validate();
+};
 // Ініціалізація функціоналу сторінки
 const moreFunctionality = function () {
   initSearch();
-  initDatePanel();
   initLessonModal();
-  initColumnActions();
+  createLesson();
   initGradeValidation();
   initNavigation();
+  setDateLimits();
+  initModalValidation();
 };
 const render = async function () {
   if (!state.groupId || !state.lessonName) {
@@ -322,7 +433,7 @@ const render = async function () {
 
   if (!data) {
     console.log("Помилка завантаження даних");
-    window.location.href = "/teacher/journal-main.html";
+    // window.location.href = "/teacher/journal-main.html";
   }
 
   renderLayout("teacher", true);

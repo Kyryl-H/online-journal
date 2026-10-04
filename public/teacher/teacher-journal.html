@@ -50,19 +50,13 @@
               </form>
             </div>
             <div>
+              <button class="create-lesson">Додати нове заняття</button>
               <button class="print-outbtn">Експортувати</button>
               <button class="saveData">Зберегти зміни</button>
             </div>
           </div>
           <div class="table-container">
             <div class="table-container">
-              <div class="date-panel hidden">
-                <button class="insert-colum-right">
-                  Додати стовпчик справа
-                </button>
-                <button class="insert-topic">Заповнити тему</button>
-              </div>
-
               <table>
                 <thead>
                   <tr class="date-container"></tr>
@@ -99,7 +93,11 @@
 
               <div class="form-group">
                 <label for="lesson-type">Тип заняття</label>
-                <select name="lesson-type" id="lesson-type" class="select">
+                <select
+                  name="lesson-type"
+                  id="lesson-type"
+                  class="select lesson-type"
+                >
                   <option value="para">Пара</option>
                   <option value="notebook">Зошит</option>
                   <option value="test">Рубіж</option>
@@ -109,9 +107,39 @@
 
               <div class="form-group">
                 <label for="lesson-date">Дата</label>
-                <select name="lesson-date" id="lesson-date" class="select">
-                  <option value="" disabled selected>Оберіть дату...</option>
+                <input
+                  type="date"
+                  id="lesson-date"
+                  name="lesson-date"
+                  class="input lesson-date"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="lesson-number">Час проведення</label>
+                <select
+                  name="lesson-number"
+                  id="lesson-number"
+                  class="select lesson-number"
+                >
+                  <option value="1">1 (8:30-9:30)</option>
+                  <option value="2">2 (8:30-9:30)</option>
+                  <option value="3">3 (8:30-9:30)</option>
+                  <option value="4">4 (8:30-9:30)</option>
+                  <option value="5">5 (8:30-9:30)</option>
+                  <option value="6">6 (8:30-9:30)</option>
+                  <option value="7">7 (8:30-9:30)</option>
                 </select>
+              </div>
+
+              <div class="form-group">
+                <label for="lesson-topic">Місце</label>
+                <input
+                  type="text"
+                  id="lesson-room"
+                  class="input lesson-room"
+                  placeholder="Введіть аудиторію..."
+                />
               </div>
 
               <div class="form-group">
@@ -119,8 +147,18 @@
                 <input
                   type="text"
                   id="lesson-topic"
-                  class="input"
+                  class="input lesson-topic"
                   placeholder="Введіть тему заняття..."
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="lesson-topic">Домашнє завдання</label>
+                <input
+                  type="text"
+                  id="lesson-homework"
+                  class="input lesson-homework"
+                  placeholder="Введіть завдання..."
                 />
               </div>
 

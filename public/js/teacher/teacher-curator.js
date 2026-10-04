@@ -2,10 +2,12 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal } from "../global.js";
+import { getCuratorGroup, getCuratorStudents } from "../api.js";
 
 const state = {
   chartInstance: null,
   currentSudents: [],
+  nameGroup: "",
 };
 
 //DOM Елементи
@@ -22,6 +24,8 @@ const els = {
   modalOverlay: document.querySelector(".modal-overlay"),
   reportBtn: document.querySelector(".report-btn"),
   btnCloseModal: document.querySelector(".btn-close-modal"),
+  messageList: document.querySelector(".message-group-list"),
+  messageStatistic: document.querySelector(".message-group-statistic"),
 };
 
 // ЛІВА КАРТКА: Список студентів
@@ -48,6 +52,24 @@ const renderStudentList = (students, searchQuery = "") => {
 // ПРАВА КАРТКА: Статистика
 const renderStatistics = (statistics) => {
   // Оновлюємо UI
+  const months = [
+    "Січень",
+    "Лютий",
+    "Березень",
+    "Квітень",
+    "Травень",
+    "Червень",
+    "Липень",
+    "Серпень",
+    "Вересень",
+    "Жовтень",
+    "Листопад",
+    "Грудень",
+  ];
+
+  const currentMonthIndex = new Date().getMonth();
+
+  els.monthEl.textContent = months[currentMonthIndex];
   els.groupPasses.textContent = statistics.totalPasses;
   els.groupGrades.textContent = statistics.averageGrade;
 
@@ -100,29 +122,13 @@ const renderChart = (dataArr) => {
 const loadDashboardForGroup = async function (groupId) {
   const date = new Date();
   const year = date.getFullYear();
-  const month = 8; // Вересень
+  const month = date.getMonth();
 
-  const startOfMonth = new Date(year, month, 1);
-  const endOfMonth = new Date(year, month + 1, 0);
+  const student = await getCuratorStudents(groupId, year, month);
 
-  // const responsStudent = await fetch(`/api/curator-profil?${currentGroup}&start=${startOfMonth}&end=${endOfMonth}`);
-  // const students = await responsStudent.json();
-  const mockDataStudent = {
-    students: [
-      { id: 101, fullName: "Астонюк Віталій Володимирович" },
-      { id: 102, fullName: "Беляк Олександра Григорієвна" },
-      { id: 103, fullName: "Волощенко Сергій Миколайович" },
-      { id: 104, fullName: "Годлевський Кирил Васильович" },
-    ],
-    statistics: {
-      averageGrade: 4.2,
-      totalPasses: 6,
-      diagramData: [4, 5, 2, 6],
-    },
-  };
-  state.currentSudents = mockDataStudent.students;
+  state.currentSudents = student.students;
   renderStudentList(state.currentSudents);
-  renderStatistics(mockDataStudent.statistics);
+  renderStatistics(student.statistics);
 };
 
 // СЛУХАЧІ ПОДІЙ
@@ -131,6 +137,11 @@ const setupEventListeners = () => {
   els.select.addEventListener("change", (e) => {
     els.searchInput.value = "";
     loadDashboardForGroup(e.target.value);
+
+    const selectedGroupName = e.target.options[e.target.selectedIndex].text;
+
+    els.messageList.textContent = `Список студентів групи ${selectedGroupName}`;
+    els.messageStatistic.textContent = `Статистика групи ${selectedGroupName}`;
   });
 
   // Пошук
@@ -169,21 +180,13 @@ const setupEventListeners = () => {
 
 // ГОЛОВНА ФУНКЦІЯ: Запуск додатку
 const initApp = async () => {
-  const currentPath = window.location.pathname;
-  const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
-  renderLayout(currentRole, true);
+  renderLayout("teacher", true);
   renderExit();
   initGlobal();
 
-  const userId = localStorage.getItem("userId");
-  // const responsGroup = await fetch(`/api/curator-profil?${userId}`);
-  // const groups = await responsGroup.json();
-  const mockDataGroups = [
-    { id: 1, name: "П-13" },
-    { id: 3, name: "С-15" },
-  ];
+  const group = await getCuratorGroup();
 
-  mockDataGroups.forEach((g) => {
+  group.forEach((g) => {
     els.select.insertAdjacentHTML(
       "beforeend",
       `<option value="${g.id}">${g.name}</option>`,
@@ -195,6 +198,7 @@ const initApp = async () => {
 
   if (els.select.value) {
     loadDashboardForGroup(els.select.value);
+    state.nameGroup = els.select.value;
   }
 };
 initApp();

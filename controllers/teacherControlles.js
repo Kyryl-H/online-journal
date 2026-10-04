@@ -202,7 +202,15 @@ exports.getJournal = async (req, res, next) => {
         { date: { [Op.between]: [startMonth, endMonth] } },
       ],
     },
-    attributes: ["id", "date", "topic"],
+    attributes: [
+      "id",
+      "date",
+      "topic",
+      "lessonType",
+      "lessonNumber",
+      "room",
+      "homework",
+    ],
   });
 
   const scheduleId = schedule.map((s) => s.id);
@@ -230,6 +238,40 @@ exports.getJournal = async (req, res, next) => {
     schedule: schedule,
     grades: grades,
   });
+};
+
+exports.updateLesson = async (req, res, next) => {
+  try {
+    const { id, lessonType, date, lessonNumber, room, topic, homework } =
+      req.body;
+
+    const lesson = await Schedule.findByPk(id);
+
+    if (!lesson) {
+      return res.status(404).json({ message: "Урок не знайдено" });
+    }
+
+    await lesson.update({
+      lessonType: lessonType,
+      date: date,
+      lessonNumber: lessonNumber,
+      room: room,
+      topic: topic,
+      homework: homework,
+    });
+
+    const lessonData = lesson.toJSON();
+
+    const { createdAt, updatedAt, subjectId, ...cleanedLesson } = lessonData;
+
+    res.status(200).json({
+      message: "Дані успішно оновлено!",
+      lesson: cleanedLesson,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка збереження" });
+  }
 };
 
 exports.postGrades = async (req, res, next) => {
@@ -297,6 +339,91 @@ exports.getSchedule = async (req, res, next) => {
       teacherFullName: s.subject?.teacher?.fullName,
     }));
     res.status(200).json(scheduleFormat);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка збереження" });
+  }
+};
+
+exports.getCuratorGroup = async (req, res, next) => {
+  const currentUserId = req.headers["user-id"];
+  try {
+    const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
+    const group = await Group.findAll({
+      where: { teacherId: teacher.id },
+      attributes: ["id", "name"],
+    });
+
+    res.status(200).json(group);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка збереження" });
+  }
+};
+
+exports.getCuratorStudent = async (req, res, next) => {
+  const currentUserId = req.headers["user-id"];
+  const groupId = req.params.groupId;
+  const year = req.params.year;
+  const month = req.params.month;
+
+  const startOfMonth = new Date(year, month, 1);
+  const endOfMonth = new Date(year, month + 1, 0);
+  try {
+    const student = await Student.findAll({
+      where: { groupId: groupId },
+      attributes: ["id", "fullName"],
+      order: [["fullName", "ASC"]],
+    });
+
+    const studentId = student.map((s) => s.id);
+
+    const grades = await Grades.findAll({
+      where: { studentId: { [Op.in]: studentId } },
+      attributes: ["value"],
+      include: {
+        model: Schedule,
+        attributes: ["id"],
+        include: {
+          model: Subject,
+          attributes: ["gradingSystem"],
+        },
+      },
+    });
+
+    let passes = 0;
+    let gradesSum = 0;
+    let dataGradeDiagram = [0, 0, 0, 0];
+
+    // Рахуємо пропуски, середній бал та дані для графіка
+    grades.forEach((g) => {
+      if (g.value.toLowerCase() === "н") {
+        passes++;
+      } else {
+        const val = Number(g.value);
+        gradesSum += val;
+
+        if (g.schedule.subject.gradingSystem === 5) {
+          if (val === 5) dataGradeDiagram[0]++;
+          else if (val === 4) dataGradeDiagram[1]++;
+          else if (val === 3) dataGradeDiagram[2]++;
+          else if (val === 2) dataGradeDiagram[3]++;
+        } else if (g.schedule.subject.gradingSystem === 12) {
+          if (val >= 10) dataGradeDiagram[0]++;
+          else if (val >= 7) dataGradeDiagram[1]++;
+          else if (val >= 4) dataGradeDiagram[2]++;
+          else if (val >= 1) dataGradeDiagram[3]++;
+        }
+      }
+    });
+    res.status(200).json({
+      students: student,
+      statistics: {
+        averageGrade: (gradesSum / grades.length).toFixed(2),
+        totalPasses: passes,
+        diagramData: dataGradeDiagram,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Помилка збереження" });

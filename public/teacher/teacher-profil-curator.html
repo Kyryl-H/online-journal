@@ -26,7 +26,7 @@
         <div class="card-box">
           <div class="card">
             <div class="message">
-              <h2>Список студентів групи П-33</h2>
+              <h2 class="message-group-list">Список студентів групи П-33</h2>
             </div>
             <form action="/search" method="GET" class="search-form">
               <div class="input-wrapper">
@@ -49,8 +49,10 @@
             </div>
           </div>
           <div class="card">
-            <div class="message"><h2>Статистика групи П-33</h2></div>
-            <h2 class="month">Вересень</h2>
+            <div class="message">
+              <h2 class="message-group-statistic">Статистика групи П-33</h2>
+            </div>
+            <h2 class="month"></h2>
             <div class="chart-wrapper">
               <div class="chart-container" style="width: 200px; margin: 0 auto">
                 <canvas id="gradesChart"></canvas>
@@ -76,7 +78,7 @@
             </div>
             <div class="card-info">
               <div class="icon-box"><i class="bi bi-bar-chart-line"></i></div>
-              <div class="info-static">Загальна успішність:</div>
+              <div class="info-static">Успішність:</div>
               <div class="static-value group-grades"></div>
             </div>
             <div class="card-info">

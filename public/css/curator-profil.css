@@ -21,7 +21,30 @@
   font-weight: 600;
 }
 .student-number {
+  min-width: 2.4rem;
   color: var(--text-muted);
+}
+/* Список студентів: видно рівно 10 рядків, далі внутрішній скрол */
+.student-container {
+  --student-rows: 10;
+  --student-row-height: 6.5rem; /* 1.2 + 1.2 padding + 4 іконка + 0.1 рамка */
+  max-height: calc(var(--student-rows) * var(--student-row-height));
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--input-border) transparent;
+}
+.student-container::-webkit-scrollbar {
+  width: 0.6rem;
+}
+.student-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.student-container::-webkit-scrollbar-thumb {
+  background-color: var(--input-border);
+  border-radius: 1rem;
+}
+.student-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
 }
 .input-group {
   display: flex;
@@ -213,5 +236,10 @@
     max-height: 100%;
     padding: 3rem 2rem 2.5rem;
     overflow-y: auto;
+  }
+  /* На телефоні скролиться сама сторінка, а не список */
+  .student-container {
+    max-height: none;
+    overflow-y: visible;
   }
 }

@@ -100,8 +100,8 @@ export const fetchJournalData = async function (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "user-id": 1,
-        "user-role": "teacher",
+        "user-id": tempUserId,
+        "user-role": tempRole,
       },
     });
 
@@ -124,8 +124,8 @@ export const postGrades = async function (grades) {
       method: "POST",
       headers: {
         "Content-type": "application/json",
-        "user-id": 1,
-        "user-role": "teacher",
+        "user-id": tempUserId,
+        "user-role": tempRole,
       },
       body: JSON.stringify(grades),
     });
@@ -148,8 +148,8 @@ export const getGroup = async function () {
     const response = await fetch("/api/groups", {
       method: "GET",
       headers: {
-        "user-id": 1,
-        "user-role": "teacher",
+        "user-id": tempUserId,
+        "user-role": tempRole,
       },
     });
 
@@ -171,8 +171,8 @@ export const getSchedule = async function (groupId, start, end) {
     const response = await fetch(`/api/schedule/${groupId}/${start}/${end}`, {
       method: "GET",
       headers: {
-        "user-id": 1,
-        "user-role": "teacher",
+        "user-id": tempUserId,
+        "user-role": tempRole,
       },
     });
 
@@ -182,6 +182,94 @@ export const getSchedule = async function (groupId, start, end) {
     }
 
     return await response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+
+export const getCuratorGroup = async function () {
+  try {
+    const response = await fetch("/api/curator/groups", {
+      method: "GET",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+export const getCuratorStudents = async function (groupId, year, month) {
+  try {
+    const response = await fetch(`/api/curator/${groupId}/${year}/${month}`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+
+export const updateTopic = async function (lesson) {
+  try {
+    const response = await fetch(`/api/teacher/journal/updateLesson`, {
+      method: "PATCH",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(lesson),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+export const createLesson = async function (lesson) {
+  try {
+    const response = await fetch("/api/teacher/createLesson", {
+      method: "POST",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(lesson),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
   } catch (err) {
     console.error(err);
     showToast(err.message);

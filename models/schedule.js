@@ -24,6 +24,14 @@ const Schedule = sequelize.define("schedule", {
   topic: {
     type: Sequelize.TEXT,
   },
+  lessonType: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    defaultValue: "Пара",
+  },
+  homework: {
+    type: Sequelize.TEXT,
+  },
 });
 
 module.exports = Schedule;

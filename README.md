@@ -125,7 +125,7 @@ http://localhost:3000
 - [ ] Middleware for verifying roles and access rights.
 - [ ] Full-featured electronic grade book.
 - [x] Adding and editing grades.
-- [ ] Attendance tracking.
+- [x] Attendance tracking.
 - [x] Expanding the functionality of the user dashboard.
 - [x] Optimizing and refactoring CSS.
 - [x] Full responsiveness for mobile devices.

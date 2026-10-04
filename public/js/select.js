@@ -362,5 +362,36 @@
     start();
   }
 
-  window.customSelect = { refresh: (select) => registry.get(select)?.sync() };
+  /**
+   * Програмно виставити значення. Приймає value або видимий текст option
+   * (без урахування регістру). Якщо збігу нема — вибирається плейсхолдер
+   * (<option value="">), а за його відсутності — порожній стан.
+   * Повертає true, якщо варіант знайдено.
+   */
+  const setValue = (select, newValue) => {
+    const target = String(newValue ?? "")
+      .trim()
+      .toLowerCase();
+    const options = [...select.options];
+
+    const match =
+      options.find((o) => o.value.toLowerCase() === target) ??
+      options.find((o) => o.text.trim().toLowerCase() === target);
+
+    const fallback = options.find((o) => o.value === "");
+    const index = match?.index ?? fallback?.index ?? -1;
+
+    // Перехоплений setter сам викличе sync() кастомного селекта
+    select.selectedIndex = index;
+    select.dispatchEvent(new Event("change"));
+
+    if (!match)
+      console.warn(`customSelect.set: немає варіанта "${newValue}"`, select);
+    return Boolean(match);
+  };
+
+  window.customSelect = {
+    refresh: (select) => registry.get(select)?.sync(),
+    set: setValue,
+  };
 })();

@@ -425,7 +425,8 @@ video {
   .saveData,
   .modal-save-btn,
   .comeback,
-  :where(.btn-container, .date-panel) > button
+  :where(.btn-container) > button,
+  .create-lesson
 ) {
   --btn-bg: transparent;
   --btn-bg-hover: var(--hover-overlay);
