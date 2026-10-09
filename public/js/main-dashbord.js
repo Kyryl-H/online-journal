@@ -1,12 +1,13 @@
 "use strict";
 import { renderLayout, renderLessonCard, renderExit } from "./components.js";
 import { initGlobal } from "./global.js";
-import { fetchScheduleForDay } from "./api.js";
+import { fetchScheduleForDay, getMessage } from "./api.js";
 
 const els = {
   greeting: document.querySelector(".greeting"),
   labelDate: document.querySelector(".date"),
   scheduleGrid: document.querySelector(".schedule-grid"),
+  messageContainer: document.querySelector(".message-container"),
 };
 
 const currentPath = window.location.pathname;
@@ -35,19 +36,6 @@ const renderHeader = function (fullName) {
 
 const initTeacherPage = async function () {
   const data = await fetchScheduleForDay();
-  //     : {
-  //         role: "student",
-  //         isCurator: false,
-  //         fullName: "Годлевський Кирил",
-  //         schedule: [
-  //           {
-  //             time: "8:30-9:50",
-  //             subject: "Основи програмування",
-  //             room: "403",
-  //             teacherName: "Дашкевич В.",
-  //           },
-  //         ],
-  //       };
   if (!data) {
     renderLayout(currentRole, false);
     renderExit();
@@ -69,6 +57,28 @@ const initTeacherPage = async function () {
     const html = `<div class="schedule-card"><h1 >${data.message}</h1></div>`;
     els.scheduleGrid.insertAdjacentHTML("afterbegin", html);
   }
+
+  const message = await getMessage();
+  if (message.message !== 0) {
+    message.message.forEach(function (l) {
+      const html = `
+  <div class="notice">
+    <i class="bi bi-exclamation-circle-fill notice-icon"></i>
+    <h3 class="notice-text">У вас не заповнений журнал за ${l.date.split("T")[0]} у групи ${l.subject.group.name}</h3>
+    <button class="btn-primary notice-btn" data-groupId=${l.subject.group.id} data-lessonName='${l.subject.name}' data-date=${l.date.split("T")[0]} data-scheduleId=${l.id}>Перейти</button>
+  </div>`;
+      els.messageContainer.insertAdjacentHTML("beforeend", html);
+    });
+  }
+
+  const path = window.location.pathname;
+
+  els.messageContainer.addEventListener("click", function (e) {
+    console.log(e.target);
+    const btn = e.target.closest(".notice-btn");
+    if (!btn) return;
+    window.location.href = `/teacher/teacher-journal.html?groupId=${btn.dataset.groupid}&lessonName=${btn.dataset.lessonname}&path=${path}&data=${btn.dataset.date}&scheduleId=${btn.dataset.scheduleid}`;
+  });
 };
 
 initTeacherPage();

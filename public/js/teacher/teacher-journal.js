@@ -7,6 +7,8 @@ import {
   postGrades,
   showToast,
   updateTopic,
+  createLessons,
+  deleteLesson,
 } from "../api.js";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -15,11 +17,14 @@ const state = {
   groupId: urlParams.get("groupId"),
   lessonName: urlParams.get("lessonName"),
   path: urlParams.get("path"),
+  dateParams: urlParams.get("data") ?? "",
+  scheduleId: urlParams.get("scheduleId") ?? "",
   newGrades: [],
   editLessonId: "",
 
   schedule: [],
   student: [],
+  subject: [],
   grades: [],
   date: new Date(),
   month: "",
@@ -47,11 +52,16 @@ const els = {
   lessonHomework: document.querySelector(".lesson-homework"),
   lessonNumber: document.querySelector(".lesson-number"),
   modalSaveBtn: document.querySelector(".modal-save-btn"),
+  deleteContainer: document.getElementById("delete-container"),
+  modalDeleteBtn: document.querySelector(".modal-delete-btn"),
+  lessonDelete: document.querySelector(".lesson-delete"),
 };
 
 // Рендеринг блока з місяцями
 const renderMonthHeader = function (lessonName, groupName) {
-  state.month = state.date.getMonth();
+  state.month = state.dateParams
+    ? Number(state.dateParams.split("-")[1]) - 1
+    : state.date.getMonth();
 
   els.selectGroup.textContent = `${lessonName} ${groupName}`;
   // Налаштування вибору місяця
@@ -113,7 +123,7 @@ const renderTable = function (searchQuery = "") {
     const day = String(d.getDate()).padStart(2, "0");
     const monthD = String(d.getMonth() + 1).padStart(2, "0");
 
-    const html = `<th data-id=${lesson.id}>${day}/${monthD} <button class="insert-lesson"><i class="bi bi-pencil-square"></i></button>
+    const html = `<th data-id=${lesson.id}>${day}/${monthD} <button class="insert-lesson" data-scheduleId =${lesson.id} data-date=${lesson.date.split("T")[0]}><i class="bi bi-pencil-square"></i></button>
 </th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
@@ -201,13 +211,18 @@ const initLessonModal = function () {
     state.editLessonId = lesson.id;
     window.customSelect.set(els.lessonType, lesson.lessonType);
     els.lessonDate.value = lesson.date?.split("T")[0] ?? "";
-    window.customSelect.set(els.lessonNumber, lesson.lessonNumber ?? "1");
+    window.customSelect.set(els.lessonNumber, lesson.lessonNumber ?? "");
     els.lessonRoom.value = lesson.room ?? "";
     els.lessonTopic.value = lesson.topic ?? "";
     els.lessonHomework.value = lesson.homework ?? "";
+    els.lessonDelete.value = "";
+
+    els.modalSaveBtn.classList.add("edit");
+    els.deleteContainer.style.display = "block";
+    els.modalDeleteBtn.style.display = "block";
+    els.modalDeleteBtn.disabled = true;
 
     showLessonModal();
-    els.modalSaveBtn.classList.add("edit");
   });
 
   // Закрити кнопкою
@@ -228,15 +243,16 @@ const initLessonModal = function () {
 const createLesson = function () {
   els.createLessonBtn.addEventListener("click", function () {
     window.customSelect.set(els.lessonType, "Пара");
-    els.lessonType.disabled = false;
-
-    els.lessonDate.value = currentLesson.date?.split("T")[0] ?? "";
-    els.lessonDate.disabled = true;
+    els.lessonDate.value = "";
+    els.lessonRoom.value = "";
     els.lessonTopic.value = "";
+    els.lessonHomework.value = "";
 
     els.modalSaveBtn.classList.add("create");
+    els.deleteContainer.style.display = "none";
+    els.modalDeleteBtn.style.display = "none";
+
     showLessonModal();
-    // Додати валідацію дат з клавіатури
   });
 };
 
@@ -303,18 +319,20 @@ els.saveData.addEventListener("click", async function () {
 });
 // Кнопка створення/оновлення заняття
 els.modalSaveBtn.addEventListener("click", async function () {
+  let lesson = {};
+  lesson = {
+    lessonType: els.lessonType.value,
+    date: els.lessonDate.value,
+    lessonNumber: els.lessonNumber.value,
+    room: els.lessonRoom.value,
+    topic: els.lessonTopic.value,
+    homework: els.lessonHomework.value,
+  };
   if (els.modalSaveBtn.classList.contains("edit")) {
-    const topic = {
-      id: state.editLessonId,
-      lessonType: els.lessonType.value,
-      date: els.lessonDate.value,
-      lessonNumber: els.lessonNumber.value,
-      room: els.lessonRoom.value,
-      topic: els.lessonTopic.value,
-      homework: els.lessonHomework.value,
-    };
     try {
-      const update = await updateTopic(topic);
+      lesson.id = state.editLessonId;
+
+      const update = await updateTopic(lesson);
 
       const lessonIndex = state.schedule.findIndex(
         (l) => l.id === Number(state.editLessonId),
@@ -337,21 +355,44 @@ els.modalSaveBtn.addEventListener("click", async function () {
       showToast("Помилка при збереженні");
     }
   } else if (els.modalSaveBtn.classList.contains("create")) {
-    console.log(currentLesson);
-    const lesson = {
-      subjectId: currentLesson.subject,
-      date: els.lessonDate.value,
-      lessonNumber: 0,
-      topic: els.lessonTopic.value,
-      room: null,
-      lessonType: els.lessonType.value,
-    };
     try {
-      const create = await createLesson(lesson);
+      lesson.subjectId = state.subject.id;
+      const newLesson = await createLessons(lesson);
+
+      state.schedule.push(newLesson.lesson);
+      hideLessonModal();
+      renderTable();
+      showToast(newLesson.message, "info-msg");
     } catch (err) {
       console.error("Помилка при збереженні:", err);
       showToast("Помилка при збереженні");
     }
+  }
+});
+
+els.deleteContainer.addEventListener("input", function (e) {
+  if (e.target.value.trim() === "ВИДАЛИТИ") {
+    els.modalDeleteBtn.disabled = false;
+  } else {
+    els.modalDeleteBtn.disabled = true;
+  }
+});
+
+els.modalDeleteBtn.addEventListener("click", async () => {
+  if (state.editLessonId) {
+    const del = await deleteLesson(state.editLessonId);
+
+    const scheduleIndex = state.schedule.findIndex(
+      (l) => l.id === Number(state.editLessonId),
+    );
+    state.schedule.splice(scheduleIndex, 1);
+
+    hideLessonModal();
+    renderTable();
+    showToast(del.message, "info-msg");
+  } else {
+    console.error("Помилка видалення: заняття не знайжено");
+    showToast("Заняття не знайжено");
   }
 });
 
@@ -371,9 +412,6 @@ const setDateLimits = function () {
   const currentMonth = now.getMonth();
 
   let startYear, endYear;
-
-  // Якщо зараз вересень (8) або пізніше - навчальний рік почався цього року
-  // Якщо січень-серпень - навчальний рік почався минулого року
   if (currentMonth >= 8) {
     startYear = currentYear;
     endYear = currentYear + 1;
@@ -385,24 +423,81 @@ const setDateLimits = function () {
   dateInput.min = `${startYear}-09-01`;
   dateInput.max = `${endYear}-06-30`;
 };
+
+const formatDateUA = (iso) => iso.split("-").reverse().join(".");
+
+const setupDateValidation = function () {
+  const dateInput = document.getElementById("lesson-date");
+  const errorEl = document.getElementById("lesson-date-error");
+  if (!dateInput || !errorEl) return;
+
+  setDateLimits();
+
+  // Повертає текст помилки або "" якщо все гаразд
+  const getError = () => {
+    const { validity, value, min, max } = dateInput;
+
+    if (validity.badInput) return "Введіть повну та коректну дату";
+    if (validity.valueMissing || !value) return "Оберіть дату";
+    if (validity.rangeUnderflow)
+      return `Дата не може бути раніше ${formatDateUA(min)}`;
+    if (validity.rangeOverflow)
+      return `Дата не може бути пізніше ${formatDateUA(max)}`;
+
+    return "";
+  };
+
+  const showError = (message) => {
+    errorEl.textContent = message;
+    dateInput.classList.toggle("invalid", Boolean(message));
+    dateInput.setCustomValidity(message); // щоб працював form.checkValidity()
+  };
+
+  // Під час набору: не лаємось, поки дата неповна, але прибираємо помилку, коли стала валідною
+  dateInput.addEventListener("input", () => {
+    dateInput.setCustomValidity(""); // скидаємо, щоб validity оновилась
+    if (!getError()) showError("");
+  });
+
+  dateInput.addEventListener("change", () => {
+    dateInput.setCustomValidity("");
+    showError(getError());
+  });
+
+  dateInput.addEventListener("blur", () => {
+    dateInput.setCustomValidity("");
+    showError(getError());
+  });
+
+  // Для виклику перед збереженням
+  dateInput.validateDate = () => {
+    dateInput.setCustomValidity("");
+    const message = getError();
+    showError(message);
+    return !message;
+  };
+};
+
+setupDateValidation();
 const initModalValidation = function () {
   const modalContainer = document.querySelector(".input-topic-lesson");
 
   const validate = () => {
     const isTypeValid = els.lessonType.value.trim() !== "";
-    const isDateValid = els.lessonDate.value.trim() !== "";
     const isRoomValid = els.lessonRoom.value.trim() !== "";
     const isTimeValid = els.lessonNumber.value.trim() !== "";
 
-    // Якщо хоч одне з обов'язкових полів порожнє блокуємо кнопку
-    if (isTypeValid && isDateValid && isRoomValid && isTimeValid) {
-      els.modalSaveBtn.disabled = false;
-    } else {
-      els.modalSaveBtn.disabled = true;
-    }
+    const isDateValid =
+      els.lessonDate.value.trim() !== "" && els.lessonDate.checkValidity();
+
+    els.modalSaveBtn.disabled = !(
+      isTypeValid &&
+      isDateValid &&
+      isRoomValid &&
+      isTimeValid
+    );
   };
 
-  // Делегування для запуску перевірки при змінах
   modalContainer.addEventListener("input", validate);
   modalContainer.addEventListener("change", validate);
 
@@ -428,12 +523,14 @@ const render = async function () {
   const data = await fetchJournalData(
     state.groupId,
     state.lessonName,
-    state.date.getMonth(),
+    state.dateParams
+      ? Number(state.dateParams.split("-")[1]) - 1
+      : state.date.getMonth(),
   );
 
   if (!data) {
     console.log("Помилка завантаження даних");
-    // window.location.href = "/teacher/journal-main.html";
+    window.location.href = "/teacher/journal-main.html";
   }
 
   renderLayout("teacher", true);
@@ -448,6 +545,16 @@ const render = async function () {
   renderMonthHeader(state.subject.name, data.subject.group.name);
   renderTable();
   moreFunctionality();
+
+  if (state.date && state.scheduleId) {
+    console.log(state.scheduleId);
+    const currentBtn = document.querySelector(
+      `.insert-lesson[data-scheduleid="${state.scheduleId}"]`,
+    );
+    if (currentBtn) {
+      currentBtn.click();
+    }
+  }
 };
 
 render();

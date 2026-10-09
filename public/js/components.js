@@ -1,5 +1,5 @@
 "use strict";
-
+import { getMessage } from "./api.js";
 const MOBILE_QUERY = "(max-width: 768px)";
 
 // Бургер-меню, затемнення, Esc та кнопки з data-action="logout"
@@ -75,58 +75,19 @@ export const renderLayout = function (role, isCurator = false) {
           </button>
         </li>
         <li class="nav-el-top notif">
-          <div class="el" aria-haspopup="true" aria-label="Повідомлення">
+          <button class="el notif-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Повідомлення">
             <i class="bi bi-bell-fill"></i>
-            <span class="notif-badge">5</span>
-          </div>
+            <span class="notif-badge" hidden>0</span>
+          </button>
 
           <div class="notif-dropdown" role="dialog" aria-label="Повідомлення">
             <div class="notif-header">
               <h3 class="notif-title">Повідомлення</h3>
-              <span class="notif-count">5</span>
+              <span class="notif-count">0</span>
             </div>
-
-            <ul class="notif-list">
-              <li class="notif-item notif-item--unread">
-                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
-                <div class="notif-body">
-                  <p class="notif-text">Не заповнено тему до уроку: Вища математика, П-13</p>
-                  <span class="notif-time">Сьогодні, 10:30</span>
-                </div>
-              </li>
-              <li class="notif-item notif-item--unread">
-                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
-                <div class="notif-body">
-                  <p class="notif-text">Не заповнено тему до уроку: Фізика, П-11</p>
-                  <span class="notif-time">Сьогодні, 08:45</span>
-                </div>
-              </li>
-              <li class="notif-item">
-                <div class="notif-icon notif-icon--info"><i class="bi bi-arrow-left-right"></i></div>
-                <div class="notif-body">
-                  <p class="notif-text">Заміна в розкладі: Інформатика, ауд. 214, П-13</p>
-                  <span class="notif-time">Вчора, 16:20</span>
-                </div>
-              </li>
-              <li class="notif-item">
-                <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
-                <div class="notif-body">
-                  <p class="notif-text">Не виставлено оцінки: Програмування, П-12</p>
-                  <span class="notif-time">26 вер, 14:10</span>
-                </div>
-              </li>
-              <li class="notif-item">
-                <div class="notif-icon notif-icon--info"><i class="bi bi-check-circle-fill"></i></div>
-                <div class="notif-body">
-                  <p class="notif-text">Оцінки за вересень збережено</p>
-                  <span class="notif-time">25 вер, 12:05</span>
-                </div>
-              </li>
-            </ul>
-
-            <button class="notif-clear" type="button">Позначити всі як прочитані</button>
+            <ul class="notif-list"></ul>
           </div>
-        </li>      </ul>
+        </li></ul>
     </header>
 
     <nav class="sidebar">
@@ -143,6 +104,7 @@ export const renderLayout = function (role, isCurator = false) {
   document.body.insertAdjacentHTML("afterbegin", html);
   if (window.syncThemeButtons) window.syncThemeButtons();
   initLayoutEvents();
+  initNotifications(role);
 };
 
 export const renderLessonCard = function (lesson, role, containerElement) {
@@ -207,4 +169,110 @@ export const renderExit = function () {
     <div class="overlay hidden"></div>
 `;
   document.body.insertAdjacentHTML("beforeend", html);
+};
+
+const escapeHtml = (value) =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+
+// "2026-09-30T00:00:00.000Z" > "30.09.2026"
+const formatDate = (iso) => {
+  const [y, m, d] = String(iso).split("T")[0].split("-");
+  return `${d}.${m}.${y}`;
+};
+
+// Малює список і лічильники
+const renderNotifications = function (lessons) {
+  const root = document.querySelector(".notif");
+  if (!root) return;
+
+  const list = root.querySelector(".notif-list");
+  const badge = root.querySelector(".notif-badge");
+  const count = root.querySelector(".notif-count");
+
+  badge.hidden = lessons.length === 0;
+  badge.textContent = lessons.length > 9 ? "9+" : String(lessons.length);
+  count.textContent = lessons.length;
+
+  if (lessons.length === 0) {
+    list.innerHTML = `<li class="notif-empty">Незаповнених занять немає</li>`;
+    return;
+  }
+
+  list.innerHTML = lessons
+    .map(
+      (l) => `
+    <li class="notif-item">
+      <div class="notif-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+      <div class="notif-body">
+        <p class="notif-text">Не заповнений журнал</p>
+        <p class="notif-meta">${escapeHtml(l.subject.name)} · ${escapeHtml(l.subject.group.name)}</p>
+        <div class="notif-footer">
+          <span class="notif-time"><i class="bi bi-calendar3"></i> ${formatDate(l.date)}</span>
+          <button
+            class="btn-primary notif-btn"
+            type="button"
+            data-group-id="${escapeHtml(l.subject.group.id)}"
+            data-lesson-name="${escapeHtml(l.subject.name)}"
+            data-date="${escapeHtml(l.date.split("T")[0])}"
+            data-schedule-id="${escapeHtml(l.id)}"
+          >Перейти</button>
+        </div>
+      </div>
+    </li>`,
+    )
+    .join("");
+};
+
+// Відкриття/закриття, перехід до журналу, завантаження даних
+const initNotifications = async function (role) {
+  const root = document.querySelector(".notif");
+  if (!root) return;
+
+  const toggle = root.querySelector(".notif-toggle");
+  const setOpen = (open) => {
+    root.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+  };
+
+  toggle.addEventListener("click", () =>
+    setOpen(!root.classList.contains("is-open")),
+  );
+  document.addEventListener("click", (e) => {
+    if (!root.contains(e.target)) setOpen(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  // Ті самі параметри, що й на головній сторінці
+  root.querySelector(".notif-list").addEventListener("click", (e) => {
+    const btn = e.target.closest(".notif-btn");
+    if (!btn) return;
+
+    const params = new URLSearchParams({
+      groupId: btn.dataset.groupId,
+      lessonName: btn.dataset.lessonName,
+      path: window.location.pathname,
+      data: btn.dataset.date,
+      scheduleId: btn.dataset.scheduleId,
+    });
+    window.location.href = `/teacher/teacher-journal.html?${params}`;
+  });
+
+  // Сповіщення про незаповнені пари є лише в викладача
+  if (role !== "teacher") return renderNotifications([]);
+
+  try {
+    const res = await getMessage();
+    renderNotifications(Array.isArray(res?.message) ? res.message : []);
+  } catch (err) {
+    console.error("Не вдалося завантажити повідомлення:", err);
+    renderNotifications([]);
+  }
 };

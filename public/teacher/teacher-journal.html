@@ -51,7 +51,7 @@
             </div>
             <div>
               <button class="create-lesson">Додати нове заняття</button>
-              <button class="print-outbtn">Експортувати</button>
+              <!-- <button class="print-outbtn">Експортувати</button> -->
               <button class="saveData">Зберегти зміни</button>
             </div>
           </div>
@@ -112,7 +112,13 @@
                   id="lesson-date"
                   name="lesson-date"
                   class="input lesson-date"
+                  required
                 />
+                <span
+                  class="error-message"
+                  id="lesson-date-error"
+                  aria-live="polite"
+                ></span>
               </div>
 
               <div class="form-group">
@@ -122,6 +128,9 @@
                   id="lesson-number"
                   class="select lesson-number"
                 >
+                  <option value="" disabled selected hidden>
+                    Оберіть час...
+                  </option>
                   <option value="1">1 (8:30-9:30)</option>
                   <option value="2">2 (8:30-9:30)</option>
                   <option value="3">3 (8:30-9:30)</option>
@@ -161,6 +170,18 @@
                   placeholder="Введіть завдання..."
                 />
               </div>
+              <div class="form-group" id="delete-container">
+                <label for="lesson-delete"
+                  >Для видалення напишіть 'ВИДАЛИТИ'</label
+                >
+                <input
+                  type="text"
+                  id="lesson-delete"
+                  class="input lesson-delete"
+                  placeholder="ВИДАЛИТИ"
+                />
+              </div>
+              <button class="btn modal-delete-btn">Видалити</button>
 
               <button class="btn modal-save-btn">Зберегти</button>
             </div>

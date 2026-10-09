@@ -51,7 +51,7 @@ Group.hasMany(Subject);
 Subject.belongsTo(Group);
 Teacher.hasMany(Subject);
 Subject.belongsTo(Teacher);
-Schedule.hasMany(Grades);
+Schedule.hasMany(Grades, { onDelete: "CASCADE" });
 Grades.belongsTo(Schedule);
 Subject.hasMany(Schedule);
 Schedule.belongsTo(Subject);

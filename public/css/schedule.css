@@ -18,7 +18,9 @@
 }
 .week-navigation {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
   width: 100%;
 }
 .current-week {
@@ -27,7 +29,56 @@
   font-weight: bold;
   color: var(--text-muted);
 }
+.schedule-title {
+  margin-bottom: 1.6rem;
+}
+.schedule-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+}
 
+/* Вкладки: «Мій розклад» / «Розклад групи» */
+.schedule-tabs {
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background-color: var(--sidebar);
+  border-radius: var(--border-radius);
+}
+.tab-btn {
+  padding: 1rem 2.4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--transition-speed),
+    background-color var(--transition-speed),
+    box-shadow var(--transition-speed),
+    transform var(--transition-speed);
+}
+.tab-btn:hover:not(.active) {
+  color: var(--text-main);
+  background-color: var(--hover-overlay);
+}
+.tab-btn.active {
+  color: var(--primary-color);
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+.tab-btn:active {
+  transform: translateY(0.1rem);
+}
+.tab-btn:focus-visible {
+  outline: 0.2rem solid var(--primary-color);
+  outline-offset: 0.2rem;
+}
 /* Сітка днів */
 .schedule-grid {
   display: grid;
@@ -131,9 +182,6 @@
 }
 
 @media (max-width: 768px) {
-  .schedule-header {
-    padding: 1rem 0;
-  }
   .group-selector {
     flex-wrap: wrap;
     gap: 0.8rem;
@@ -142,13 +190,24 @@
     margin: 0;
     font-size: 2rem;
   }
+  .day-column {
+    max-width: none;
+  }
+  .schedule-controls,
+  .schedule-tabs {
+    width: 100%;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 1rem 1.2rem;
+  }
+  .schedule-header {
+    padding: 1.6rem 1.2rem 1rem;
+  }
   .schedule-grid {
     grid-template-columns: 1fr;
     gap: 1.6rem;
-    padding: 1rem;
+    padding: 1rem 1.2rem 1.6rem;
     overflow-x: auto;
-  }
-  .day-column {
-    max-width: none;
   }
 }

@@ -79,6 +79,40 @@ export const initGlobal = function () {
     });
   };
 
+  // ===== Loader =====
+  let loaderEl = null;
+  let loaderCount = 0; // лічильник паралельних запитів
+
+  const getLoader = function () {
+    if (loaderEl && document.body.contains(loaderEl)) return loaderEl;
+
+    loaderEl = document.createElement("div");
+    loaderEl.className = "loader-overlay";
+    loaderEl.setAttribute("role", "status");
+    loaderEl.setAttribute("aria-live", "polite");
+    loaderEl.setAttribute("aria-label", "Завантаження");
+    loaderEl.innerHTML = '<div class="loader-spinner"></div>';
+    document.body.appendChild(loaderEl);
+    return loaderEl;
+  };
+
+  const showLoader = function () {
+    loaderCount++;
+    const el = getLoader();
+    // подвійний rAF, щоб transition відпрацював одразу після створення
+    requestAnimationFrame(() => el.classList.add("loader-overlay--visible"));
+  };
+
+  const hideLoader = function (force = false) {
+    loaderCount = force ? 0 : Math.max(0, loaderCount - 1);
+    if (loaderCount > 0 || !loaderEl) return; // ще є активні запити
+    loaderEl.classList.remove("loader-overlay--visible");
+  };
+
+  // Щоб викликати без імпорту (наприклад, з inline-скриптів)
+  window.showLoader = showLoader;
+  window.hideLoader = hideLoader;
+
   nav();
   setupExit();
 };

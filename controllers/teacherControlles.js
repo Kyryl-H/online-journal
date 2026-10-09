@@ -81,6 +81,31 @@ exports.getScheduleForDay = async (req, res, next) => {
     next(err);
   }
 };
+exports.getMessage = async (req, res, next) => {
+  const userId = req.headers["user-id"];
+
+  const teacher = await Teacher.findOne({ where: { userId: userId } });
+
+  if (!teacher) return;
+
+  const subject = await Subject.findAll({ where: { teacherId: teacher.id } });
+
+  const subjectId = subject.map((s) => s.id);
+  const message = await Schedule.findAll({
+    where: { [Op.and]: [{ subjectId: { [Op.in]: subjectId } }, { topic: "" }] },
+    attributes: ["id", "date"],
+    include: {
+      model: Subject,
+      attributes: ["name"],
+      include: {
+        model: Group,
+        attributes: ["id", "name"],
+      },
+    },
+  });
+
+  res.status(200).json({ message: message });
+};
 // Дані для профілю
 exports.getProfile = async (req, res, next) => {
   try {
@@ -186,6 +211,9 @@ exports.getJournal = async (req, res, next) => {
       attributes: ["name"],
     },
   });
+  if (!subject) {
+    return res.status(404).json({ message: "Предмет не знайдено" });
+  }
   // пошук за потрібним місяцем
   const nowDate = new Date();
   const year = nowDate.getFullYear();
@@ -239,6 +267,19 @@ exports.getJournal = async (req, res, next) => {
     grades: grades,
   });
 };
+exports.postGrades = async (req, res, next) => {
+  try {
+    // Валідація оцінок на сервері
+    await Grades.bulkCreate(req.body, {
+      updateOnDuplicate: ["value"],
+    });
+
+    res.status(200).json({ message: "Дані успішно збережені!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка збереження" });
+  }
+};
 
 exports.updateLesson = async (req, res, next) => {
   try {
@@ -274,20 +315,43 @@ exports.updateLesson = async (req, res, next) => {
   }
 };
 
-exports.postGrades = async (req, res, next) => {
+exports.createLesson = async (req, res, next) => {
   try {
-    // Валідація оцінок на сервері
-    await Grades.bulkCreate(req.body, {
-      updateOnDuplicate: ["value"],
+    const { lessonType, date, lessonNumber, room, topic, homework, subjectId } =
+      req.body;
+
+    const newLesson = await Schedule.create({
+      lessonType: lessonType,
+      date: date,
+      lessonNumber: lessonNumber,
+      room: room,
+      topic: topic,
+      homework: homework,
+      subjectId: subjectId,
     });
 
-    res.status(200).json({ message: "Дані успішно збережені!" });
+    res.status(200).json({
+      message: "Заняття успішно створено!",
+      lesson: newLesson,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Помилка збереження" });
   }
 };
 
+exports.deleteLesson = async (req, res, next) => {
+  try {
+    const lessonId = req.params.id;
+    console.log(`ID: ${lessonId}`);
+    await Schedule.destroy({ where: { id: lessonId } });
+
+    res.status(200).json({ message: "Заняття успішно видалено" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка збереження" });
+  }
+};
 exports.getGroups = async (req, res, next) => {
   try {
     const group = await Group.findAll({ attributes: ["id", "name"] });
@@ -344,11 +408,53 @@ exports.getSchedule = async (req, res, next) => {
     res.status(500).json({ message: "Помилка збереження" });
   }
 };
+exports.getTeacherSchedule = async (req, res) => {
+  try {
+    const { start, end } = req.params;
+    const userId = req.headers["user-id"];
+
+    const teacher = await Teacher.findOne({
+      where: { userId: userId },
+    });
+
+    const schedule = await Schedule.findAll({
+      attributes: ["id", "date", "lessonNumber", "room"],
+      where: { date: { [Op.between]: [start, end] } },
+      include: {
+        model: Subject,
+        attributes: ["name"],
+        where: { teacherId: teacher.id },
+        include: { model: Group, attributes: ["name"] },
+      },
+      order: [
+        ["date", "ASC"],
+        ["lessonNumber", "ASC"],
+      ],
+    });
+
+    res.status(200).json(
+      schedule.map((s) => ({
+        id: s.id,
+        date: s.date,
+        lessonNumber: s.lessonNumber,
+        room: s.room,
+        subjectName: s.subject?.name,
+        groupName: s.subject?.group?.name,
+      })),
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка завантаження розкладу" });
+  }
+};
 
 exports.getCuratorGroup = async (req, res, next) => {
   const currentUserId = req.headers["user-id"];
   try {
     const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Викладача не знайдено" });
+    }
     const group = await Group.findAll({
       where: { teacherId: teacher.id },
       attributes: ["id", "name"],
@@ -364,8 +470,8 @@ exports.getCuratorGroup = async (req, res, next) => {
 exports.getCuratorStudent = async (req, res, next) => {
   const currentUserId = req.headers["user-id"];
   const groupId = req.params.groupId;
-  const year = req.params.year;
-  const month = req.params.month;
+  const year = Number(req.params.year);
+  const month = Number(req.params.month);
 
   const startOfMonth = new Date(year, month, 1);
   const endOfMonth = new Date(year, month + 1, 0);
@@ -384,6 +490,11 @@ exports.getCuratorStudent = async (req, res, next) => {
       include: {
         model: Schedule,
         attributes: ["id"],
+        where: {
+          date: {
+            [Op.between]: [startOfMonth, endOfMonth],
+          },
+        },
         include: {
           model: Subject,
           attributes: ["gradingSystem"],
@@ -419,7 +530,8 @@ exports.getCuratorStudent = async (req, res, next) => {
     res.status(200).json({
       students: student,
       statistics: {
-        averageGrade: (gradesSum / grades.length).toFixed(2),
+        averageGrade:
+          ((dataGradeDiagram[0] + dataGradeDiagram[1]) / student.length) * 100,
         totalPasses: passes,
         diagramData: dataGradeDiagram,
       },

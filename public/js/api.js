@@ -189,6 +189,25 @@ export const getSchedule = async function (groupId, start, end) {
   }
 };
 
+export const getMySchedule = async function (start, end) {
+  try {
+    const response = await fetch(`/api/teacher-schedule/${start}/${end}`, {
+      method: "GET",
+      headers: { "user-id": tempUserId, "user-role": tempRole },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+    return await response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+
 export const getCuratorGroup = async function () {
   try {
     const response = await fetch("/api/curator/groups", {
@@ -252,9 +271,9 @@ export const updateTopic = async function (lesson) {
     return null;
   }
 };
-export const createLesson = async function (lesson) {
+export const createLessons = async function (lesson) {
   try {
-    const response = await fetch("/api/teacher/createLesson", {
+    const response = await fetch("/api/teacher/createLessons", {
       method: "POST",
       headers: {
         "user-id": tempUserId,
@@ -262,6 +281,52 @@ export const createLesson = async function (lesson) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(lesson),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+
+export const deleteLesson = async function (lessonId) {
+  try {
+    const response = await fetch(`/api/teacher/lessons/${lessonId}`, {
+      method: "DELETE",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message);
+    return null;
+  }
+};
+
+export const getMessage = async function () {
+  try {
+    const response = await fetch(`/api/teacher/message`, {
+      method: "GET",
+      headers: {
+        "user-id": tempUserId,
+        "user-role": tempRole,
+      },
     });
 
     if (!response.ok) {
