@@ -34,6 +34,7 @@
   --border-line: #e2e8f0;
   --input-border: #d1d5db;
   --header-border: #9ae6d3;
+  --logo-color: #f0fdfa;
 
   /* Оверлеї */
   --overlay-bg: rgb(0 0 0 / 0.5);
@@ -53,15 +54,35 @@
   --chart-unsatisfactory: #0ea5e9;
 
   /* Сторінка входу */
-  --login-bg-start: #000000;
-  --login-bg-mid: #1a1a2e;
-  --login-text: #ffffff;
-  --login-border: rgb(255 255 255 / 0.2);
-  --login-shadow: 0 0 1rem rgb(0 0 0 / 0.2);
-  --login-btn-bg: #ffffff;
-  --login-btn-bg-hover: #e2e8f0;
-  --login-btn-text: #334155;
+  /* у :root */
+  /* Логотип у шапці: знак малюється маскою і бере колір із --logo-color */
+  --logo-color: #17454a;
+  --logo-url: url("/assets/icon/logo-mono.svg");
 
+  /* Сторінка входу (не залежить від теми) */
+  --login-bg-start: #07181b;
+  --login-bg-mid: #123c40;
+  --login-aurora-a: rgb(123 184 169 / 0.34);
+  --login-aurora-b: rgb(45 150 140 / 0.28);
+  --login-text: #ffffff;
+  --login-muted: rgb(255 255 255 / 0.7);
+  --login-card-top: rgb(255 255 255 / 0.1);
+  --login-card-bottom: rgb(255 255 255 / 0.03);
+  --login-edge: rgb(255 255 255 / 0.22);
+  --login-field-bg: rgb(255 255 255 / 0.06);
+  --login-autofill: #174349;
+  --login-border: rgb(255 255 255 / 0.16);
+  --login-focus: #8fd0bf;
+  --login-focus-ring: rgb(143 208 191 / 0.28);
+  --login-shadow: 0 3rem 8rem rgb(0 0 0 / 0.45);
+  --login-plate-top: #ffffff;
+  --login-plate-bottom: #dff1ec;
+  --login-plate-glow: rgb(143 208 191 / 0.45);
+  --login-btn-bg: #ffffff;
+  --login-btn-bg-hover: #e4f4ef;
+  --login-btn-text: #0f3d3f;
+  --login-btn-shadow: 0 0.6rem 2rem rgb(0 0 0 / 0.3);
+  --login-sheen: rgb(143 208 191 / 0.45);
   /* Розміри й анімації */
   --border-radius: 1rem;
   --radius-sm: 0.8rem;
@@ -108,6 +129,7 @@
     --border-line: #334155;
     --input-border: #475569;
     --header-border: #2a6b5d;
+    --logo-color: #f0fdfa;
 
     /* Оверлеї */
     --overlay-bg: rgb(2 6 23 / 0.7);
@@ -159,6 +181,7 @@
   --border-line: #334155;
   --input-border: #475569;
   --header-border: #2a6b5d;
+  --logo-color: #f0fdfa;
 
   /* Оверлеї */
   --overlay-bg: rgb(2 6 23 / 0.7);
@@ -261,15 +284,57 @@ video {
   background-color: var(--brand-color);
   border-bottom: 0.1rem solid var(--header-border);
 }
-.logo-header {
+.header .logo-header {
   display: flex;
   align-items: center;
-  min-width: 4rem;
-  padding: 0 2rem;
-  font-size: 3rem;
+  gap: 1.2rem;
+  min-width: 0;
+  padding-inline: 2.4rem 1.6rem; /* відступ від краю екрана */
 }
-.logo-header h4 {
-  margin: 0 2rem;
+
+.header .brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* було 1.2rem: більше повітря між знаком і текстом */
+  padding: 0.4rem 0.8rem;
+  color: var(--logo-color);
+  border-radius: 1rem;
+  transition: opacity var(--transition-speed);
+}
+.header .brand:hover {
+  opacity: 0.8;
+}
+.header .brand:focus-visible {
+  outline: 0.2rem solid var(--primary-color);
+  outline-offset: 0.2rem;
+}
+
+.brand-mark {
+  display: inline-block;
+  flex-shrink: 0;
+  height: 4.2rem; /* було 3.4rem */
+  aspect-ratio: 2061 / 1719;
+  background-color: currentColor;
+  -webkit-mask: var(--logo-url) center / contain no-repeat;
+  mask: var(--logo-url) center / contain no-repeat;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  line-height: 1.15;
+}
+.brand-name {
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.brand-sub {
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
 }
 .nav-list-top {
   display: flex;
@@ -1300,15 +1365,19 @@ select[data-cselect] {
     justify-content: center;
     font-size: 2.8rem;
   }
-  .logo-header {
-    align-items: center;
-    padding: 0 1rem;
-    font-size: 2.4rem;
+  .header .logo-header {
+    gap: 0.8rem;
+    padding-inline: 1.2rem 1rem;
   }
-  .logo-header h4 {
-    margin: 0 1rem;
-    font-size: 1.8rem;
-    white-space: nowrap;
+  .header .brand {
+    gap: 1.1rem;
+    padding: 0.4rem;
+  }
+  .brand-mark {
+    height: 3.6rem;
+  }
+  .brand-name {
+    font-size: 2.1rem;
   }
   .nav-list-top {
     align-items: center;
@@ -1395,7 +1464,7 @@ select[data-cselect] {
 }
 
 @media (max-width: 480px) {
-  .logo-header > .bi-book {
+  .brand-sub {
     display: none;
   }
 }

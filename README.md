@@ -119,10 +119,10 @@ http://localhost:3000
 - [ ] Creating a **RESTful API** for client-server communication.
 - [x] Importing test JSON data into the database.
 - [ ] Implement CRUD operations for core entities.
-- [ ] Set up a secure authentication system.
-- [ ] Hash passwords.
-- [ ] Implement JWT or session-based authentication.
-- [ ] Middleware for verifying roles and access rights.
+- [x] Set up a secure authentication system.
+- [x] Hash passwords.
+- [x] Implement JWT or session-based authentication.
+- [x] Middleware for verifying roles and access rights.
 - [ ] Full-featured electronic grade book.
 - [x] Adding and editing grades.
 - [x] Attendance tracking.

@@ -43,7 +43,7 @@ const initLayoutEvents = function () {
 export const renderLayout = function (role, isCurator = false) {
   let navLinks = "";
 
-  if (role === "teacher") {
+  if (role === "TEACHER") {
     navLinks = `
         <li><a href="/teacher/teacher-main.html" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
         <li><a href="/teacher/teacher-profil.html" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Особистий кабінет</span></a></li>
@@ -52,7 +52,7 @@ export const renderLayout = function (role, isCurator = false) {
     if (isCurator) {
       navLinks += `<li><a href="/teacher/teacher-profil-curator.html" data-target="profil-curator" class="nav-link"><i class="bi bi-people icon"></i><span class="link-name">Кабінет куратора</span></a></li>`;
     }
-  } else if (role === "student") {
+  } else if (role === "STUDENT") {
     navLinks = `
         <li><a href="/student/student-main.html" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
         <li><a href="/student/student-profil.html" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Мій профіль</span></a></li>
@@ -60,14 +60,20 @@ export const renderLayout = function (role, isCurator = false) {
     `;
   }
 
+  const homeHref =
+    role === "STUDENT"
+      ? "/student/student-main.html"
+      : "/teacher/teacher-main.html";
+
   const html = `
     <header class="header">
-      <div class="logo-header">
-        <button class="icon-btn burger-btn" data-sidebar-toggle aria-label="Меню" aria-expanded="false">
-          <i class="bi bi-list"></i>
-        </button>
-        <i class="bi bi-book"></i><h4>Онлайн журнал</h4>
-      </div>
+      <a class="brand" href="${homeHref}" aria-label="Aleph, онлайн журнал: на головну">
+  <span class="brand-mark" aria-hidden="true"></span>
+  <span class="brand-text">
+    <span class="brand-name">Aleph</span>
+    <span class="brand-sub">Онлайн журнал</span>
+  </span>
+</a>
       <ul class="nav-list-top">
         <li>
           <button class="icon-btn" data-theme-toggle aria-label="Змінити тему">
@@ -108,19 +114,23 @@ export const renderLayout = function (role, isCurator = false) {
 };
 
 export const renderLessonCard = function (lesson, role, containerElement) {
-  const detailIcon = role === "teacher" ? "bi-people" : "bi-person";
-  const detailText = role === "teacher" ? lesson.groupName : lesson.teacherName;
+  const detailIcon =
+    localStorage.getItem("role") === "teacher" ? "bi-people" : "bi-person";
+  const detailText =
+    localStorage.getItem("role") === "teacher"
+      ? lesson.groupName
+      : lesson.teacherName;
 
   const html = `
     <div class="schedule-card">
       <div class="card-header">
-        <span class="time"><i class="bi bi-clock"></i> ${lesson.time}</span>
+        <span class="time"><i class="bi bi-clock"></i> ${escapeHtml(lesson.time)}</span>
         <span class="status-badge">Наступна</span>
       </div>
-      <h3>${lesson.subject}</h3>
+      <h3>${escapeHtml(lesson.subject)}</h3>
       <div class="card-details">
-        <div class="detail-item"><i class="bi ${detailIcon}"></i> <span>${detailText}</span></div>
-        <div class="detail-item"><i class="bi bi-geo-alt"></i><span>Ауд. ${lesson.room}</span></div>
+        <div class="detail-item"><i class="bi ${escapeHtml(detailIcon)}"></i> <span>${escapeHtml(detailText)}</span></div>
+        <div class="detail-item"><i class="bi bi-geo-alt"></i><span>Ауд. ${escapeHtml(lesson.room)}</span></div>
       </div>
     </div>
   `;
@@ -266,7 +276,7 @@ const initNotifications = async function (role) {
   });
 
   // Сповіщення про незаповнені пари є лише в викладача
-  if (role !== "teacher") return renderNotifications([]);
+  if (role !== "TEACHER") return renderNotifications([]);
 
   try {
     const res = await getMessage();

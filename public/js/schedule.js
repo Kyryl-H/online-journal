@@ -1,8 +1,8 @@
 "use strict";
 
 import { renderLayout, renderExit } from "./components.js";
-import { initGlobal } from "./global.js";
-import { getGroup, getSchedule, getMySchedule } from "./api.js";
+import { initGlobal, escapeHtml, showLoader, hideLoader } from "./global.js";
+import { getGroup, getSchedule, getMySchedule, showToast } from "./api.js";
 
 const state = {
   date: new Date(),
@@ -22,7 +22,7 @@ const els = {
   tabs: document.querySelectorAll(".tab-btn"),
 };
 
-// ---------- Допоміжні функції ----------
+//  Допоміжні функції
 
 // Формат YYYY-MM-DD за локальним часом
 const formatDate = function (d) {
@@ -59,7 +59,7 @@ const resetWeek = function () {
 
 const renderGroupSelect = function (groups) {
   groups.forEach(function (g) {
-    const html = `<option value="${g.id}">${g.name}</option>`;
+    const html = `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`;
     els.groupSelect.insertAdjacentHTML("beforeend", html);
   });
 };
@@ -113,14 +113,14 @@ const renderSchedule = function (groupListLesson) {
 
         const html = `
           <div class="lesson-card">
-            <div class="lesson-number">${les.lessonNumber}</div>
+            <div class="lesson-number">${escapeHtml(les.lessonNumber)}</div>
 
             <div class="lesson-info">
-              <div class="lesson-name">${les.subjectName}</div>
-              <div class="lesson-teacher">${secondLine}</div>
+              <div class="lesson-name">${escapeHtml(les.subjectName)}</div>
+              <div class="lesson-teacher">${escapeHtml(secondLine)}</div>
             </div>
 
-            <div class="lesson-room">${les.room}</div>
+            <div class="lesson-room">${escapeHtml(les.room)}</div>
           </div>
         `;
         dayBlock.insertAdjacentHTML("beforeend", html);
@@ -192,7 +192,15 @@ const shiftWeek = async function (delta) {
   state.sunday.setDate(state.sunday.getDate() + delta * 7);
 
   checkButtons();
-  await loadSchedule();
+  try {
+    showLoader();
+    await loadSchedule();
+  } catch (err) {
+    console.error(`Помилка: ${err}`);
+    showToast("Помилка завантаження даних");
+  } finally {
+    hideLoader();
+  }
 };
 
 const weeksBtn = function () {
@@ -207,17 +215,25 @@ const weeksBtn = function () {
 //  Старт
 
 const render = async function () {
-  renderLayout("teacher", true);
-  renderExit();
-  initGlobal();
+  try {
+    showLoader();
+    renderLayout(localStorage.getItem("role"), true);
+    renderExit();
+    initGlobal();
 
-  const groups = await getGroup();
-  renderGroupSelect(groups.group);
+    const groups = await getGroup();
+    renderGroupSelect(groups.group);
 
-  setupEventListeners();
-  weeksBtn();
+    setupEventListeners();
+    weeksBtn();
 
-  setMode("my");
+    setMode("my");
+  } catch (err) {
+    console.error(`Помилка: ${err}`);
+    showToast("Помилка завантаження даних");
+  } finally {
+    hideLoader();
+  }
 };
 
 render();

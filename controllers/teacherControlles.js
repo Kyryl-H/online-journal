@@ -10,8 +10,8 @@ const Grades = require("../models/grades");
 
 // Дані для головної сторіник
 exports.getScheduleForDay = async (req, res, next) => {
-  const currentUserId = req.headers["user-id"];
-  const currentRole = req.headers["user-role"];
+  const currentUserId = req.userId;
+  const currentRole = req.userRole;
   try {
     const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
 
@@ -82,9 +82,9 @@ exports.getScheduleForDay = async (req, res, next) => {
   }
 };
 exports.getMessage = async (req, res, next) => {
-  const userId = req.headers["user-id"];
+  const currentUserId = req.userId;
 
-  const teacher = await Teacher.findOne({ where: { userId: userId } });
+  const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
 
   if (!teacher) return;
 
@@ -109,8 +109,8 @@ exports.getMessage = async (req, res, next) => {
 // Дані для профілю
 exports.getProfile = async (req, res, next) => {
   try {
-    const currentUserId = req.headers["user-id"];
-    const currentRole = req.headers["user-role"];
+    const currentUserId = req.userId;
+    const currentRole = req.userRole;
 
     const teacher = await Teacher.findOne({
       where: { userId: currentUserId },
@@ -165,8 +165,8 @@ exports.getProfile = async (req, res, next) => {
 // Дані для головної(першої) сторнки журналу
 exports.getJournalMain = async (req, res, next) => {
   try {
-    const currentUserId = req.headers["user-id"];
-    const currentRole = req.headers["user-role"];
+    const currentUserId = req.userId;
+    const currentRole = req.userRole;
     const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
 
     if (!teacher) {
@@ -411,10 +411,10 @@ exports.getSchedule = async (req, res, next) => {
 exports.getTeacherSchedule = async (req, res) => {
   try {
     const { start, end } = req.params;
-    const userId = req.headers["user-id"];
+    const currentUserId = req.userId;
 
     const teacher = await Teacher.findOne({
-      where: { userId: userId },
+      where: { userId: currentUserId },
     });
 
     const schedule = await Schedule.findAll({
@@ -449,7 +449,7 @@ exports.getTeacherSchedule = async (req, res) => {
 };
 
 exports.getCuratorGroup = async (req, res, next) => {
-  const currentUserId = req.headers["user-id"];
+  const currentUserId = req.userId;
   try {
     const teacher = await Teacher.findOne({ where: { userId: currentUserId } });
     if (!teacher) {
@@ -468,7 +468,7 @@ exports.getCuratorGroup = async (req, res, next) => {
 };
 
 exports.getCuratorStudent = async (req, res, next) => {
-  const currentUserId = req.headers["user-id"];
+  const currentUserId = req.userId;
   const groupId = req.params.groupId;
   const year = Number(req.params.year);
   const month = Number(req.params.month);

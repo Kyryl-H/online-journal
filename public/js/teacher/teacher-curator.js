@@ -1,7 +1,7 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal } from "../global.js";
+import { initGlobal, escapeHtml } from "../global.js";
 import { getCuratorGroup, getCuratorStudents } from "../api.js";
 
 const state = {
@@ -61,7 +61,8 @@ const updateExportHint = () => {
 
 const initMonthSelect = (onMonthChange) => {
   els.monthSelect.innerHTML = MONTHS.map(
-    ({ value, name }) => `<option value="${value}">${name}</option>`,
+    ({ value, name }) =>
+      `<option value="${escapeHtml(value)}">${escapeHtml(name)}</option>`,
   ).join("");
   els.monthSelect.value = String(getDefaultMonth());
 
@@ -85,9 +86,9 @@ const renderStudentList = (students, searchQuery = "") => {
   students.forEach((stud, i) => {
     const html = `
       <div class="card-row">
-        <div class="student-number">${i + 1}</div>
+        <div class="student-number">${escapeHtml(i + 1)}</div>
         <div class="icon-box"><i class="bi bi-person"></i></div>
-        <div class="full-name">${stud.fullName}</div>
+        <div class="full-name">${escapeHtml(stud.fullName)}</div>
       </div>`;
     els.studentContainer.insertAdjacentHTML("beforeend", html);
   });
@@ -208,7 +209,7 @@ const setupEventListeners = () => {
 };
 
 const initApp = async () => {
-  renderLayout("teacher", true);
+  renderLayout(localStorage.getItem("role"), true);
   renderExit();
   initGlobal();
 
@@ -225,7 +226,7 @@ const initApp = async () => {
   group.forEach((g) => {
     els.select.insertAdjacentHTML(
       "beforeend",
-      `<option value="${g.id}">${g.name}</option>`,
+      `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`,
     );
   });
 

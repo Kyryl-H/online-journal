@@ -1,7 +1,7 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal } from "../global.js";
+import { initGlobal, escapeHtml } from "../global.js";
 import {
   fetchJournalData,
   postGrades,
@@ -123,7 +123,7 @@ const renderTable = function (searchQuery = "") {
     const day = String(d.getDate()).padStart(2, "0");
     const monthD = String(d.getMonth() + 1).padStart(2, "0");
 
-    const html = `<th data-id=${lesson.id}>${day}/${monthD} <button class="insert-lesson" data-scheduleId =${lesson.id} data-date=${lesson.date.split("T")[0]}><i class="bi bi-pencil-square"></i></button>
+    const html = `<th data-id=${escapeHtml(lesson.id)}>${escapeHtml(day)}/${escapeHtml(monthD)} <button class="insert-lesson" data-scheduleId =${escapeHtml(lesson.id)} data-date=${escapeHtml(lesson.date.split("T")[0])}><i class="bi bi-pencil-square"></i></button>
 </th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
@@ -134,7 +134,7 @@ const renderTable = function (searchQuery = "") {
   );
   filterStudent.forEach(function (student, i) {
     let html = `                <tr class="row">
-                        <td><div>${i + 1}.${student.fullName}</div></td>
+                        <td><div>${escapeHtml(i + 1)}.${escapeHtml(student.fullName)}</div></td>
                       
       `;
     // Якщо є оцінка в базі інпут малюємо з оцінкою, немає малюємо пустий інпут
@@ -144,9 +144,9 @@ const renderTable = function (searchQuery = "") {
           grade.studentId == student.id && grade.scheduleId == lesson.id,
       );
       if (gradesValue) {
-        html += `<td><input type="text" class="grade-input" data-studentId=${student.id} data-scheduleId = ${lesson.id} value="${gradesValue.value}"/></td>`;
+        html += `<td><input type="text" class="grade-input" data-studentId=${escapeHtml(student.id)} data-scheduleId = ${escapeHtml(lesson.id)} value="${escapeHtml(gradesValue.value)}"/></td>`;
       } else {
-        html += `<td><input type="text" class="grade-input" data-studentId=${student.id} data-scheduleId = ${lesson.id} /></td>`;
+        html += `<td><input type="text" class="grade-input" data-studentId=${escapeHtml(student.id)} data-scheduleId = ${escapeHtml(lesson.id)} /></td>`;
       }
     });
     html += "</tr>";
@@ -533,7 +533,7 @@ const render = async function () {
     window.location.href = "/teacher/journal-main.html";
   }
 
-  renderLayout("teacher", true);
+  renderLayout(localStorage.getItem("role"), true);
   renderExit();
   initGlobal();
 

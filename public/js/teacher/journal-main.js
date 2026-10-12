@@ -1,11 +1,11 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal } from "../global.js";
+import { initGlobal, escapeHtml } from "../global.js";
 import { fetchTeacherJournalMain } from "../api.js";
 
 const renderLesson = async function () {
-  renderLayout("teacher", true);
+  renderLayout("TEACHER", true);
   renderExit();
   initGlobal();
 
@@ -18,7 +18,7 @@ const renderLesson = async function () {
   // Пошук груп з предметами в яких викладається
   data.subjects.forEach((group) => {
     const html = `
-            <button class="btn" data-lesson-name="${group.subjectName}" data-group="${group.groupID}">${group.subjectName} ${group.group}</button>`;
+            <button class="btn" data-lesson-name="${escapeHtml(group.subjectName)}" data-group="${escapeHtml(group.groupID)}">${escapeHtml(group.subjectName)} ${escapeHtml(group.group)}</button>`;
 
     els.btnContainer.insertAdjacentHTML("beforeend", html);
   });

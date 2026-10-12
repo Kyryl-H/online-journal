@@ -1,8 +1,5 @@
 "use strict";
 
-// ТИМЧАСОВІ ЗМІННІ (видалимо, коли з'явиться JWT)
-const tempUserId = 1;
-const tempRole = "teacher";
 // Спливаючі повідомлення про помилку
 export const showToast = function (message, type = "error-msg") {
   const msgDiv = document.createElement("div");
@@ -23,8 +20,7 @@ export const fetchScheduleForDay = async function () {
     const response = await fetch("/api/teacher/scheduleForDay", {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -46,8 +42,7 @@ export const fetchTeacherProfile = async function () {
     const response = await fetch("/api/teacher/profil", {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
     if (!response.ok) {
@@ -68,8 +63,7 @@ export const fetchTeacherJournalMain = async function () {
     const response = await fetch(`/api/teacher/journalMain`, {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -100,8 +94,7 @@ export const fetchJournalData = async function (
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -124,8 +117,7 @@ export const postGrades = async function (grades) {
       method: "POST",
       headers: {
         "Content-type": "application/json",
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(grades),
     });
@@ -148,8 +140,7 @@ export const getGroup = async function () {
     const response = await fetch("/api/groups", {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -171,8 +162,7 @@ export const getSchedule = async function (groupId, start, end) {
     const response = await fetch(`/api/schedule/${groupId}/${start}/${end}`, {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -193,7 +183,7 @@ export const getMySchedule = async function (start, end) {
   try {
     const response = await fetch(`/api/teacher-schedule/${start}/${end}`, {
       method: "GET",
-      headers: { "user-id": tempUserId, "user-role": tempRole },
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
     });
 
     if (!response.ok) {
@@ -213,8 +203,7 @@ export const getCuratorGroup = async function () {
     const response = await fetch("/api/curator/groups", {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -232,7 +221,12 @@ export const getCuratorGroup = async function () {
 };
 export const getCuratorStudents = async function (groupId, year, month) {
   try {
-    const response = await fetch(`/api/curator/${groupId}/${year}/${month}`);
+    const response = await fetch(`/api/curator/${groupId}/${year}/${month}`, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -252,9 +246,8 @@ export const updateTopic = async function (lesson) {
     const response = await fetch(`/api/teacher/journal/updateLesson`, {
       method: "PATCH",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
         "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(lesson),
     });
@@ -276,8 +269,7 @@ export const createLessons = async function (lesson) {
     const response = await fetch("/api/teacher/createLessons", {
       method: "POST",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(lesson),
@@ -301,8 +293,7 @@ export const deleteLesson = async function (lessonId) {
     const response = await fetch(`/api/teacher/lessons/${lessonId}`, {
       method: "DELETE",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
@@ -324,8 +315,7 @@ export const getMessage = async function () {
     const response = await fetch(`/api/teacher/message`, {
       method: "GET",
       headers: {
-        "user-id": tempUserId,
-        "user-role": tempRole,
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 

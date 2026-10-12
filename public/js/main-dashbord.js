@@ -1,7 +1,7 @@
 "use strict";
 import { renderLayout, renderLessonCard, renderExit } from "./components.js";
-import { initGlobal } from "./global.js";
-import { fetchScheduleForDay, getMessage } from "./api.js";
+import { initGlobal, escapeHtml, showLoader, hideLoader } from "./global.js";
+import { fetchScheduleForDay, getMessage, showToast } from "./api.js";
 
 const els = {
   greeting: document.querySelector(".greeting"),
@@ -10,8 +10,6 @@ const els = {
   messageContainer: document.querySelector(".message-container"),
 };
 
-const currentPath = window.location.pathname;
-const currentRole = currentPath.includes("teacher") ? "teacher" : "student";
 // Дата
 const renderHeader = function (fullName) {
   els.greeting.textContent = `Вітаю, ${fullName}`;
@@ -35,40 +33,48 @@ const renderHeader = function (fullName) {
 };
 
 const initTeacherPage = async function () {
-  const data = await fetchScheduleForDay();
-  if (!data) {
-    renderLayout(currentRole, false);
+  try {
+    showLoader();
+    const data = await fetchScheduleForDay();
+    if (!data) {
+      renderLayout(localStorage.getItem("role"), false);
+      renderExit();
+      initGlobal();
+
+      els.greeting.textContent = "Помилка завантаження даних";
+      return;
+    }
+    renderLayout(data.role, data.isCurator);
     renderExit();
     initGlobal();
 
-    els.greeting.textContent = "Помилка завантаження даних";
-    return;
-  }
-  renderLayout(data.role, data.isCurator);
-  renderExit();
-  initGlobal();
+    renderHeader(data.fullName);
+    if (data.schedule.length !== 0) {
+      data.schedule.forEach((lesson) => {
+        renderLessonCard(lesson, data.role, els.scheduleGrid);
+      });
+    } else {
+      const html = `<div class="schedule-card"><h1 >${escapeHtml(data.message)}</h1></div>`;
+      els.scheduleGrid.insertAdjacentHTML("afterbegin", html);
+    }
 
-  renderHeader(data.fullName);
-  if (data.schedule.length !== 0) {
-    data.schedule.forEach((lesson) => {
-      renderLessonCard(lesson, data.role, els.scheduleGrid);
-    });
-  } else {
-    const html = `<div class="schedule-card"><h1 >${data.message}</h1></div>`;
-    els.scheduleGrid.insertAdjacentHTML("afterbegin", html);
-  }
-
-  const message = await getMessage();
-  if (message.message !== 0) {
-    message.message.forEach(function (l) {
-      const html = `
+    const message = await getMessage();
+    if (message.message !== 0) {
+      message.message.forEach(function (l) {
+        const html = `
   <div class="notice">
     <i class="bi bi-exclamation-circle-fill notice-icon"></i>
-    <h3 class="notice-text">У вас не заповнений журнал за ${l.date.split("T")[0]} у групи ${l.subject.group.name}</h3>
-    <button class="btn-primary notice-btn" data-groupId=${l.subject.group.id} data-lessonName='${l.subject.name}' data-date=${l.date.split("T")[0]} data-scheduleId=${l.id}>Перейти</button>
+    <h3 class="notice-text">У вас не заповнений журнал за ${escapeHtml(l.date.split("T")[0])} у групи ${escapeHtml(l.subject.group.name)}</h3>
+    <button class="btn-primary notice-btn" data-groupId=${escapeHtml(l.subject.group.id)} data-lessonName='${escapeHtml(l.subject.name)}' data-date=${escapeHtml(l.date.split("T")[0])} data-scheduleId=${l.id}>Перейти</button>
   </div>`;
-      els.messageContainer.insertAdjacentHTML("beforeend", html);
-    });
+        els.messageContainer.insertAdjacentHTML("beforeend", html);
+      });
+    }
+  } catch (err) {
+    console.error(`Помилка: ${err}`);
+    showToast("Помилка завантаження даних");
+  } finally {
+    hideLoader();
   }
 
   const path = window.location.pathname;

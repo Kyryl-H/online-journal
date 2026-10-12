@@ -1,36 +1,44 @@
-const path = require("path");
-const fs = require("fs");
-const { json } = require("body-parser");
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { Op, Model, where } = require("sequelize");
+const User = require("../models/user");
 
-exports.getLogin = (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "public", "login.html"));
-};
-
-exports.getRootLogin = (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "public", "login.html"));
-};
-exports.postLogin = (req, res, next) => {
-  const { fgmail, fpassword } = req.body;
-  const p = path.join(__dirname, "../", "data", "users.json");
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      return res.status(500).json({ err: "Не вдалося отримати дані" });
-    }
-    const user = JSON.parse(fileContent);
-    const CurrentUser = user.find((e) => e.login === fgmail);
-    if (CurrentUser) {
-      if (CurrentUser.password === fpassword) {
-        if (CurrentUser.role === "teacher") {
-          res.redirect("/teacher/teacher-main.html");
-        } else if (CurrentUser.role === "student") {
-          res.redirect("/student/student-main.html");
-        }
-      } else {
-        return res.status(500).json({ err: "Користувача не знайдено" });
+exports.login = (req, res, next) => {
+  const { gmail, password } = req.body;
+  let loadUser;
+  User.findOne({ where: { login: gmail } })
+    .then((user) => {
+      if (!user) {
+        const err = new Error("Користувача з такою поштою не знайдено.");
+        err.statusCode = 401;
+        throw err;
       }
-    } else {
-      return res.status(500).json({ err: "Користувача не знайдено" });
-    }
-  });
+      loadUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then((isEqual) => {
+      if (!isEqual) {
+        const err = new Error("Невірний пароль!");
+        err.statusCode = 401;
+        throw err;
+      }
+      const token = jwt.sign(
+        {
+          userId: loadUser.id,
+          userRole: loadUser.role,
+        },
+        "secret",
+        { expiresIn: "24h" },
+      );
+      res
+        .status(200)
+        .json({ token: token, userId: loadUser.id, userRole: loadUser.role });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
-exports.getUsers = (req, res, next) => {};
