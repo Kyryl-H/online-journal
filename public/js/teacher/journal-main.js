@@ -1,7 +1,7 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal, escapeHtml } from "../global.js";
+import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
 import { fetchTeacherJournalMain } from "../api.js";
 
 const renderLesson = async function () {
@@ -14,14 +14,22 @@ const renderLesson = async function () {
     userId: localStorage.getItem("userId"),
   };
 
-  const data = await fetchTeacherJournalMain();
-  // Пошук груп з предметами в яких викладається
-  data.subjects.forEach((group) => {
-    const html = `
+  try {
+    showLoader();
+    const data = await fetchTeacherJournalMain();
+
+    // Пошук груп з предметами в яких викладається
+    data.subjects.forEach((group) => {
+      const html = `
             <button class="btn" data-lesson-name="${escapeHtml(group.subjectName)}" data-group="${escapeHtml(group.groupID)}">${escapeHtml(group.subjectName)} ${escapeHtml(group.group)}</button>`;
 
-    els.btnContainer.insertAdjacentHTML("beforeend", html);
-  });
+      els.btnContainer.insertAdjacentHTML("beforeend", html);
+    });
+  } catch (err) {
+    console.error(err);
+  } finally {
+    hideLoader();
+  }
 
   // Відкриття журналу з вибраними даними заняття
   els.btnContainer.onclick = async function (e) {
@@ -36,4 +44,5 @@ const renderLesson = async function () {
     window.location.href = `/teacher/teacher-journal.html?groupId=${groupId}&lessonName=${safeLessonName}&path=${path}`;
   };
 };
+
 renderLesson();

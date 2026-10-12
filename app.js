@@ -6,6 +6,7 @@ const sequelize = require("./util/database");
 const app = express();
 
 const authRout = require("./routes/auth");
+const generalRout = require("./routes/general");
 const teacherRout = require("./routes/teacher");
 const studentRout = require("./routes/student");
 // models
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(authRout);
+app.use(generalRout);
 app.use(teacherRout);
 app.use(studentRout);
 

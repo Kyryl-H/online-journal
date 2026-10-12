@@ -5,14 +5,7 @@ const Controllers = require("../controllers/teacherControlles");
 const isAuth = require("../middelware/is-auth");
 const isTeacher = require("../middelware/is-teacher");
 
-rout.get(
-  "/api/teacher/scheduleForDay",
-  isAuth,
-  isTeacher,
-  Controllers.getScheduleForDay,
-);
 rout.get("/api/teacher/message", isAuth, isTeacher, Controllers.getMessage);
-rout.get("/api/teacher/profil", isAuth, isTeacher, Controllers.getProfile);
 rout.get(
   `/api/teacher/journalMain`,
   isAuth,
@@ -30,13 +23,6 @@ rout.post(
   isAuth,
   isTeacher,
   Controllers.postGrades,
-);
-rout.get("/api/groups", isAuth, isTeacher, Controllers.getGroups);
-rout.get(
-  "/api/schedule/:groupId/:start/:end",
-  isAuth,
-  isTeacher,
-  Controllers.getSchedule,
 );
 rout.get(
   "/api/teacher-schedule/:start/:end",
@@ -69,4 +55,5 @@ rout.delete(
   isTeacher,
   Controllers.deleteLesson,
 );
+
 module.exports = rout;

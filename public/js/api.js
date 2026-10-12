@@ -17,7 +17,7 @@ export const showToast = function (message, type = "error-msg") {
 // Головна сторінка
 export const fetchScheduleForDay = async function () {
   try {
-    const response = await fetch("/api/teacher/scheduleForDay", {
+    const response = await fetch("/api/scheduleForDay", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -39,7 +39,7 @@ export const fetchScheduleForDay = async function () {
 // Профіль
 export const fetchTeacherProfile = async function () {
   try {
-    const response = await fetch("/api/teacher/profil", {
+    const response = await fetch("/api/profil", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -330,4 +330,23 @@ export const getMessage = async function () {
     showToast(err.message);
     return null;
   }
+};
+
+export const changePassword = async (data) => {
+  const response = await fetch("/api/teacher/change-password", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+    body: JSON.stringify(data),
+  });
+
+  const resData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(resData.message || "Щось пішло не так");
+  }
+
+  return resData;
 };

@@ -56,6 +56,7 @@ export const renderLayout = function (role, isCurator = false) {
     navLinks = `
         <li><a href="/student/student-main.html" data-target="main" class="nav-link"><i class="bi bi-house icon"></i> <span class="link-name">Головна</span></a></li>
         <li><a href="/student/student-profil.html" data-target="profil" class="nav-link"><i class="bi bi-person icon"></i><span class="link-name">Мій профіль</span></a></li>
+        <li><a href="/student/student-journal.html" data-target="journal" class="nav-link"><i class="bi bi-book icon"></i><span class="link-name">Журнал</span></a></li>
         <li><a href="/student/student-schedule.html" data-target="schedule" class="nav-link"><i class="bi bi-journal-text icon"></i><span class="link-name">Розклад</span></a></li>
     `;
   }
@@ -67,13 +68,25 @@ export const renderLayout = function (role, isCurator = false) {
 
   const html = `
     <header class="header">
-      <a class="brand" href="${homeHref}" aria-label="Aleph, онлайн журнал: на головну">
-  <span class="brand-mark" aria-hidden="true"></span>
-  <span class="brand-text">
-    <span class="brand-name">Aleph</span>
-    <span class="brand-sub">Онлайн журнал</span>
-  </span>
-</a>
+      <div class="logo-header">
+  <button
+    class="burger-btn icon-btn"
+    type="button"
+    data-sidebar-toggle
+    aria-label="Меню"
+    aria-expanded="false"
+  >
+    <i class="bi bi-list"></i>
+  </button>
+
+  <a class="brand" href="${homeHref}" aria-label="Aleph, онлайн журнал: на головну">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-text">
+      <span class="brand-name">Aleph</span>
+      <span class="brand-sub">Онлайн журнал</span>
+    </span>
+  </a>
+</div>
       <ul class="nav-list-top">
         <li>
           <button class="icon-btn" data-theme-toggle aria-label="Змінити тему">

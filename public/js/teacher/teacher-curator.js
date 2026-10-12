@@ -1,7 +1,7 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal, escapeHtml } from "../global.js";
+import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
 import { getCuratorGroup, getCuratorStudents } from "../api.js";
 
 const state = {
@@ -160,11 +160,18 @@ const loadDashboardForGroup = async function (groupId, monthParam) {
   const year = new Date().getFullYear();
   const month = monthParam !== undefined ? monthParam : getSelectedMonth();
 
-  const student = await getCuratorStudents(groupId, year, month);
+  showLoader();
+  try {
+    const student = await getCuratorStudents(groupId, year, month);
 
-  state.currentSudents = student.students;
-  renderStudentList(state.currentSudents);
-  renderStatistics(student.statistics);
+    state.currentSudents = student.students;
+    renderStudentList(state.currentSudents);
+    renderStatistics(student.statistics);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    hideLoader();
+  }
 };
 
 const setupEventListeners = () => {
@@ -221,26 +228,34 @@ const initApp = async () => {
     }
   });
 
-  const group = await getCuratorGroup();
+  showLoader();
+  try {
+    const group = await getCuratorGroup();
 
-  group.forEach((g) => {
-    els.select.insertAdjacentHTML(
-      "beforeend",
-      `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`,
-    );
-  });
+    group.forEach((g) => {
+      els.select.insertAdjacentHTML(
+        "beforeend",
+        `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`,
+      );
+    });
 
-  if (els.select.value) {
-    loadDashboardForGroup(els.select.value);
+    if (els.select.value) {
+      loadDashboardForGroup(els.select.value);
 
-    const selectedGroupName = els.select.options[els.select.selectedIndex].text;
-    state.nameGroup = selectedGroupName;
+      const selectedGroupName =
+        els.select.options[els.select.selectedIndex].text;
+      state.nameGroup = selectedGroupName;
 
-    els.messageList.textContent = `Список студентів групи ${state.nameGroup}`;
-    els.messageStatistic.textContent = `Статистика групи ${state.nameGroup}`;
+      els.messageList.textContent = `Список студентів групи ${state.nameGroup}`;
+      els.messageStatistic.textContent = `Статистика групи ${state.nameGroup}`;
+    }
+
+    setupEventListeners();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    hideLoader();
   }
-
-  setupEventListeners();
 };
 
 initApp();

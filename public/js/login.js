@@ -33,7 +33,7 @@ els.loginBtn.addEventListener("click", async function (e) {
     if (data.userRole === "TEACHER") {
       window.location.href = "./teacher/teacher-main.html";
     } else if (data.userRole === "STUDENT") {
-      window.location.href = "/student-dashboard";
+      window.location.href = "./student/student-main.html";
     }
   } catch (err) {
     console.error(err);

@@ -3,6 +3,9 @@
 import { renderLayout, renderExit } from "./components.js";
 import { initGlobal, escapeHtml, showLoader, hideLoader } from "./global.js";
 import { fetchTeacherProfile, showToast } from "./api.js";
+import { initPasswordReset } from "./password-reset.js";
+
+initPasswordReset("#resetPasswordBtn");
 
 // DOM елементи
 const els = {
@@ -23,7 +26,9 @@ const renderInfo = function (fullName, groups, email, curator) {
     els.curator.textContent = curator;
   }
   // Група
-  els.valueGrop.textContent = groups.join(", ");
+  els.valueGrop.textContent = Array.isArray(groups)
+    ? groups.join(", ")
+    : groups || "";
   // Пошта
   els.gmail.textContent = email;
 };
@@ -73,7 +78,7 @@ const render = async function () {
     showLoader();
     const data = await fetchTeacherProfile();
 
-    renderLayout(localStorage.getItem("role"), data.isCurator);
+    renderLayout(localStorage.getItem("role"));
     renderExit();
     initGlobal();
 

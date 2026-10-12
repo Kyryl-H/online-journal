@@ -1,7 +1,7 @@
 "use strict";
 
 import { renderLayout, renderExit } from "../components.js";
-import { initGlobal, escapeHtml } from "../global.js";
+import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
 import {
   fetchJournalData,
   postGrades,
@@ -77,25 +77,33 @@ const renderMonthHeader = function (lessonName, groupName) {
     let target = e.target;
     if (!target.classList.contains("monthbtn")) return;
     state.month = Number(target.dataset.number);
-    // Потрібно оптимізувати
-    const data = await fetchJournalData(
-      state.groupId,
-      state.lessonName,
-      state.month,
-      true,
-    );
-    if (data) {
-      state.schedule = data.schedule;
-      state.grades = data.grades;
 
-      els.monthBtn.forEach((btn) => {
-        btn.classList.remove("monthbtn-active");
-      });
+    try {
+      showLoader();
+      const data = await fetchJournalData(
+        state.groupId,
+        state.lessonName,
+        state.month,
+        true,
+      );
 
-      target.classList.add("monthbtn-active");
-      renderTable(els.searchInput.value);
-    } else {
-      return;
+      if (data) {
+        state.schedule = data.schedule;
+        state.grades = data.grades;
+
+        els.monthBtn.forEach((btn) => {
+          btn.classList.remove("monthbtn-active");
+        });
+
+        target.classList.add("monthbtn-active");
+        renderTable(els.searchInput.value);
+      } else {
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      hideLoader();
     }
   };
 };
@@ -189,7 +197,6 @@ const validateLessonForm = function () {
 };
 
 els.lessonTopic.addEventListener("input", validateLessonForm);
-
 els.lessonType.addEventListener("change", validateLessonForm);
 
 const initLessonModal = function () {
@@ -310,11 +317,14 @@ const initGradeValidation = function () {
 // Відправка оцінок в БД
 els.saveData.addEventListener("click", async function () {
   try {
+    showLoader();
     const gradesPush = await postGrades(state.newGrades);
     state.newGrades = [];
     showToast(gradesPush.message, "info-msg");
   } catch (err) {
-    console.error("Помилка при збереженні:", err);
+    console.error(err);
+  } finally {
+    hideLoader();
   }
 });
 // Кнопка створення/оновлення заняття
@@ -328,10 +338,11 @@ els.modalSaveBtn.addEventListener("click", async function () {
     topic: els.lessonTopic.value,
     homework: els.lessonHomework.value,
   };
+
   if (els.modalSaveBtn.classList.contains("edit")) {
     try {
       lesson.id = state.editLessonId;
-
+      showLoader();
       const update = await updateTopic(lesson);
 
       const lessonIndex = state.schedule.findIndex(
@@ -351,12 +362,15 @@ els.modalSaveBtn.addEventListener("click", async function () {
       renderTable();
       showToast(update.message, "info-msg");
     } catch (err) {
-      console.error("Помилка при збереженні:", err);
+      console.error(err);
       showToast("Помилка при збереженні");
+    } finally {
+      hideLoader();
     }
   } else if (els.modalSaveBtn.classList.contains("create")) {
     try {
       lesson.subjectId = state.subject.id;
+      showLoader();
       const newLesson = await createLessons(lesson);
 
       state.schedule.push(newLesson.lesson);
@@ -364,8 +378,10 @@ els.modalSaveBtn.addEventListener("click", async function () {
       renderTable();
       showToast(newLesson.message, "info-msg");
     } catch (err) {
-      console.error("Помилка при збереженні:", err);
+      console.error(err);
       showToast("Помилка при збереженні");
+    } finally {
+      hideLoader();
     }
   }
 });
@@ -380,16 +396,24 @@ els.deleteContainer.addEventListener("input", function (e) {
 
 els.modalDeleteBtn.addEventListener("click", async () => {
   if (state.editLessonId) {
-    const del = await deleteLesson(state.editLessonId);
+    try {
+      showLoader();
+      const del = await deleteLesson(state.editLessonId);
 
-    const scheduleIndex = state.schedule.findIndex(
-      (l) => l.id === Number(state.editLessonId),
-    );
-    state.schedule.splice(scheduleIndex, 1);
+      const scheduleIndex = state.schedule.findIndex(
+        (l) => l.id === Number(state.editLessonId),
+      );
+      state.schedule.splice(scheduleIndex, 1);
 
-    hideLessonModal();
-    renderTable();
-    showToast(del.message, "info-msg");
+      hideLessonModal();
+      renderTable();
+      showToast(del.message, "info-msg");
+    } catch (err) {
+      console.error(err);
+      showToast("Заняття не знайжено");
+    } finally {
+      hideLoader();
+    }
   } else {
     console.error("Помилка видалення: заняття не знайжено");
     showToast("Заняття не знайжено");
@@ -520,40 +544,48 @@ const render = async function () {
     return;
   }
 
-  const data = await fetchJournalData(
-    state.groupId,
-    state.lessonName,
-    state.dateParams
-      ? Number(state.dateParams.split("-")[1]) - 1
-      : state.date.getMonth(),
-  );
-
-  if (!data) {
-    console.log("Помилка завантаження даних");
-    window.location.href = "/teacher/journal-main.html";
-  }
-
-  renderLayout(localStorage.getItem("role"), true);
-  renderExit();
-  initGlobal();
-
-  state.schedule = data.schedule;
-  state.student = data.student;
-  state.grades = data.grades;
-  state.subject = data.subject;
-
-  renderMonthHeader(state.subject.name, data.subject.group.name);
-  renderTable();
-  moreFunctionality();
-
-  if (state.date && state.scheduleId) {
-    console.log(state.scheduleId);
-    const currentBtn = document.querySelector(
-      `.insert-lesson[data-scheduleid="${state.scheduleId}"]`,
+  try {
+    showLoader();
+    const data = await fetchJournalData(
+      state.groupId,
+      state.lessonName,
+      state.dateParams
+        ? Number(state.dateParams.split("-")[1]) - 1
+        : state.date.getMonth(),
     );
-    if (currentBtn) {
-      currentBtn.click();
+
+    if (!data) {
+      console.log("Помилка завантаження даних");
+      window.location.href = "/teacher/journal-main.html";
+      return;
     }
+
+    renderLayout(localStorage.getItem("role"), true);
+    renderExit();
+    initGlobal();
+
+    state.schedule = data.schedule;
+    state.student = data.student;
+    state.grades = data.grades;
+    state.subject = data.subject;
+
+    renderMonthHeader(state.subject.name, data.subject.group.name);
+    renderTable();
+    moreFunctionality();
+
+    if (state.date && state.scheduleId) {
+      console.log(state.scheduleId);
+      const currentBtn = document.querySelector(
+        `.insert-lesson[data-scheduleid="${state.scheduleId}"]`,
+      );
+      if (currentBtn) {
+        currentBtn.click();
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    hideLoader();
   }
 };
 
