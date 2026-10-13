@@ -8,6 +8,7 @@ const User = require("../models/user");
 const Student = require("../models/student");
 const Grades = require("../models/grades");
 const bcrypt = require("bcrypt");
+const { getLessons } = require("../services/scheduleService");
 
 // Дані для головної сторіник
 exports.getMessage = async (req, res, next) => {
@@ -228,38 +229,19 @@ exports.deleteLesson = async (req, res, next) => {
 
 exports.getTeacherSchedule = async (req, res) => {
   try {
+    const teacher = await Teacher.findOne({ where: { userId: req.userId } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Викладача не знайдено" });
+    }
+
     const { start, end } = req.params;
-    const currentUserId = req.userId;
-
-    const teacher = await Teacher.findOne({
-      where: { userId: currentUserId },
+    const lessons = await getLessons({
+      subjectWhere: { teacherId: teacher.id },
+      start,
+      end,
     });
 
-    const schedule = await Schedule.findAll({
-      attributes: ["id", "date", "lessonNumber", "room"],
-      where: { date: { [Op.between]: [start, end] } },
-      include: {
-        model: Subject,
-        attributes: ["name"],
-        where: { teacherId: teacher.id },
-        include: { model: Group, attributes: ["name"] },
-      },
-      order: [
-        ["date", "ASC"],
-        ["lessonNumber", "ASC"],
-      ],
-    });
-
-    res.status(200).json(
-      schedule.map((s) => ({
-        id: s.id,
-        date: s.date,
-        lessonNumber: s.lessonNumber,
-        room: s.room,
-        subjectName: s.subject?.name,
-        groupName: s.subject?.group?.name,
-      })),
-    );
+    res.status(200).json(lessons);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Помилка завантаження розкладу" });

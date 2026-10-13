@@ -128,9 +128,9 @@ export const renderLayout = function (role, isCurator = false) {
 
 export const renderLessonCard = function (lesson, role, containerElement) {
   const detailIcon =
-    localStorage.getItem("role") === "teacher" ? "bi-people" : "bi-person";
+    localStorage.getItem("role") === "TEACHER" ? "bi-people" : "bi-person";
   const detailText =
-    localStorage.getItem("role") === "teacher"
+    localStorage.getItem("role") === "TEACHER"
       ? lesson.groupName
       : lesson.teacherName;
 

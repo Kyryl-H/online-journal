@@ -1,11 +1,21 @@
 const express = require("express");
-const path = require("path");
 
 const rout = express.Router();
 const Controllers = require("../controllers/studentControlles");
+const isAuth = require("../middelware/is-auth");
+const isStudent = require("../middelware/is-student");
 
-rout.get("/student/main", Controllers.getStudentMain);
-rout.get("/student/profil", Controllers.getStudentProfil);
-rout.get("/student/schedule", Controllers.getStudentSchedule);
+rout.get(
+  "/api/student/schedule",
+  isAuth,
+  isStudent,
+  Controllers.getStudentGroupSchedule,
+);
+rout.get(
+  "/api/student/grades",
+  isAuth,
+  isStudent,
+  Controllers.getStudentGrades,
+);
 
 module.exports = rout;

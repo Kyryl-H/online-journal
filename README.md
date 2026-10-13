@@ -1,7 +1,7 @@
-# 🎓 Online Journal & Class Schedule
+# 🎓 Online Journal & Class Schedule (Aleph)
 
 **Student:** Kyryl Hodlevskyi  
-**Group:** P-33  
+**Group:** P-43  
 **Specialty:** 121 — Software Engineering  
 **Educational Institution:** VSP "Zhytomyr Technological Professional College of Kyiv National University of Construction and Architecture"
 
@@ -12,11 +12,11 @@ A web application designed to manage and organize educational processes. The pro
 **Coursework and Diploma Project Topic:**  
 **"Development of a Web Application for an Electronic Journal and Class Schedule for an Educational Institution"**
 
-The project is currently under active development. The main Frontend functionality has been implemented, including role-based access, a dynamic class schedule, academic performance data, and statistics. The Backend is being developed using Node.js and Express.js, with further integration with a relational database planned.
+The project is currently under active development. The main Frontend functionality is complete, featuring a fully responsive dark-themed UI, role-based access, a dynamic class schedule, and interactive performance statistics. The Backend is built with Node.js and Express.js, successfully integrated with a relational database via Sequelize ORM, and secured with JWT authentication.
 
 ## 🔑 Test Accounts
 
-Basic role-based authentication is currently implemented for testing purposes.
+Secure JWT-based authentication with role verification is implemented for testing purposes.
 
 > **The following credentials are fictional test accounts created exclusively for demonstrating the application.**
 
@@ -28,23 +28,24 @@ Basic role-based authentication is currently implemented for testing purposes.
 ### 👨‍🏫 Teacher / Curator
 
 - **Login:** `v.dashkevych@ztfk.edu.ua`
-- **Password:** `22222222`
+- **Password:** `33333333V`
 
 ## 🛠 Technology Stack
 
-- **Frontend:** HTML5, CSS3 (CSS Variables, Flexbox/Grid), Vanilla JavaScript (ES6 Modules).
+- **Frontend:** HTML5, CSS3 (CSS Variables, Flexbox/Grid, Dark Mode), Vanilla JavaScript (ES6 Modules).
 - **Dashboards & Analytics:** **Chart.js** for academic performance visualization.
-- **Backend:** Node.js, Express.js.
-- **Data:** JSON files during development, with planned integration of a relational database.
-- **Architecture:** Modular structure, DRY, Separation of Concerns (SoC), with gradual implementation of the MVC pattern on the server side.
+- **Backend:** Node.js, Express.js, JWT, bcrypt.
+- **Data:** MySQL / PostgreSQL database using Sequelize ORM.
+- **Architecture:** Modular MVC structure, DRY, Separation of Concerns (SoC), with business logic extracted into Service layers and DTOs.
 
 ## ✨ Key Features
 
-### 1. 🔐 Role-Based Routing
+### 1. 🔐 Role-Based Routing & Security
 
+- Secure JWT authentication and hashed passwords.
 - Dynamic user redirection based on their role after authentication.
 - Separate interfaces for Students, Teachers, and Curators.
-- Role-based access to application functionality.
+- Middleware-protected routes to enforce access rights.
 
 ### 2. 📅 Dynamic Class Schedule
 
@@ -73,11 +74,10 @@ Basic role-based authentication is currently implemented for testing purposes.
 - Support for both 5-point and 12-point grading scales.
 - Dynamic statistics updates based on the selected data.
 
-### 5. 🧩 State Management
+### 5. 🧩 State Management & API Integration
 
-Application data is separated from DOM manipulation and stored in dedicated state structures.
-
-This approach simplifies data management, interface updates, and future integration with the REST API.
+- Application data is separated from DOM manipulation and fetched dynamically from backend controllers.
+- DTOs (Data Transfer Objects) ensure clean data formatting before reaching the client side.
 
 ## 🚀 How to Run Locally
 
@@ -118,12 +118,12 @@ http://localhost:3000
 - [x] Integrating a real relational database (**PostgreSQL / MySQL**).
 - [ ] Creating a **RESTful API** for client-server communication.
 - [x] Importing test JSON data into the database.
-- [ ] Implement CRUD operations for core entities.
+- [x] Implement CRUD operations for core entities.
 - [x] Set up a secure authentication system.
 - [x] Hash passwords.
 - [x] Implement JWT or session-based authentication.
 - [x] Middleware for verifying roles and access rights.
-- [ ] Full-featured electronic grade book.
+- [x] Full-featured electronic grade book.
 - [x] Adding and editing grades.
 - [x] Attendance tracking.
 - [x] Expanding the functionality of the user dashboard.
@@ -137,5 +137,4 @@ http://localhost:3000
 ## 📌 Current Status
 
 **The project is in active development.**
-At this stage, the core frontend has been implemented, featuring role-based logic, a dynamic schedule, a mentor dashboard, and the ability to view performance metrics and statistics.
-Test data is stored in JSON files. The server-side component at Node.js/Express is being developed to create a REST API and integrate a relational database.
+The application now features a fully functional REST API, JWT-based authentication, and a connected MySQL database via Sequelize. Both teacher and student interfaces are active, allowing full CRUD operations for core educational entities. The codebase is currently undergoing architectural refactoring—extracting business logic into dedicated Service layers and DTOs—to prepare a clean, scalable MVC structure before final testing and deployment.

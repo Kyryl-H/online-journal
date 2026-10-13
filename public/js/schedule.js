@@ -4,236 +4,256 @@ import { renderLayout, renderExit } from "./components.js";
 import { initGlobal, escapeHtml, showLoader, hideLoader } from "./global.js";
 import { getGroup, getSchedule, getMySchedule, showToast } from "./api.js";
 
+const MAX_WEEK_OFFSET = 4;
+
+const EMPTY_CARD = `
+  <div class="lesson-card lesson-card--empty">
+    <div class="empty-info">
+      <i class="bi bi-cup-hot"></i>
+      <p>Пари відсутні</p>
+    </div>
+  </div>
+`;
+
+const role = (localStorage.getItem("role") || "STUDENT").toUpperCase();
+
 const state = {
-  date: new Date(),
-  monday: "",
-  sunday: "",
-  count: 0,
-  mode: "my", // "my" - мій розклад, "group" - розклад групи
-  groupListLesson: new Map(),
+  role,
+  // "my"    — усі пари викладача (у картці показуємо групу)
+  // "group" — розклад вибраної групи (у картці показуємо викладача)
+  mode: role === "STUDENT" ? "group" : "my",
+  weekOffset: 0,
+  groups: [],
+  myGroupId: null,
+  selectedGroupId: null,
 };
 
 const els = {
   groupSelect: document.querySelector(".group-select"),
   groupSelector: document.querySelector(".group-selector"),
-  lessonContainer: document.querySelectorAll(".lesson-container"),
+  lessonContainers: document.querySelectorAll(".lesson-container"),
   comebackBtn: document.querySelector(".comeback"),
   nextBtn: document.querySelector(".next"),
+  weekLabel: document.querySelector(".current-week"),
   tabs: document.querySelectorAll(".tab-btn"),
 };
 
-//  Допоміжні функції
+//  Дати
 
-// Формат YYYY-MM-DD за локальним часом
-const formatDate = function (d) {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+const pad = (n) => String(n).padStart(2, "0");
+
+const formatDate = (d) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+const formatShort = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}`;
+
+const getWeekRange = function (offset) {
+  const monday = new Date();
+  const daysFromMonday = (monday.getDay() + 6) % 7;
+  monday.setDate(monday.getDate() - daysFromMonday + offset * 7);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  return { monday, sunday };
 };
 
-// Показ / ховання кнопок переходу по тижнях на межах
-const checkButtons = function () {
-  els.nextBtn.classList.toggle("none", state.count >= 4);
-  els.comebackBtn.classList.toggle("none", state.count <= -4);
+// "YYYY-MM-DD" розбираємо як локальну дату, щоб уникнути зсуву через UTC
+const parseLessonDate = function (value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
+  return match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : new Date(value);
 };
 
-// Скидання на поточний тиждень
-const resetWeek = function () {
-  const dayNumber = state.date.getDay();
-  const currentDay = dayNumber === 0 ? 7 : dayNumber;
+// Понеділок = 1 ... Неділя = 7
+const getWeekday = (value) => ((parseLessonDate(value).getDay() + 6) % 7) + 1;
 
-  // Понеділок поточного тижня
-  state.monday = new Date(state.date);
-  state.monday.setDate(state.monday.getDate() - (currentDay - 1));
+//  Рендер
 
-  // Неділя поточного тижня
-  state.sunday = new Date(state.monday);
-  state.sunday.setDate(state.sunday.getDate() + 6);
+const updateControls = function () {
+  const { monday, sunday } = getWeekRange(state.weekOffset);
 
-  state.count = 0;
-  checkButtons();
+  els.nextBtn?.classList.toggle("none", state.weekOffset >= MAX_WEEK_OFFSET);
+  els.comebackBtn?.classList.toggle(
+    "none",
+    state.weekOffset <= -MAX_WEEK_OFFSET,
+  );
+  els.groupSelector?.classList.toggle("none", state.mode === "my");
+  els.tabs.forEach((tab) =>
+    tab.classList.toggle("active", tab.dataset.mode === state.mode),
+  );
+
+  if (els.weekLabel) {
+    els.weekLabel.textContent =
+      state.weekOffset === 0
+        ? "Поточний"
+        : `${formatShort(monday)} – ${formatShort(sunday)}`;
+  }
 };
 
-//  Селект груп
+const renderGroupOptions = function () {
+  if (!els.groupSelect) return;
 
-const renderGroupSelect = function (groups) {
-  groups.forEach(function (g) {
-    const html = `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`;
-    els.groupSelect.insertAdjacentHTML("beforeend", html);
-  });
-};
-
-//  Групування та рендер розкладу
-
-// Групуємо пари по днях тижня
-const renderWeek = function (weekSchedule) {
-  state.groupListLesson.set(1, []);
-  state.groupListLesson.set(2, []);
-  state.groupListLesson.set(3, []);
-  state.groupListLesson.set(4, []);
-  state.groupListLesson.set(5, []);
-
-  weekSchedule.forEach(function (lesson) {
-    const dayOfWeek = new Date(lesson.date).getDay();
-    if (state.groupListLesson.has(dayOfWeek)) {
-      state.groupListLesson.get(dayOfWeek).push(lesson);
-    }
-  });
-
-  return state.groupListLesson;
-};
-
-// Вставляємо пари у відповідні блоки днів
-const renderSchedule = function (groupListLesson) {
-  els.lessonContainer.forEach(function (container) {
-    container.innerHTML = "";
-  });
-
-  groupListLesson.forEach(function (lessonsList, dayNumber) {
-    const dayBlock = document.querySelector(`[data-day="${dayNumber}"]`);
-    if (!dayBlock) return;
-
-    // Якщо пар немає - пишемо про це, інакше вставляємо пари
-    if (lessonsList.length === 0) {
-      const html = `
-        <div class="lesson-card lesson-card--empty">
-          <div class="empty-info">
-            <i class="bi bi-cup-hot"></i>
-            <p>Пари відсутні</p>
-          </div>
-        </div>
-      `;
-      dayBlock.insertAdjacentHTML("beforeend", html);
-    } else {
-      lessonsList.forEach(function (les) {
-        // У "Мій розклад" показуємо групу, у розкладі групи - викладача
-        const secondLine =
-          state.mode === "my" ? les.groupName : `${les.teacherFullName}.`;
-
-        const html = `
-          <div class="lesson-card">
-            <div class="lesson-number">${escapeHtml(les.lessonNumber)}</div>
-
-            <div class="lesson-info">
-              <div class="lesson-name">${escapeHtml(les.subjectName)}</div>
-              <div class="lesson-teacher">${escapeHtml(secondLine)}</div>
-            </div>
-
-            <div class="lesson-room">${escapeHtml(les.room)}</div>
-          </div>
-        `;
-        dayBlock.insertAdjacentHTML("beforeend", html);
-      });
-    }
-  });
-};
-
-//  Завантаження розкладу
-
-const loadSchedule = async function () {
-  const start = formatDate(state.monday);
-  const end = formatDate(state.sunday);
-
-  let data;
-  if (state.mode === "my") {
-    data = await getMySchedule(start, end);
-  } else {
-    if (!els.groupSelect.value) return;
-    data = await getSchedule(els.groupSelect.value, start, end);
+  if (!state.groups.length) {
+    els.groupSelect.replaceChildren(new Option("Немає груп", ""));
+    return;
   }
 
-  if (!Array.isArray(data)) return;
-
-  const groupedData = renderWeek(data);
-  renderSchedule(groupedData);
+  els.groupSelect.replaceChildren(
+    ...state.groups.map(
+      (group) =>
+        new Option(
+          group.name || "Група",
+          group.id,
+          false,
+          Number(group.id) === state.selectedGroupId,
+        ),
+    ),
+  );
 };
 
-//  Перемикання режимів
+const groupByWeekday = function (lessons) {
+  const byDay = new Map([1, 2, 3, 4, 5].map((day) => [day, []]));
 
-const setMode = function (mode) {
-  state.mode = mode;
-
-  els.tabs.forEach(function (tab) {
-    tab.classList.toggle("active", tab.dataset.mode === mode);
+  lessons.forEach((lesson) => {
+    byDay.get(getWeekday(lesson.date))?.push(lesson);
   });
+  byDay.forEach((list) => list.sort((a, b) => a.lessonNumber - b.lessonNumber));
 
-  // У режимі "Мій розклад" селект груп не потрібен
-  els.groupSelector.classList.toggle("none", mode === "my");
-
-  resetWeek();
-  loadSchedule();
+  return byDay;
 };
 
-//  Події
+const renderLesson = function (lesson) {
+  const secondary =
+    state.mode === "my" ? lesson.groupName : lesson.teacherFullName;
 
-const setupEventListeners = function () {
-  // Вкладки "Мій розклад" / "Розклад групи"
-  els.tabs.forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      setMode(tab.dataset.mode);
-    });
-  });
+  return `
+    <div class="lesson-card">
+      <div class="lesson-number">${escapeHtml(String(lesson.lessonNumber ?? ""))}</div>
+      <div class="lesson-info">
+        <div class="lesson-name">${escapeHtml(lesson.subjectName || "—")}</div>
+        <div class="lesson-teacher">${escapeHtml(secondary || "—")}</div>
+      </div>
+      <div class="lesson-room">${escapeHtml(lesson.room || "—")}</div>
+    </div>
+  `;
+};
 
-  // Вибір іншої групи
-  els.groupSelect.addEventListener("change", function () {
-    resetWeek();
-    loadSchedule();
+const renderSchedule = function (lessons) {
+  const byDay = groupByWeekday(lessons);
+
+  els.lessonContainers.forEach((container) => {
+    const dayLessons = byDay.get(Number(container.dataset.day)) ?? [];
+    container.innerHTML = dayLessons.length
+      ? dayLessons.map(renderLesson).join("")
+      : EMPTY_CARD;
   });
 };
 
-// Перехід на інший тиждень
-const shiftWeek = async function (delta) {
-  const next = state.count + delta;
-  if (next > 4 || next < -4) return;
+//  Дані
 
-  state.count = next;
-  state.monday.setDate(state.monday.getDate() + delta * 7);
-  state.sunday.setDate(state.sunday.getDate() + delta * 7);
+// Повертає масив пар або null, якщо api.js уже показав помилку
+const fetchLessons = async function () {
+  const { monday, sunday } = getWeekRange(state.weekOffset);
+  const start = formatDate(monday);
+  const end = formatDate(sunday);
 
-  checkButtons();
+  let lessons;
+  if (state.mode === "my") {
+    lessons = await getMySchedule(start, end);
+  } else if (state.selectedGroupId) {
+    lessons = await getSchedule(state.selectedGroupId, start, end);
+  } else {
+    return [];
+  }
+
+  return Array.isArray(lessons) ? lessons : null;
+};
+
+// Захист від гонки: показуємо лише відповідь на останній запит
+let lastRequestId = 0;
+
+const loadSchedule = async function () {
+  const requestId = ++lastRequestId;
+  const lessons = await fetchLessons();
+
+  if (requestId !== lastRequestId || lessons === null) return;
+  renderSchedule(lessons);
+};
+
+const initGroups = async function () {
+  const data = await getGroup();
+  if (!data) return;
+
+  state.groups = Array.isArray(data.group) ? data.group : [];
+  state.myGroupId = data.myGroup ? Number(data.myGroup.id) : null;
+  state.selectedGroupId =
+    state.myGroupId ??
+    (state.groups.length ? Number(state.groups[0].id) : null);
+
+  renderGroupOptions();
+};
+
+//  Керування
+
+const withLoader = async function (task) {
+  showLoader();
   try {
-    showLoader();
-    await loadSchedule();
+    await task();
   } catch (err) {
-    console.error(`Помилка: ${err}`);
-    showToast("Помилка завантаження даних");
+    console.error(err);
+    showToast(err.message || "Помилка завантаження даних");
   } finally {
     hideLoader();
   }
 };
 
-const weeksBtn = function () {
-  els.nextBtn.addEventListener("click", function () {
-    shiftWeek(1);
+const refresh = function () {
+  updateControls();
+  return withLoader(loadSchedule);
+};
+
+const shiftWeek = function (delta) {
+  const next = state.weekOffset + delta;
+  if (Math.abs(next) > MAX_WEEK_OFFSET) return;
+
+  state.weekOffset = next;
+  refresh();
+};
+
+const setupEventListeners = function () {
+  els.groupSelect?.addEventListener("change", () => {
+    state.selectedGroupId = Number(els.groupSelect.value) || null;
+    refresh();
   });
-  els.comebackBtn.addEventListener("click", function () {
-    shiftWeek(-1);
+
+  els.nextBtn?.addEventListener("click", () => shiftWeek(1));
+  els.comebackBtn?.addEventListener("click", () => shiftWeek(-1));
+
+  els.tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const mode = tab.dataset.mode;
+      if (!mode || mode === state.mode) return;
+
+      state.mode = mode;
+      refresh();
+    });
   });
 };
 
-//  Старт
-
-const render = async function () {
-  try {
-    showLoader();
-    renderLayout(localStorage.getItem("role"), true);
+const init = function () {
+  return withLoader(async () => {
+    renderLayout(state.role, true);
     renderExit();
     initGlobal();
 
-    const groups = await getGroup();
-    renderGroupSelect(groups.group);
-
     setupEventListeners();
-    weeksBtn();
+    updateControls();
 
-    setMode("my");
-  } catch (err) {
-    console.error(`Помилка: ${err}`);
-    showToast("Помилка завантаження даних");
-  } finally {
-    hideLoader();
-  }
+    await initGroups();
+    await loadSchedule();
+  });
 };
 
-render();
+init();

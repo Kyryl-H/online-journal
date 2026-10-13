@@ -8,10 +8,37 @@ const User = require("../models/user");
 const Student = require("../models/student");
 const Grades = require("../models/grades");
 const bcrypt = require("bcrypt");
+const { getLessons } = require("../services/scheduleService");
+
+const resolveCurrentRole = (req) => {
+  const rawRole = req.role || req.userRole || (req.user && req.user.role);
+  return typeof rawRole === "string" ? rawRole.toUpperCase() : rawRole;
+};
+
+const getStudentWithDetails = (userId) =>
+  Student.findOne({
+    where: { userId },
+    include: [
+      {
+        model: User,
+        attributes: ["login"],
+      },
+      {
+        model: Group,
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: Teacher,
+            attributes: ["id", "fullName", "isCurator"],
+          },
+        ],
+      },
+    ],
+  });
 
 exports.getScheduleForDay = async (req, res, next) => {
   const currentUserId = req.userId;
-  const currentRole = req.userRole;
+  const currentRole = resolveCurrentRole(req);
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
   const endOfDay = new Date();
@@ -29,16 +56,7 @@ exports.getScheduleForDay = async (req, res, next) => {
 
   try {
     if (currentRole === "STUDENT") {
-      const student = await Student.findOne({
-        where: { userId: currentUserId },
-        include: {
-          model: Group,
-          include: {
-            model: Teacher,
-            attributes: ["fullName"],
-          },
-        },
-      });
+      const student = await getStudentWithDetails(currentUserId);
 
       if (!student) {
         const error = new Error("Студента не знайдено");
@@ -46,8 +64,7 @@ exports.getScheduleForDay = async (req, res, next) => {
         throw error;
       }
 
-      // get curator (if any) via include
-      let curatorFullName = student.group?.teacher?.fullName ?? null;
+      const curatorFullName = student.group?.teacher?.fullName ?? null;
 
       const rawSchedule = await Schedule.findAll({
         where: { date: { [Op.between]: [startOfDay, endOfDay] } },
@@ -74,8 +91,9 @@ exports.getScheduleForDay = async (req, res, next) => {
         return res.status(200).json({
           role: currentRole,
           fullName: student.fullName,
-          schedule: [],
+          group: student.group?.name || null,
           curator: curatorFullName,
+          schedule: [],
           message: "На сьогодні пар немає",
         });
       }
@@ -91,8 +109,9 @@ exports.getScheduleForDay = async (req, res, next) => {
       return res.status(200).json({
         role: currentRole,
         fullName: student.fullName,
-        schedule: formattedSchedule,
+        group: student.group?.name || null,
         curator: curatorFullName,
+        schedule: formattedSchedule,
       });
     }
 
@@ -155,23 +174,10 @@ exports.getScheduleForDay = async (req, res, next) => {
 exports.getProfile = async (req, res, next) => {
   try {
     const currentUserId = req.userId;
-    const currentRole = req.userRole;
+    const currentRole = resolveCurrentRole(req);
 
     if (currentRole === "STUDENT") {
-      const student = await Student.findOne({
-        where: { userId: currentUserId },
-        include: [
-          {
-            model: User,
-            where: { id: currentUserId },
-            attributes: ["login"],
-          },
-          {
-            model: Group,
-            attributes: ["name"],
-          },
-        ],
-      });
+      const student = await getStudentWithDetails(currentUserId);
 
       if (!student) {
         const error = new Error("Студента не знайдено");
@@ -189,8 +195,9 @@ exports.getProfile = async (req, res, next) => {
       return res.status(200).json({
         role: currentRole,
         fullName: student.fullName,
-        group: student.group?.name,
-        email: student.user.login,
+        group: student.group?.name || null,
+        curator: student.group?.teacher?.fullName || null,
+        email: student.user?.login || null,
         statistics,
       });
     }
@@ -245,59 +252,69 @@ exports.getProfile = async (req, res, next) => {
     next(err);
   }
 };
-exports.getGroups = async (req, res, next) => {
+// Список груп для <select> розкладу.
+// STUDENT — усі групи + myGroup (власна), TEACHER — лише групи, де він викладає.
+exports.getGroups = async (req, res) => {
   try {
-    const group = await Group.findAll({ attributes: ["id", "name"] });
-    res.status(200).json({ group: group });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Помилка збереження" });
-  }
-};
-exports.getSchedule = async (req, res, next) => {
-  try {
-    const groupId = req.params.groupId;
-    const start = req.params.start;
-    const end = req.params.end;
-    const sub = await Subject.findAll({
-      where: { groupId: groupId },
-    });
-    const subjectId = sub.map((s) => s.id);
+    const currentRole = resolveCurrentRole(req);
 
-    const schedule = await Schedule.findAll({
-      attributes: ["id", "date", "lessonNumber", "room"],
-      where: {
-        [Op.and]: [
-          { subjectId: { [Op.in]: subjectId } },
-          { date: { [Op.between]: [start, end] } },
-        ],
-      },
-      include: {
-        model: Subject,
-        attributes: ["name"],
-        include: {
-          model: Teacher,
-          attributes: ["fullName"],
-        },
-      },
-    });
+    if (currentRole === "TEACHER") {
+      const teacher = await Teacher.findOne({ where: { userId: req.userId } });
+      if (!teacher) {
+        return res.status(404).json({ message: "Викладача не знайдено" });
+      }
 
-    if (subjectId.length === 0) {
-      return res.status(200).json({ schedule: [] });
+      const subjects = await Subject.findAll({
+        where: { teacherId: teacher.id },
+        attributes: ["id"],
+        include: { model: Group, attributes: ["id", "name"], required: true },
+      });
+
+      const uniqueGroups = new Map(
+        subjects.map((subject) => [subject.group.id, subject.group]),
+      );
+      const groups = [...uniqueGroups.values()].sort((a, b) =>
+        a.name.localeCompare(b.name, "uk"),
+      );
+
+      return res
+        .status(200)
+        .json({ role: currentRole, myGroup: null, group: groups });
     }
 
-    const scheduleFormat = schedule.map((s) => ({
-      id: s.id,
-      date: s.date,
-      lessonNumber: s.lessonNumber,
-      room: s.room,
-      subjectName: s.subject?.name,
-      teacherFullName: s.subject?.teacher?.fullName,
-    }));
-    res.status(200).json(scheduleFormat);
+    const allGroups = await Group.findAll({
+      attributes: ["id", "name"],
+      order: [["name", "ASC"]],
+    });
+
+    let myGroup = null;
+    if (currentRole === "STUDENT") {
+      const student = await Student.findOne({
+        where: { userId: req.userId },
+        attributes: ["groupId"],
+      });
+      if (!student) {
+        return res.status(404).json({ message: "Студента не знайдено" });
+      }
+      myGroup = allGroups.find((group) => group.id === student.groupId) ?? null;
+    }
+
+    res.status(200).json({ role: currentRole, myGroup, group: allGroups });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Помилка збереження" });
+    res.status(500).json({ message: "Помилка завантаження груп" });
+  }
+};
+
+// Розклад будь-якої групи за період — масив пар
+exports.getSchedule = async (req, res) => {
+  try {
+    const { groupId, start, end } = req.params;
+    const lessons = await getLessons({ subjectWhere: { groupId }, start, end });
+    res.status(200).json(lessons);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Помилка завантаження розкладу" });
   }
 };
 exports.changePassword = async (req, res, next) => {

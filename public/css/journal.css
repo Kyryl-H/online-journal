@@ -418,3 +418,732 @@ td:hover .grade-input {
     gap: 1rem;
   }
 }
+/* ==========================================================================
+   Журнал студента: glass-віджети, таблиця, модалка Д/З
+   ========================================================================== */
+.journal-summary,
+.journal-table-wrap,
+.hw-dialog {
+  --glass-solid: var(
+    --card-bg,
+    Canvas
+  ); /* підставте змінну фону вашої картки */
+  --glass-bg: color-mix(in srgb, currentColor 5%, transparent);
+  --glass-border: color-mix(in srgb, currentColor 14%, transparent);
+  --glass-hover: color-mix(in srgb, var(--primary-color) 9%, transparent);
+}
+
+/* ---------- Віджети ---------- */
+.journal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+  margin-bottom: 2.4rem;
+}
+.summary-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 2rem;
+  overflow: hidden;
+  background: var(--glass-bg);
+  border: 0.1rem solid var(--glass-border);
+  border-radius: 2rem;
+  backdrop-filter: blur(1.4rem);
+  transition:
+    transform var(--transition-speed, 0.2s),
+    box-shadow var(--transition-speed, 0.2s);
+}
+.summary-card::after {
+  /* м'який відблиск у куті */
+  content: "";
+  position: absolute;
+  top: -6rem;
+  right: -6rem;
+  width: 14rem;
+  height: 14rem;
+  background: radial-gradient(
+    closest-side,
+    var(--accent, var(--primary-color)),
+    transparent
+  );
+  opacity: 0.14;
+  pointer-events: none;
+}
+.summary-card:hover {
+  transform: translateY(-0.3rem);
+  box-shadow: 0 1.2rem 3rem
+    color-mix(in srgb, var(--accent, var(--primary-color)) 22%, transparent);
+}
+.summary-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 5.2rem;
+  height: 5.2rem;
+  font-size: 2.4rem;
+  color: var(--accent, var(--primary-color));
+  background: color-mix(
+    in srgb,
+    var(--accent, var(--primary-color)) 16%,
+    transparent
+  );
+  border-radius: 1.6rem;
+}
+.summary-icon--avg {
+  --accent: #f5b301;
+}
+.summary-icon--count {
+  --accent: var(--primary-color);
+}
+.summary-icon--miss {
+  --accent: #e5484d;
+}
+.summary-card:has(.summary-icon--avg) {
+  --accent: #f5b301;
+}
+.summary-card:has(.summary-icon--count) {
+  --accent: var(--primary-color);
+}
+.summary-card:has(.summary-icon--miss) {
+  --accent: #e5484d;
+}
+
+.summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.summary-label {
+  font-size: 1.3rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+.summary-body strong {
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Таблиця ---------- */
+.journal-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--glass-bg);
+  border: 0.1rem solid var(--glass-border);
+  border-radius: 2rem;
+  backdrop-filter: blur(1.4rem);
+}
+.journal-table {
+  width: 100%;
+  min-width: 70rem; /* на телефоні вмикається горизонтальний скрол */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.journal-table th,
+.journal-table td {
+  padding: 1.4rem 1.8rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.journal-table th {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-bottom: 0.1rem solid var(--glass-border);
+  opacity: 0.85;
+}
+.journal-table td {
+  font-size: 1.5rem;
+  border-bottom: 0.1rem solid color-mix(in srgb, currentColor 8%, transparent);
+}
+.journal-table tbody tr {
+  transition: background-color var(--transition-speed, 0.2s);
+}
+.journal-table tbody tr:hover {
+  background: var(--glass-hover);
+}
+.journal-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.journal-table .col-details,
+.journal-table .details-cell {
+  width: 1%;
+  text-align: center;
+}
+.journal-table .empty-state {
+  padding: 4rem 1.8rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+/* Оцінка як «чіп» */
+.grade-cell {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.grade-chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 3.4rem;
+  height: 3.4rem;
+  padding: 0 0.8rem;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  border-radius: 1rem;
+}
+.grade-cell.is-miss .grade-chip {
+  color: #e5484d;
+  background: color-mix(in srgb, #e5484d 14%, transparent);
+}
+
+/* Кнопка «Деталі» */
+.hw-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 3.8rem;
+  height: 3.8rem;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  border: 0.1rem solid transparent;
+  border-radius: 1.1rem;
+  transition:
+    transform var(--transition-speed, 0.2s),
+    background-color var(--transition-speed, 0.2s),
+    color var(--transition-speed, 0.2s);
+}
+.hw-btn:hover:not(:disabled) {
+  color: #fff;
+  background: var(--primary-color);
+  transform: translateY(-0.15rem);
+}
+.hw-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.hw-btn:focus-visible {
+  outline: 0.2rem solid var(--primary-color);
+  outline-offset: 0.2rem;
+}
+.hw-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+/* ---------- Модальне вікно ---------- */
+.hw-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1.6rem;
+}
+.hw-modal[hidden] {
+  display: none;
+}
+.hw-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 20, 22, 0.55);
+  backdrop-filter: blur(0.6rem);
+  animation: hw-fade 0.2s ease both;
+}
+.hw-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 52rem;
+  max-height: calc(100dvh - 3.2rem);
+  padding: 2.8rem;
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--glass-solid) 88%, transparent);
+  border: 0.1rem solid var(--glass-border);
+  border-radius: 2.4rem;
+  box-shadow: 0 3rem 8rem rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2.4rem);
+  animation: hw-pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.hw-close {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.4rem;
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  color: inherit;
+  cursor: pointer;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 0;
+  border-radius: 50%;
+  transition: background-color var(--transition-speed, 0.2s);
+}
+.hw-close:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+.hw-head {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding-right: 4rem;
+  margin-bottom: 2.4rem;
+}
+.hw-head-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 5.2rem;
+  height: 5.2rem;
+  font-size: 2.4rem;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    color-mix(in srgb, var(--primary-color) 55%, #000)
+  );
+  border-radius: 1.6rem;
+}
+.hw-subject {
+  font-size: 2.2rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.hw-date {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  font-size: 1.3rem;
+  opacity: 0.7;
+}
+.hw-section {
+  padding: 1.6rem 1.8rem;
+  margin-bottom: 1.2rem;
+  background: var(--glass-bg);
+  border: 0.1rem solid var(--glass-border);
+  border-radius: 1.6rem;
+}
+.hw-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+}
+.hw-topic,
+.hw-text {
+  font-size: 1.5rem;
+  line-height: 1.6;
+  white-space: pre-wrap; /* зберігає переноси рядків із бекенду */
+  overflow-wrap: anywhere;
+}
+.hw-text.is-empty,
+.hw-topic.is-empty {
+  opacity: 0.55;
+  font-style: italic;
+}
+.hw-ok {
+  width: 100%;
+  margin-top: 1.2rem;
+  padding: 1.2rem;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+@keyframes hw-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes hw-pop {
+  from {
+    opacity: 0;
+    transform: translateY(1.6rem) scale(0.96);
+  }
+}
+
+/* ---------- Адаптивність ---------- */
+@media (max-width: 1024px) {
+  .summary-body strong {
+    font-size: 2.8rem;
+  }
+}
+@media (max-width: 768px) {
+  .journal-summary {
+    grid-template-columns: repeat(2, 1fr); /* сітка 2×2 */
+    gap: 1.2rem;
+  }
+  .summary-card:first-child {
+    grid-column: 1 / -1;
+  }
+  .summary-card {
+    padding: 1.6rem;
+    gap: 1.2rem;
+  }
+  .summary-icon {
+    width: 4.4rem;
+    height: 4.4rem;
+    font-size: 2rem;
+    border-radius: 1.3rem;
+  }
+  .summary-body strong {
+    font-size: 2.6rem;
+  }
+  .journal-table th,
+  .journal-table td {
+    padding: 1.2rem 1.4rem;
+  }
+  .hw-dialog {
+    padding: 2.2rem 1.8rem;
+    border-radius: 2rem;
+  }
+}
+@media (max-width: 380px) {
+  .journal-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-backdrop,
+  .hw-dialog {
+    animation: none;
+  }
+  .summary-card,
+  .hw-btn {
+    transition: none;
+  }
+}
+/* ==========================================================================
+   Журнал студента: макет, glass-поверхні, фільтри, таблиця
+   ========================================================================== */
+
+/* ---------- Glass-змінні з ваших змінних проєкту ---------- */
+:is(.journal-summary, .journal-filters, .journal-table-wrap, .hw-dialog) {
+  --glass-solid: var(--card-bg);
+  --glass-bg: color-mix(in srgb, var(--text-main) 5%, transparent);
+  --glass-border: var(--border-line);
+  --glass-hover: color-mix(in srgb, var(--primary-color) 9%, transparent);
+}
+
+/* Одна поверхня для карток статистики, фільтрів і таблиці */
+:is(.summary-card, .journal-filters, .journal-table-wrap) {
+  background: var(--glass-bg);
+  border: 0.1rem solid var(--glass-border);
+  border-radius: 2rem;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(1.4rem);
+}
+
+/* ---------- Сторінка не скролиться ---------- */
+html:has(body.journal-page),
+body.journal-page {
+  height: 100dvh;
+  overflow: hidden;
+}
+/* padding і margin-left беруться з global.css (там уже є місце під хедер і sidebar) */
+.journal-page .main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.journal-page .container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  max-width: 120rem;
+  min-height: 0;
+  margin-inline: auto;
+  padding: 0;
+}
+
+/* ---------- Картка-контейнер: відступи всередині + gap між блоками ---------- */
+.journal-page .card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2rem;
+  min-height: 0;
+  padding: 2.4rem;
+  box-shadow: var(--shadow-sm);
+}
+.journal-page .card > * {
+  flex-shrink: 0;
+}
+.journal-page .card > .journal-table-wrap {
+  flex: 1 1 0; /* таблиця забирає всю решту висоти */
+}
+.journal-page .message,
+.journal-page .journal-summary,
+.journal-page .journal-filters {
+  margin: 0; /* відступи тепер тільки через gap картки */
+}
+.journal-page .message {
+  padding: 0;
+}
+.journal-page .message h1,
+.journal-page .message h3 {
+  margin: 0.4rem 0;
+}
+.summary-label {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* ---------- Панель фільтрів ---------- */
+.journal-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1.2rem 2rem;
+  align-items: center;
+  padding: 1.4rem 2rem;
+}
+/* Мітка зліва від поля: дрібна, приглушена, без капсу */
+.filter-field {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-width: 0;
+}
+.filter-field label {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.filter-field label i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+/* Селект (працює і для нативного, і для .cselect із select.js) */
+.filter-field .select {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 4.4rem;
+  padding: 0 1.4rem;
+  font-size: 1.4rem;
+  color: var(--text-main);
+  cursor: pointer;
+  background-color: color-mix(in srgb, var(--text-main) 4%, var(--card-bg));
+  border: 0.1rem solid var(--border-line);
+  border-radius: var(--border-radius);
+}
+.filter-field .cselect {
+  display: flex;
+  align-items: center;
+}
+.filter-field .cselect__trigger {
+  height: 100%;
+}
+.filter-field .select:hover {
+  border-color: var(--text-muted);
+}
+.filter-field .select:is(:focus-within, [data-open="true"]) {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.3rem var(--primary-ring);
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+.filter-count {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.filter-reset {
+  height: 4.4rem;
+  padding-inline: 1.6rem;
+  font-size: 1.4rem;
+  white-space: nowrap;
+}
+
+/* ---------- Таблиця: єдина зона скролу ---------- */
+.journal-table-wrap {
+  min-height: 16rem;
+  overflow: auto; /* вертикальний + горизонтальний скрол */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-color) transparent;
+}
+.journal-table-wrap::-webkit-scrollbar {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.journal-table-wrap::-webkit-scrollbar-thumb {
+  background-color: var(--brand-color);
+  border-radius: 1rem;
+}
+.journal-table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Скидаємо успадковані правила таблиці журналу викладача
+   (рамка й заливка кожної комірки, липка перша колонка) */
+.journal-table th,
+.journal-table td {
+  min-width: 0;
+  padding: 1.4rem 1.8rem;
+  text-align: left;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 0.1rem solid var(--border-line);
+  border-radius: 0;
+}
+.journal-table th {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  /* шапка непрозора, інакше рядки просвічують при скролі */
+  background-color: color-mix(in srgb, var(--text-main) 8%, var(--card-bg));
+  opacity: 1;
+}
+.journal-table td {
+  font-size: 1.5rem;
+}
+.journal-table tbody td:first-child {
+  position: static;
+  min-width: 0;
+  white-space: nowrap;
+}
+.journal-table tbody tr:hover {
+  background: none;
+}
+.journal-table tbody tr:hover td {
+  background-color: var(--glass-hover);
+}
+.journal-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.journal-table :is(.col-details, .details-cell) {
+  width: 1%;
+  text-align: center;
+}
+
+/* ---------- Адаптивність ---------- */
+@media (max-width: 1024px) {
+  .journal-page .card {
+    gap: 1.6rem;
+    padding: 2rem;
+  }
+  .journal-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filter-actions {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .journal-page .card {
+    gap: 1.2rem;
+    padding: 1.2rem;
+  }
+  .journal-page .message h1 {
+    font-size: 2.2rem;
+  }
+  :is(.summary-card, .journal-filters, .journal-table-wrap) {
+    border-radius: 1.6rem;
+  }
+
+  /* компактні віджети в один рядок, щоб лишити місце таблиці */
+  .journal-summary {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+  }
+  .summary-card:first-child {
+    grid-column: auto;
+  }
+  .summary-card {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.2rem 0.6rem;
+    text-align: center;
+  }
+  .summary-icon {
+    width: 3.4rem;
+    height: 3.4rem;
+    font-size: 1.7rem;
+    border-radius: 1.1rem;
+  }
+  .summary-body {
+    align-items: center;
+  }
+  .summary-label {
+    font-size: 1.1rem;
+  }
+  .summary-body strong {
+    font-size: 2.2rem;
+  }
+
+  /* фільтри: мітка над полем, дрібна й приглушена */
+  .journal-filters {
+    gap: 1rem;
+    padding: 1.2rem;
+  }
+  .filter-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .filter-field label {
+    font-size: 1.2rem;
+  }
+
+  .journal-table th,
+  .journal-table td {
+    padding: 1.2rem 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .journal-page .message h3 {
+    display: none;
+  }
+}
+@media (max-width: 380px) {
+  .summary-icon {
+    display: none;
+  }
+  .journal-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Низькі екрани (телефон у ландшафті): картка скролиться сама, щоб нічого не обрізалось */
+@media (max-height: 560px) {
+  .journal-page .card {
+    overflow-y: auto;
+  }
+  .journal-page .card > .journal-table-wrap {
+    flex: 0 0 auto;
+    max-height: 70vh;
+  }
+}

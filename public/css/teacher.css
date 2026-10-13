@@ -147,3 +147,207 @@ h2 {
     width: 100%;
   }
 }
+/* ==========================================================================
+   Стани карток розкладу: зараз / наступна / пройшла
+   Колір стану задає змінна --state, її успадковує й бейдж усередині картки.
+   ========================================================================== */
+.schedule-card {
+  --state: var(--text-muted);
+
+  position: relative;
+  overflow: hidden;
+  padding: 0.5rem;
+  background-color: var(--card-bg);
+  border: 0.2rem solid var(--border-line);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-speed),
+    box-shadow var(--transition-speed),
+    border-color var(--transition-speed),
+    opacity var(--transition-speed),
+    filter var(--transition-speed);
+
+  /* кольорова смужка зверху (видна тільки в станів) */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 0.4rem;
+    background: transparent;
+    transition: background var(--transition-speed);
+  }
+  &:hover {
+    transform: translateY(-0.3rem);
+    box-shadow: var(--shadow-popup);
+  }
+
+  .time {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+  }
+  .card-header {
+    align-items: center;
+  }
+
+  /* ---------- Бейдж: «пігулка» у кольорі стану ---------- */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--state);
+    background-color: color-mix(in srgb, var(--state) 14%, transparent);
+    border-radius: 10rem;
+  }
+
+  /* ======================= ЗАРАЗ ======================= */
+  &:is(.schedule-active, :has(.status-badge.active)) {
+    --state: var(--active-card);
+
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--state) 14%, var(--card-bg)),
+      var(--card-bg) 65%
+    );
+    border-color: var(--state); /* 0.2rem замість 0.3rem: без стрибка макета */
+    box-shadow:
+      0 0 0 0.4rem color-mix(in srgb, var(--state) 16%, transparent),
+      0 1.2rem 3rem color-mix(in srgb, var(--state) 28%, transparent);
+    animation: schedule-pulse 2.4s ease-in-out infinite;
+
+    &::before {
+      background: linear-gradient(
+        90deg,
+        var(--state),
+        color-mix(in srgb, var(--state) 40%, var(--brand-color))
+      );
+    }
+    h3 {
+      color: var(--text-main);
+    }
+    .time {
+      color: var(--text-main);
+    }
+    .status-badge {
+      color: var(--on-accent);
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--state) 82%, #000),
+        color-mix(in srgb, var(--state) 62%, #000)
+      );
+      box-shadow: 0 0.4rem 1.2rem
+        color-mix(in srgb, var(--state) 40%, transparent);
+    }
+    /* «живий» індикатор */
+    .status-badge::before {
+      content: "";
+      width: 0.8rem;
+      height: 0.8rem;
+      background-color: currentColor;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0.3rem rgb(255 255 255 / 0.3);
+    }
+  }
+
+  /* ===================== НАСТУПНА ===================== */
+  /* ← додайте/змініть назви класів, якщо JS називає їх інакше */
+  &:is(
+    .schedule-next,
+    .schedule-upcoming,
+    :has(.status-badge:is(.next, .upcoming))
+  ) {
+    --state: var(--primary-color);
+
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--state) 7%, var(--card-bg)),
+      var(--card-bg) 70%
+    );
+    border-color: color-mix(in srgb, var(--state) 45%, var(--border-line));
+    border-style: dashed; /* пунктир: «ще не почалась» */
+
+    &::before {
+      background: color-mix(in srgb, var(--state) 70%, transparent);
+    }
+    .status-badge {
+      background-color: var(--primary-ring);
+      box-shadow: inset 0 0 0 0.1rem
+        color-mix(in srgb, var(--state) 40%, transparent);
+    }
+    /* стрілка «далі» */
+    .status-badge::before {
+      content: "";
+      width: 0.6rem;
+      height: 0.6rem;
+      border-top: 0.2rem solid currentColor;
+      border-right: 0.2rem solid currentColor;
+      transform: rotate(45deg);
+    }
+  }
+
+  /* ===================== ПРОЙШЛА ===================== */
+  /* ← те саме: підлаштуйте назви класів під ваш JS */
+  &:is(
+    .schedule-past,
+    .schedule-done,
+    .schedule-finished,
+    :has(.status-badge:is(.past, .done, .finished, .completed))
+  ) {
+    --state: var(--text-muted);
+
+    background-color: color-mix(in srgb, var(--text-main) 3%, var(--card-bg));
+    box-shadow: none;
+    opacity: 0.68;
+    filter: saturate(0.55);
+
+    h3,
+    .time {
+      color: var(--text-muted);
+    }
+    &:hover {
+      opacity: 1;
+      filter: none;
+      box-shadow: var(--shadow-sm);
+    }
+    /* галочка «проведено» */
+    .status-badge::before {
+      content: "";
+      width: 0.9rem;
+      height: 0.5rem;
+      margin-top: -0.2rem;
+      border-bottom: 0.2rem solid currentColor;
+      border-left: 0.2rem solid currentColor;
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+@keyframes schedule-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0.4rem color-mix(in srgb, var(--active-card) 16%, transparent),
+      0 1.2rem 3rem color-mix(in srgb, var(--active-card) 28%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 0.9rem color-mix(in srgb, var(--active-card) 6%, transparent),
+      0 1.6rem 4rem color-mix(in srgb, var(--active-card) 36%, transparent);
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-card:hover {
+    transform: none; /* на таскрині hover «залипає» */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schedule-card {
+    animation: none !important;
+  }
+}
