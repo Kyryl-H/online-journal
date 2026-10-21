@@ -132,8 +132,7 @@ export const renderLessonCard = function (lesson, role, containerElement) {
   const detailText =
     localStorage.getItem("role") === "TEACHER"
       ? lesson.groupName
-      : lesson.teacherName;
-
+      : lesson.teacherFullName;
   const html = `
     <div class="schedule-card">
       <div class="card-header">

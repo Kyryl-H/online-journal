@@ -44,7 +44,7 @@ const initTeacherPage = async function () {
       els.greeting.textContent = "Помилка завантаження даних";
       return;
     }
-    renderLayout(data.role, false);
+    renderLayout(data.role, data.isCurator);
     renderExit();
     initGlobal();
 
@@ -72,7 +72,6 @@ const initTeacherPage = async function () {
         const path = window.location.pathname;
 
         els.messageContainer.addEventListener("click", function (e) {
-          console.log(e.target);
           const btn = e.target.closest(".notice-btn");
           if (!btn) return;
           window.location.href = `/teacher/teacher-journal.html?groupId=${btn.dataset.groupid}&lessonName=${btn.dataset.lessonname}&path=${path}&data=${btn.dataset.date}&scheduleId=${btn.dataset.scheduleid}`;

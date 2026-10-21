@@ -60,6 +60,7 @@ export const fetchStudentGrades = () => safeRequest("/api/student/grades");
 export const fetchTeacherJournalMain = () =>
   safeRequest("/api/teacher/journalMain");
 
+export const getStudentGrades = () => safeRequest("/api/student/grades");
 export const fetchJournalData = function (
   groupId,
   lessonName,
@@ -73,7 +74,7 @@ export const fetchJournalData = function (
 };
 
 export const postGrades = (grades) =>
-  safeRequest("/api/teacher/post/grades", { method: "POST", body: grades });
+  safeRequest("/api/teacher/post/grades", { method: "POST", body: { grades } });
 
 export const updateTopic = (lesson) =>
   safeRequest("/api/teacher/journal/updateLesson", {

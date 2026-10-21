@@ -216,7 +216,7 @@ const setupEventListeners = () => {
 };
 
 const initApp = async () => {
-  renderLayout(localStorage.getItem("role"), true);
+  renderLayout(localStorage.getItem("role"), localStorage.getItem("isCurator"));
   renderExit();
   initGlobal();
 

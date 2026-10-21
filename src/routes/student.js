@@ -2,8 +2,8 @@ const express = require("express");
 
 const rout = express.Router();
 const Controllers = require("../controllers/studentControlles");
-const isAuth = require("../middelware/is-auth");
-const isStudent = require("../middelware/is-student");
+const isAuth = require("../middleware/is-auth");
+const isStudent = require("../middleware/is-student");
 
 rout.get(
   "/api/student/schedule",

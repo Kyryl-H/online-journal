@@ -244,7 +244,7 @@ const setupEventListeners = function () {
 
 const init = function () {
   return withLoader(async () => {
-    renderLayout(state.role, true);
+    renderLayout(state.role, localStorage.getItem("isCurator"));
     renderExit();
     initGlobal();
 

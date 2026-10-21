@@ -1,18 +1,18 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../util/database");
+const sequelize = require("../config/database.js");
 
-const Student = sequelize.define("student", {
+const Group = sequelize.define("group", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true,
   },
-  fullName: {
+  name: {
     type: Sequelize.STRING,
     allowNull: false,
   },
 });
 
-module.exports = Student;
+module.exports = Group;

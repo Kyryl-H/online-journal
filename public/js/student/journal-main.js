@@ -2,7 +2,7 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
-import { showToast } from "../api.js";
+import { showToast, getStudentGrades } from "../api.js";
 
 const SORT_DESC = true; // true: нові оцінки зверху
 
@@ -45,22 +45,6 @@ const getDetails = (grade) => ({
   homework: (grade.homework || "").trim(),
 });
 
-const getStudentGrades = async () => {
-  const response = await fetch("/api/student/grades", {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Не вдалося завантажити журнал");
-  }
-
-  return (await response.json()).grades || [];
-};
-
 /*  Фільтри  */
 const getPeriodStart = (period) => {
   const now = new Date();
@@ -86,7 +70,7 @@ const fillSubjects = (grades) => {
 
   els.subject.length = 1; // лишаємо тільки "Всі предмети"
   subjects.forEach((name) => {
-    els.subject.add(new Option(name, name)); 
+    els.subject.add(new Option(name, name));
   });
 };
 
@@ -190,7 +174,7 @@ const renderTable = (grades) => {
 
 /*  Модальне вікно  */
 const setText = (el, text, placeholder) => {
-  el.textContent = text || placeholder; 
+  el.textContent = text || placeholder;
   el.classList.toggle("is-empty", !text);
 };
 
@@ -242,13 +226,13 @@ const initFilters = () => {
 const render = async function () {
   try {
     showLoader();
-    renderLayout("STUDENT", true);
+    renderLayout("STUDENT", localStorage.getItem("isCurator"));
     renderExit();
     initGlobal();
     initModal();
     initFilters();
-
-    allGrades = await getStudentGrades();
+    const grades = await getStudentGrades();
+    allGrades = grades.grades || [];
     fillSubjects(allGrades);
     applyFilters(); // перший рендер: фільтри за замовчуванням
   } catch (err) {

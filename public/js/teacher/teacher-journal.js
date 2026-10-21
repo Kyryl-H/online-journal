@@ -188,9 +188,15 @@ const validateLessonForm = function () {
     isDateValid = els.lessonDate.value !== "" && els.lessonDate.checkValidity();
   }
 
-  if (type === "Зошит" || type === "Рубіж" || type === "Семестр") {
+  if (type === "notebook" || type === "test" || type === "semester") {
+    els.lessonNumber.closest(".form-group").style.display = "none";
+    els.lessonRoom.closest(".form-group").style.display = "none";
+    els.lessonHomework.closest(".form-group").style.display = "none";
     els.modalSaveBtn.disabled = topicLength > 255 || !isDateValid;
   } else {
+    els.lessonNumber.closest(".form-group").style.display = "block";
+    els.lessonRoom.closest(".form-group").style.display = "block";
+    els.lessonHomework.closest(".form-group").style.display = "block";
     els.modalSaveBtn.disabled =
       !(topicLength > 5 && topicLength < 255) || !isDateValid;
   }
@@ -309,7 +315,6 @@ const initGradeValidation = function () {
           studentId: input.dataset.studentid,
           scheduleId: input.dataset.scheduleid,
         });
-        console.log(state.newGrades);
       }
     }
   });
@@ -318,6 +323,7 @@ const initGradeValidation = function () {
 els.saveData.addEventListener("click", async function () {
   try {
     showLoader();
+    console.log(state.newGrades);
     const gradesPush = await postGrades(state.newGrades);
     state.newGrades = [];
     showToast(gradesPush.message, "info-msg");
@@ -344,6 +350,11 @@ els.modalSaveBtn.addEventListener("click", async function () {
       lesson.id = state.editLessonId;
       showLoader();
       const update = await updateTopic(lesson);
+      if (!update) {
+        console.log("Помилка збереження");
+        showToast("Помилка при збереженні");
+        return;
+      }
 
       const lessonIndex = state.schedule.findIndex(
         (l) => l.id === Number(state.editLessonId),
@@ -372,6 +383,11 @@ els.modalSaveBtn.addEventListener("click", async function () {
       lesson.subjectId = state.subject.id;
       showLoader();
       const newLesson = await createLessons(lesson);
+      if (!newLesson) {
+        console.log("Помилка збереження");
+        showToast("Помилка при збереженні");
+        return;
+      }
 
       state.schedule.push(newLesson.lesson);
       hideLessonModal();
@@ -510,16 +526,24 @@ const initModalValidation = function () {
     const isTypeValid = els.lessonType.value.trim() !== "";
     const isRoomValid = els.lessonRoom.value.trim() !== "";
     const isTimeValid = els.lessonNumber.value.trim() !== "";
-
     const isDateValid =
       els.lessonDate.value.trim() !== "" && els.lessonDate.checkValidity();
 
-    els.modalSaveBtn.disabled = !(
-      isTypeValid &&
-      isDateValid &&
-      isRoomValid &&
-      isTimeValid
-    );
+    if (
+      els.lessonType.value === "notebook" ||
+      els.lessonType.value === "test" ||
+      els.lessonType.value === "semester"
+    ) {
+      els.modalSaveBtn.disabled = !(isTypeValid && isDateValid);
+    }
+    if (els.lessonType.value === "para") {
+      els.modalSaveBtn.disabled = !(
+        isTypeValid &&
+        isDateValid &&
+        isRoomValid &&
+        isTimeValid
+      );
+    }
   };
 
   modalContainer.addEventListener("input", validate);
@@ -560,7 +584,10 @@ const render = async function () {
       return;
     }
 
-    renderLayout(localStorage.getItem("role"), true);
+    renderLayout(
+      localStorage.getItem("role"),
+      localStorage.getItem("isCurator"),
+    );
     renderExit();
     initGlobal();
 
@@ -574,7 +601,6 @@ const render = async function () {
     moreFunctionality();
 
     if (state.date && state.scheduleId) {
-      console.log(state.scheduleId);
       const currentBtn = document.querySelector(
         `.insert-lesson[data-scheduleid="${state.scheduleId}"]`,
       );

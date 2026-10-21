@@ -9,6 +9,7 @@ const Student = require("../models/student");
 const Grades = require("../models/grades");
 const bcrypt = require("bcrypt");
 const { getLessons } = require("../services/scheduleService");
+const { validationResult } = require("express-validator");
 
 const resolveCurrentRole = (req) => {
   const rawRole = req.role || req.userRole || (req.user && req.user.role);
@@ -318,6 +319,12 @@ exports.getSchedule = async (req, res) => {
   }
 };
 exports.changePassword = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmty()) {
+    const err = new Error(errors.array()[0].msg);
+    err.codeSatus = 422;
+    throw err;
+  }
   const currentUserId = req.userId;
   const { oldPassword, newPassword } = req.body;
 

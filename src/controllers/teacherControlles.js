@@ -8,6 +8,7 @@ const User = require("../models/user");
 const Student = require("../models/student");
 const Grades = require("../models/grades");
 const bcrypt = require("bcrypt");
+const { validationResult } = require("express-validator");
 const { getLessons } = require("../services/scheduleService");
 
 // Дані для головної сторіник
@@ -142,9 +143,15 @@ exports.getJournal = async (req, res, next) => {
   });
 };
 exports.postGrades = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = new Error(errors.array()[0].msg);
+    err.statusCode = 422;
+    throw err;
+  }
   try {
     // Валідація оцінок на сервері
-    await Grades.bulkCreate(req.body, {
+    await Grades.bulkCreate(req.body.grades, {
       updateOnDuplicate: ["value"],
     });
 
@@ -156,15 +163,17 @@ exports.postGrades = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = new Error(errors.array()[0].msg);
+    err.statusCode = 422;
+    throw err;
+  }
   try {
     const { id, lessonType, date, lessonNumber, room, topic, homework } =
       req.body;
 
     const lesson = await Schedule.findByPk(id);
-
-    if (!lesson) {
-      return res.status(404).json({ message: "Урок не знайдено" });
-    }
 
     await lesson.update({
       lessonType: lessonType,
@@ -190,6 +199,12 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.createLesson = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = new Error(errors.array()[0].msg);
+    err.statusCode = 422;
+    throw err;
+  }
   try {
     const { lessonType, date, lessonNumber, room, topic, homework, subjectId } =
       req.body;
@@ -215,9 +230,14 @@ exports.createLesson = async (req, res, next) => {
 };
 
 exports.deleteLesson = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = new Error(errors.array()[0].msg);
+    err.statusCode = 422;
+    throw err;
+  }
   try {
     const lessonId = req.params.id;
-    console.log(`ID: ${lessonId}`);
     await Schedule.destroy({ where: { id: lessonId } });
 
     res.status(200).json({ message: "Заняття успішно видалено" });

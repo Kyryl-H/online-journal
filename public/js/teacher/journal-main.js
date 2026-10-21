@@ -5,7 +5,7 @@ import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
 import { fetchTeacherJournalMain } from "../api.js";
 
 const renderLesson = async function () {
-  renderLayout("TEACHER", true);
+  renderLayout("TEACHER", localStorage.getItem("isCurator"));
   renderExit();
   initGlobal();
 

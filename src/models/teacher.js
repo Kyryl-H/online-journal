@@ -1,22 +1,23 @@
 const Sequelize = require("sequelize");
 
-const sequelize = require("../util/database");
+const sequelize = require("../config/database");
 
-const Subject = sequelize.define("subject", {
+const Teacher = sequelize.define("teacher", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true,
   },
-  name: {
+  fullName: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  gradingSystem: {
-    type: Sequelize.INTEGER,
+  isCurator: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
     allowNull: false,
   },
 });
 
-module.exports = Subject;
+module.exports = Teacher;

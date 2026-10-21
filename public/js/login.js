@@ -28,6 +28,7 @@ els.loginBtn.addEventListener("click", async function (e) {
     localStorage.setItem("token", data.token);
     localStorage.setItem("userId", data.userId);
     localStorage.setItem("role", data.userRole);
+    localStorage.setItem("isCurator", data.isCurator);
 
     // Робимо редірект залежно від ролі
     if (data.userRole === "TEACHER") {

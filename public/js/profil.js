@@ -125,7 +125,10 @@ const render = async function () {
     showLoader();
     const data = await fetchTeacherProfile();
 
-    renderLayout(localStorage.getItem("role"));
+    renderLayout(
+      localStorage.getItem("role"),
+      localStorage.getItem("isCurator"),
+    );
     renderExit();
     initGlobal();
 
