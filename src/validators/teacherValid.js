@@ -124,7 +124,14 @@ exports.pushGrades = [
       });
       const gradingSystemValue = gradingSystem.subject.gradingSystem;
       for (const g of grade) {
-        if (!(g.value > 0 && g.value <= gradingSystemValue)) {
+        const valid =
+          g.value === "" ||
+          g.value === "н" ||
+          g.value === "Н" ||
+          g.value === "н/а" ||
+          g.value === "зар" ||
+          (Number(g.value) >= 1 && Number(g.value) <= gradingSystemValue);
+        if (!valid) {
           const err = new Error("Невалідна оцінка");
           err.statusCode = 422;
           throw err;

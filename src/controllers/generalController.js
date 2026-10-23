@@ -185,12 +185,112 @@ exports.getProfile = async (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      const grades = await Grades.findAll({
+        where: { studentId: student.id },
+        attributes: ["value"],
+        include: {
+          model: Schedule,
+          attributes: ["date"],
+          include: {
+            model: Subject,
+            attributes: ["gradingSystem"],
+          },
+        },
+      });
+      if (!grades) {
+        const error = new Error("Оцінок не знайдено");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      const now = new Date();
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth();
+      const startStudingYear = new Date(
+        `${month >= 9 ? year : year - 1}-09-01`,
+      );
+      const endStudingYear = new Date(`${month <= 6 ? year : year + 1}-06-30`);
+      const startMonth = new Date(Date.UTC(year, month, 1));
+      const endMonth = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
+      console.log(startMonth);
+      console.log(now);
+      console.log(endMonth);
+      // некоректне створення дат місяців
+      // Обрахунок кількості пропусків
+      const numberOfPasses = function (start, end) {
+        return grades.filter((grade) => {
+          if (
+            grade.schedule.date >= start &&
+            grade.schedule.date <= end &&
+            grade.value.toLowerCase() === "н"
+          ) {
+            return true;
+          }
+        }).length;
+      };
+      // Пропуски за рік
+      const totalNumberOfPasses = numberOfPasses(
+        startStudingYear,
+        endStudingYear,
+      );
+      // Пропуски за місяць
+      const monthNumberOfPasses = numberOfPasses(startMonth, endMonth);
+      // Обрахунок середнього балу
+      // Допоміжні інструменти
+      const normalizeNumber = (value) => {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? numeric : null;
+      };
+      const convertGrades = (item) => {
+        if (item >= 10 && item <= 12) {
+          return 5;
+        }
+        if (item >= 7 && item <= 9) {
+          return 4;
+        }
+        if (item >= 4 && item <= 6) {
+          return 3;
+        }
+        if (item >= 1 && item <= 3) {
+          return 2;
+        }
+      };
+
+      const averageGrades = function (start, end, passes) {
+        const validValues = grades
+          .map((grade) => {
+            const normalNumber = normalizeNumber(grade.value);
+            if (grade.schedule.subject.gradingSystem === 5) {
+              return normalNumber;
+            } else if (grade.schedule.subject.gradingSystem === 12) {
+              return convertGrades(normalNumber);
+            }
+          })
+          .filter((value) => value !== null && value > 0);
+
+        return (average = validValues.length
+          ? (
+              validValues.reduce((sum, item) => sum + item, 0) /
+                validValues.length -
+              passes * 0.02
+            ).toFixed(2)
+          : "0.00");
+      };
+      // Загальна успішність
+      const overallAcademicPerformance = averageGrades(
+        startStudingYear,
+        endStudingYear,
+        totalNumberOfPasses ?? 0,
+      );
+      // Успішність за місяць
+      const monthAcademicPerformance =
+        averageGrades(startMonth, endMonth, monthNumberOfPasses ?? 0) ?? 0;
 
       const statistics = {
-        overallAcademicPerformance: student.overallAcademicPerformance ?? 0,
-        totalNumberOfPasses: student.totalNumberOfPasses ?? 0,
-        monthAcademicPerformance: student.monthAcademicPerformance ?? 0,
-        monthNumberOfPasses: student.monthNumberOfPasses ?? 0,
+        overallAcademicPerformance: overallAcademicPerformance ?? 0,
+        totalNumberOfPasses: totalNumberOfPasses ?? 0,
+        monthAcademicPerformance: monthAcademicPerformance ?? 0,
+        monthNumberOfPasses: monthNumberOfPasses ?? 0,
       };
 
       return res.status(200).json({

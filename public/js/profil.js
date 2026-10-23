@@ -16,32 +16,6 @@ const els = {
   subjectsContainer: document.querySelector(".subjects-taught"),
 };
 
-const getStudentStatsFallback = async () => {
-  const data = await fetchStudentGrades();
-  const grades = Array.isArray(data.grades) ? data.grades : [];
-  const numericValues = grades
-    .map((grade) => Number(grade.value))
-    .filter((value) => Number.isFinite(value) && value > 0);
-
-  const totalMisses = grades.filter(
-    (grade) => String(grade.value).trim().toLowerCase() === "н",
-  ).length;
-
-  const average = numericValues.length
-    ? +(
-        numericValues.reduce((sum, item) => sum + item, 0) /
-        numericValues.length
-      ).toFixed(2)
-    : 0;
-
-  return {
-    overallAcademicPerformance: average,
-    totalNumberOfPasses: totalMisses,
-    monthAcademicPerformance: average,
-    monthNumberOfPasses: totalMisses,
-  };
-};
-
 const renderInfo = function (fullName, group, email, curator) {
   els.fullName.textContent = fullName || "—";
   els.valueGrop.textContent = Array.isArray(group)
@@ -150,10 +124,6 @@ const render = async function () {
     const hasRealStats = Object.values(studentStatistics).some(
       (value) => value !== null && value !== undefined && value !== 0,
     );
-
-    if (!hasRealStats) {
-      studentStatistics = await getStudentStatsFallback();
-    }
 
     renderStatistic(studentStatistics);
   } catch (err) {

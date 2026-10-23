@@ -330,6 +330,11 @@ exports.getCuratorStudent = async (req, res, next) => {
     grades.forEach((g) => {
       if (g.value.toLowerCase() === "н") {
         passes++;
+      } else if (
+        g.value.toLowerCase() === "н/a" ||
+        g.value.toLowerCase() === "зар"
+      ) {
+        return;
       } else {
         const val = Number(g.value);
         gradesSum += val;

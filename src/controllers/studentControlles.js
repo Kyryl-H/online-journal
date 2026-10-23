@@ -53,43 +53,66 @@ exports.getStudentGrades = async (req, res, next) => {
 
     const student = await Student.findOne({
       where: { userId: currentUserId },
-      attributes: ["id", "fullName"],
+      attributes: ["id", "fullName", "groupId"],
     });
 
     if (!student) {
-      return res.status(404).json({ message: "Студента не знайдено" });
+      const err = new Error("Студента не знайдено");
+      err.statusCode = 404;
+      throw err;
     }
 
-    const grades = await Grades.findAll({
-      where: { studentId: student.id },
+    const schedules = await Schedule.findAll({
+      // Видалено where: { groupId: student.groupId } звідси
       include: [
         {
-          model: Schedule,
-          attributes: ["id", "date", "lessonNumber", "room"],
-          include: [
-            {
-              model: Subject,
-              attributes: ["name"],
-              include: {
-                model: Teacher,
-                attributes: ["fullName"],
-              },
-            },
-          ],
+          model: Subject,
+          where: { groupId: student.groupId }, // Переміщено сюди: фільтруємо предмети групи
+          attributes: ["name", "gradingSystem"],
+          include: {
+            model: Teacher,
+            attributes: ["fullName"],
+          },
+        },
+        {
+          model: Grades,
+          attributes: ["id", "value"],
+          where: { studentId: student.id },
+          required: false, // LEFT JOIN
         },
       ],
     });
 
-    const formattedGrades = grades
-      .map((grade) => ({
-        id: grade.id,
-        value: grade.value,
-        date: grade.schedule?.date || null,
-        lessonNumber: grade.schedule?.lessonNumber || null,
-        room: grade.schedule?.room || null,
-        subjectName: grade.schedule?.subject?.name || null,
-        teacherFullName: grade.schedule?.subject?.teacher?.fullName || null,
-      }))
+    if (!schedules) {
+      const err = new Error("Помилка під час пошуку занять");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const formattedGrades = schedules
+      .map((schedule) => {
+        const grade =
+          (schedule.grades && schedule.grades[0]) ||
+          (schedule.Grades && schedule.Grades[0]) ||
+          schedule.grade ||
+          null;
+
+        const subject = schedule.subject || schedule.Subject;
+
+        return {
+          id: grade ? grade.id : null,
+          value: grade ? grade.value : null,
+          gradingSystem: subject?.gradingSystem || null,
+          date: schedule.date || null,
+          lessonNumber: schedule.lessonNumber || null,
+          room: schedule.room || null,
+          subjectName: subject?.name || null,
+          teacherFullName:
+            subject?.teacher?.fullName || subject?.Teacher?.fullName || null,
+          topic: schedule.topic || null,
+          homework: schedule.homework || null,
+        };
+      })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     return res.status(200).json({

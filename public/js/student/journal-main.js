@@ -4,7 +4,7 @@ import { renderLayout, renderExit } from "../components.js";
 import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
 import { showToast, getStudentGrades } from "../api.js";
 
-const SORT_DESC = true; // true: нові оцінки зверху
+const SORT_DESC = true; // true: нові заняття зверху
 
 const els = {
   average: document.querySelector(".summary-average"),
@@ -23,7 +23,7 @@ const els = {
   mText: document.querySelector(".hw-text"),
 };
 
-let allGrades = []; // повний масив із бекенду, завантажується один раз
+let allGrades = []; // повний масив із бекенду (тепер це масив занять), завантажується один раз
 let visibleGrades = []; // те, що зараз у таблиці (для модалки)
 let lastFocused = null;
 
@@ -32,7 +32,8 @@ const normalizeNumber = (value) => {
   return Number.isFinite(numeric) ? numeric : null;
 };
 
-const isMiss = (value) => String(value).trim().toLowerCase() === "н";
+// БЕЗПЕКА: додано перевірку, чи value взагалі існує (не null)
+const isMiss = (value) => value && String(value).trim().toLowerCase() === "н";
 
 const formatDate = (date) =>
   date ? new Date(date).toLocaleDateString("uk-UA") : "—";
@@ -56,8 +57,8 @@ const getPeriodStart = (period) => {
     return start;
   }
   if (period === "month") {
-    // рівно місяць тому від сьогодні
-    start.setMonth(start.getMonth() - 1);
+    // 1-ше число поточного місяця, 00:00
+    start.setDate(1);
     return start;
   }
   return null; // "За весь час"
@@ -104,20 +105,47 @@ const resetFilters = () => {
 
 /*  Рендер  */
 const renderSummary = (grades) => {
+  const convertGrades = (item) => {
+    if (item >= 10 && item <= 12) {
+      return 5;
+    }
+    if (item >= 7 && item <= 9) {
+      return 4;
+    }
+    if (item >= 4 && item <= 6) {
+      return 3;
+    }
+    if (item >= 1 && item <= 3) {
+      return 2;
+    }
+  };
+
   const validValues = grades
-    .map((grade) => normalizeNumber(grade.value))
+    .map((grade) => {
+      if (!grade.value || isMiss(grade.value)) return null;
+
+      const normalNumber = normalizeNumber(grade.value);
+      if (grade.gradingSystem === 5) {
+        return normalNumber;
+      } else if (grade.gradingSystem === 12) {
+        return convertGrades(normalNumber);
+      }
+      return null;
+    })
     .filter((value) => value !== null && value > 0);
 
   const totalMisses = grades.filter((grade) => isMiss(grade.value)).length;
 
   const average = validValues.length
     ? (
-        validValues.reduce((sum, item) => sum + item, 0) / validValues.length
+        validValues.reduce((sum, item) => sum + item, 0) / validValues.length -
+        totalMisses * 0.02
       ).toFixed(2)
     : "0.00";
 
   els.average.textContent = average;
-  els.count.textContent = String(grades.length);
+  // Увага: тут показується кількість саме оцінок, а не кількість занять. Це правильно.
+  els.count.textContent = String(validValues.length);
   els.miss.textContent = String(totalMisses);
 };
 
@@ -126,7 +154,7 @@ const renderTable = (grades) => {
     visibleGrades = [];
     const text = allGrades.length
       ? "За обраними фільтрами нічого не знайдено"
-      : "Немає оцінок для відображення";
+      : "Немає занять для відображення"; // Змінено текст, оскільки тепер виводяться заняття
     els.tableBody.innerHTML = `
       <tr>
         <td colspan="6" class="empty-state">${text}</td>

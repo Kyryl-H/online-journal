@@ -126,12 +126,17 @@ const renderTable = function (searchQuery = "") {
     "beforeend",
     `<th class="sticky-corner">Учень/День</th>`,
   );
+  const lessonTypeNames = {
+    semester: "Семестр",
+    notebook: "Зошит",
+    test: "Тематична",
+  };
   state.schedule.forEach(function (lesson) {
     const d = new Date(lesson.date);
     const day = String(d.getDate()).padStart(2, "0");
     const monthD = String(d.getMonth() + 1).padStart(2, "0");
 
-    const html = `<th data-id=${escapeHtml(lesson.id)}>${escapeHtml(day)}/${escapeHtml(monthD)} <button class="insert-lesson" data-scheduleId =${escapeHtml(lesson.id)} data-date=${escapeHtml(lesson.date.split("T")[0])}><i class="bi bi-pencil-square"></i></button>
+    const html = `<th data-id=${escapeHtml(lesson.id)}>${lesson.lessonType === "para" ? `${escapeHtml(day)}/${escapeHtml(monthD)}` : lessonTypeNames[lesson.lessonType] || lesson.lessonType} <button class="insert-lesson" data-scheduleId =${escapeHtml(lesson.id)} data-date=${escapeHtml(lesson.date.split("T")[0])}><i class="bi bi-pencil-square"></i></button>
 </th>`;
     els.dateContainer.insertAdjacentHTML("beforeend", html);
   });
@@ -281,6 +286,8 @@ const initGradeValidation = function () {
       value === "" ||
       value === "н" ||
       value === "Н" ||
+      value === "н/а" ||
+      value === "зар" ||
       (Number(value) >= 1 && Number(value) <= state.subject.gradingSystem);
 
     if (!valid) {
@@ -325,6 +332,11 @@ els.saveData.addEventListener("click", async function () {
     showLoader();
     console.log(state.newGrades);
     const gradesPush = await postGrades(state.newGrades);
+    if (!gradesPush) {
+      console.log("Помилка збереження даних");
+      showToast("Помилка збереження");
+      return;
+    }
     state.newGrades = [];
     showToast(gradesPush.message, "info-msg");
   } catch (err) {

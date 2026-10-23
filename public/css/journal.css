@@ -934,14 +934,15 @@ body.journal-page {
   color: var(--primary-color);
 }
 
-/* Селект (працює і для нативного, і для .cselect із select.js) */
+/* Селект: працює і для .cselect (select.js), і для нативного <select> */
 .filter-field .select {
-  flex: 1;
+  flex: 1 1 auto; /* не "flex: 1": basis 0 ігнорує height у колонці (мобільний) */
   width: auto;
   min-width: 0;
   height: 4.4rem;
   padding: 0 1.4rem;
   font-size: 1.4rem;
+  font-weight: 500;
   color: var(--text-main);
   cursor: pointer;
   background-color: color-mix(in srgb, var(--text-main) 4%, var(--card-bg));
@@ -952,8 +953,15 @@ body.journal-page {
   display: flex;
   align-items: center;
 }
+.filter-field .cselect[hidden] {
+  display: none;
+}
 .filter-field .cselect__trigger {
   height: 100%;
+  gap: 0.8rem;
+}
+.filter-field .cselect__value {
+  min-width: 0; /* довгі назви предметів обрізаються через «…» */
 }
 .filter-field .select:hover {
   border-color: var(--text-muted);
@@ -962,7 +970,6 @@ body.journal-page {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 0.3rem var(--primary-ring);
 }
-
 .filter-actions {
   display: flex;
   align-items: center;
@@ -1043,6 +1050,30 @@ body.journal-page {
 .journal-table :is(.col-details, .details-cell) {
   width: 1%;
   text-align: center;
+}
+
+/* ==========================================================================
+   Випадаючий список фільтрів (select.js виносить його в <body>)
+   ========================================================================== */
+.journal-page > .cselect__list {
+  padding: 0.6rem;
+  background-color: color-mix(in srgb, var(--card-bg) 94%, transparent);
+  border: 0.1rem solid var(--border-line);
+  border-radius: 1.4rem;
+  box-shadow: var(--shadow-popup);
+  backdrop-filter: blur(1.4rem);
+}
+.journal-page > .cselect__list .cselect__option {
+  min-height: 4rem; /* зручна ціль для пальця */
+  padding: 0.9rem 1.2rem;
+  font-size: 1.4rem;
+  border-radius: 1rem;
+}
+
+@media (max-width: 768px) {
+  .filter-reset {
+    height: 4rem; /* компактніше в нижньому рядку фільтрів */
+  }
 }
 
 /* ---------- Адаптивність ---------- */
