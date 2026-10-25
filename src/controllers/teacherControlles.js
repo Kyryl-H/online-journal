@@ -352,11 +352,15 @@ exports.getCuratorStudent = async (req, res, next) => {
         }
       }
     });
+    const totalGrades = dataGradeDiagram.reduce((acc, val) => acc + val, 0);
     res.status(200).json({
       students: student,
       statistics: {
-        averageGrade:
-          ((dataGradeDiagram[0] + dataGradeDiagram[1]) / student.length) * 100,
+        averageGrade: totalGrades
+          ? Math.round(
+              ((dataGradeDiagram[0] + dataGradeDiagram[1]) / totalGrades) * 100,
+            )
+          : 0,
         totalPasses: passes,
         diagramData: dataGradeDiagram,
       },

@@ -6,6 +6,7 @@ import { getCuratorGroup, getCuratorStudents } from "../api.js";
 
 const state = {
   chartInstance: null,
+  lastChartData: null,
   currentSudents: [],
   nameGroup: "",
 };
@@ -17,7 +18,6 @@ const els = {
   groupGrades: document.querySelector(".group-grades"),
   groupPasses: document.querySelector(".group-passes"),
   ctx: document.getElementById("gradesChart"),
-  legendDiagram: document.querySelector(".legend-diagram"),
   legendRows: document.querySelectorAll(".legend-row"),
   modalOverlay: document.querySelector(".modal-overlay"),
   reportBtn: document.querySelector(".report-btn"),
@@ -100,7 +100,12 @@ const renderStatistics = (statistics) => {
   renderChart(statistics.diagramData);
 };
 
+const cssVar = (name) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 const renderChart = (dataArr) => {
+  state.lastChartData = dataArr; // для перемальовування при зміні теми
+
   if (state.chartInstance) {
     state.chartInstance.destroy();
   }
@@ -111,9 +116,13 @@ const renderChart = (dataArr) => {
   const chartData = isEmpty ? [1] : dataArr;
 
   const bgColors = isEmpty
-    ? ["#374151"]
-    : ["#0f766e", "#2563eb", "#f59e0b", "#0ea5e9"];
-
+    ? [cssVar("--input-border")]
+    : [
+        cssVar("--chart-perfect"),
+        cssVar("--chart-good"),
+        cssVar("--chart-satisfactory"),
+        cssVar("--chart-unsatisfactory"),
+      ];
   state.chartInstance = new Chart(els.ctx, {
     type: "doughnut",
     data: {
@@ -124,7 +133,7 @@ const renderChart = (dataArr) => {
           backgroundColor: bgColors,
           borderWidth: 2,
           // Прибираємо  обводку, якщо це порожній стан
-          borderColor: isEmpty ? "transparent" : "#ffffff",
+          borderColor: isEmpty ? "transparent" : cssVar("--card-bg"),
           hoverOffset: isEmpty ? 0 : 15,
         },
       ],
@@ -150,11 +159,19 @@ const renderChart = (dataArr) => {
       },
     },
   });
-
-  const rect = els.ctx.getBoundingClientRect();
-  els.legendDiagram.style.top = ` ${rect.top + window.scrollY + 35}px`;
-  els.legendDiagram.style.left = `${rect.right + window.scrollX + 10}px`;
 };
+// Перемальовуємо діаграму, коли змінилась тема (кнопка або системна)
+const rerenderOnThemeChange = () => {
+  if (state.lastChartData) renderChart(state.lastChartData);
+};
+new MutationObserver(rerenderOnThemeChange).observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["data-theme"],
+});
+window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", rerenderOnThemeChange);
+
 // Беремо місяць з аргументу або прямо з селекта
 const loadDashboardForGroup = async function (groupId, monthParam) {
   const year = new Date().getFullYear();

@@ -51,8 +51,7 @@
   --chart-perfect: #0f766e;
   --chart-good: #2563eb;
   --chart-satisfactory: #f59e0b;
-  --chart-unsatisfactory: #0ea5e9;
-
+  --chart-unsatisfactory: var(--error-color);
   /* Сторінка входу */
   /* у :root */
   /* Логотип у шапці: знак малюється маскою і бере колір із --logo-color */
@@ -146,7 +145,6 @@
     --chart-perfect: #14b8a6;
     --chart-good: #3b82f6;
     --chart-satisfactory: #fbbf24;
-    --chart-unsatisfactory: #38bdf8;
   }
 }
 
@@ -198,7 +196,6 @@
   --chart-perfect: #14b8a6;
   --chart-good: #3b82f6;
   --chart-satisfactory: #fbbf24;
-  --chart-unsatisfactory: #38bdf8;
 }
 
 /* ==========================================================================

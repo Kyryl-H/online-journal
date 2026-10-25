@@ -1,7 +1,7 @@
 const { body } = require("express-validator");
 const User = require("../models/user");
 
-module.exports = [
+exports.login = [
   body("gmail")
     .trim()
     .isEmail()
@@ -19,5 +19,18 @@ module.exports = [
     .isLength({ min: 8 })
     .withMessage("Пароль має містити щонайменше 8 символів.")
     .isAlphanumeric()
-    .withMessage("Пароль повинен містити лише літери та цифри."),
+    .withMessage("Пароль повинен містити лише літери та цифри.")
+    .matches(/[a-zA-Z]/)
+    .withMessage("Пароль повинен містити мінімум одну літеру."),
+  ,
+];
+exports.newPassword = [
+  body("password")
+    .trim()
+    .isLength({ min: 8 })
+    .withMessage("Пароль має містити щонайменше 8 символів.")
+    .isAlphanumeric()
+    .withMessage("Пароль повинен містити лише літери та цифри.")
+    .matches(/[a-zA-Z]/)
+    .withMessage("Пароль повинен містити мінімум одну літеру."),
 ];

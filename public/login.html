@@ -24,7 +24,7 @@
         <p class="login-subtitle">Увійдіть до онлайн журналу</p>
       </header>
 
-      <form action="/login" method="post">
+      <form action="/login" method="post" novalidate>
         <div class="input-box">
           <i class="bi bi-envelope" aria-hidden="true"></i>
           <input
@@ -51,11 +51,22 @@
             required
           />
           <label for="input-password">Пароль</label>
+          <button
+            type="button"
+            class="eye-toggle"
+            aria-label="Показати пароль"
+            aria-pressed="false"
+          >
+            <i class="bi bi-eye"></i><i class="bi bi-eye-slash"></i>
+          </button>
         </div>
 
         <div class="remember">
-          <label><input type="checkbox" /> Запам'ятати мене</label>
-          <a href="#" class="login-forgot">Забули пароль?</a>
+          <label
+            ><input type="checkbox" name="remember-me" class="remember-me" />
+            Запам'ятати мене</label
+          >
+          <a href="/resetPassword.html" class="login-forgot">Забули пароль?</a>
         </div>
 
         <button type="submit" class="btn login">Увійти</button>

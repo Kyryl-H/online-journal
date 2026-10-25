@@ -105,12 +105,19 @@
 }
 .chart-wrapper {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 3rem;
+  gap: 2rem 3rem;
+}
+.chart-container {
+  position: relative; /* потрібно Chart.js для адаптивного розміру */
+  flex: 0 0 auto;
+  width: 20rem;
+  max-width: 100%;
 }
 .legend-diagram {
-  position: absolute;
+  padding-right: 1rem; /* запас для зсуву рядка при hover (translateX) */
 }
 .legend-row {
   display: flex;

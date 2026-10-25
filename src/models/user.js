@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 
 const sequelize = require("../config/database");
+const { resetPassword } = require("../controllers/auth");
 
 const User = sequelize.define("user", {
   id: {
@@ -20,6 +21,12 @@ const User = sequelize.define("user", {
   role: {
     type: Sequelize.STRING,
     allowNull: false,
+  },
+  resetTocen: {
+    type: Sequelize.STRING,
+  },
+  resetTocenExpiration: {
+    type: Sequelize.DATE,
   },
 });
 

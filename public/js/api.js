@@ -46,7 +46,22 @@ const safeRequest = async function (url, options) {
     return null;
   }
 };
+// Вхід
+export const postLogin = (email, password, rememberMe) =>
+  safeRequest("/login", {
+    method: "POST",
+    body: { gmail: email, password: password, rememberMe: rememberMe },
+  });
+// Відправка листа на пошту для скидання пароля
+export const sendLetter = (email) =>
+  safeRequest("/reset", { method: "POST", body: { email: email } });
 
+// Скидування пароля
+export const postNewPassword = (password, tocen) =>
+  safeRequest("/new-password", {
+    method: "PATCH",
+    body: { password: password, tocen: tocen },
+  });
 //  Головна, профіль
 
 export const fetchScheduleForDay = () => safeRequest("/api/scheduleForDay");
