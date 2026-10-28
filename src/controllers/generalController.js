@@ -420,9 +420,9 @@ exports.getSchedule = async (req, res) => {
 };
 exports.changePassword = async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmty()) {
+  if (!errors.isEmpty()) {
     const err = new Error(errors.array()[0].msg);
-    err.codeSatus = 422;
+    err.statusCode = 422;
     throw err;
   }
   const currentUserId = req.userId;

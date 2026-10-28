@@ -23,7 +23,7 @@ Secure JWT-based authentication with role verification is implemented for testin
 ### 👨‍🎓 Student
 
 - **Login:** `k.hodlevskyi@ztfk.edu.ua`
-- **Password:** `11111111`
+- **Password:** `11111111H`
 
 ### 👨‍🏫 Teacher / Curator
 

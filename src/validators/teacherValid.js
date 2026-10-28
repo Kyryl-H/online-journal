@@ -9,13 +9,19 @@ exports.resetPassword = [
     .isLength({ min: 8 })
     .withMessage("Пароль має містити щонайменше 8 символів.")
     .isAlphanumeric()
-    .withMessage("Пароль повинен містити лише літери та цифри."),
+    .withMessage("Пароль повинен містити лише літери та цифри.")
+    .matches(/[a-zA-Z]/)
+    .withMessage("Пароль повинен містити мінімум одну літеру."),
+  ,
   body("newPassword")
     .trim()
     .isLength({ min: 8 })
     .withMessage("Пароль має містити щонайменше 8 символів.")
     .isAlphanumeric()
-    .withMessage("Пароль повинен містити лише літери та цифри."),
+    .withMessage("Пароль повинен містити лише літери та цифри.")
+    .matches(/[a-zA-Z]/)
+    .withMessage("Пароль повинен містити мінімум одну літеру."),
+  ,
 ];
 
 exports.lessonBaseValidators = [

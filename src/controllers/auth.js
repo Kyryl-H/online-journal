@@ -80,23 +80,15 @@ exports.sendLetter = async (req, res, next) => {
     user.resetTocenExpiration = Date.now() + 3600000; // 1 година
     await user.save();
 
-    res.status(200).json({ message: "Лист для скидання пароля відправлено." });
-
-    sgMail
-      .send({
-        to: email,
-        from: "aleph.journal.notify@gmail.com",
-        subject: "Reset password",
-        html: `<p>Ви подали заявку на скидання пароля</p>
+    await sgMail.send({
+      to: email,
+      from: "aleph.journal.notify@gmail.com",
+      subject: "Reset password",
+      html: `<p>Ви подали заявку на скидання пароля</p>
             <p>Натисніть на це <a href='http://localhost:3000/reset/${tocen}'>Посилання</a>, щоб встановити новий пароль.</p>`,
-      })
-      .catch((err) => {
-        console.log("Не вдалося відправити лист:", err.message);
-        if (!err.statusCode) {
-          err.statusCode = 500;
-        }
-        next(err);
-      });
+    });
+
+    res.status(200).json({ message: "Лист для скидання пароля відправлено." });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
