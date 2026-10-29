@@ -12,7 +12,7 @@ A web application designed to manage and organize educational processes. The pro
 **Coursework and Diploma Project Topic:**  
 **"Development of a Web Application for an Electronic Journal and Class Schedule for an Educational Institution"**
 
-The project is currently under active development. The main Frontend functionality is complete, featuring a fully responsive dark-themed UI, role-based access, a dynamic class schedule, and interactive performance statistics. The Backend is built with Node.js and Express.js, successfully integrated with a relational database via Sequelize ORM, and secured with JWT authentication.
+The project has reached its primary coursework release milestone. The Frontend features a fully responsive dark-themed UI, role-based access, interactive performance statistics, and PDF report generation. The Backend is built on Node.js and Express.js, organized in a clean MVC structure inside `src/`, backed by a MySQL database via Sequelize ORM, validated with `express-validator`, and secured using JWT and `.env` configuration.
 
 ## 🔑 Test Accounts
 
@@ -33,19 +33,19 @@ Secure JWT-based authentication with role verification is implemented for testin
 ## 🛠 Technology Stack
 
 - **Frontend:** HTML5, CSS3 (CSS Variables, Flexbox/Grid, Dark Mode), Vanilla JavaScript (ES6 Modules).
-- **Dashboards & Analytics:** **Chart.js** for academic performance visualization.
-- **Backend:** Node.js, Express.js, JWT, bcrypt.
+- **Dashboards & Analytics:** **Chart.js** for performance visualization, **PDFKit** for PDF report generation.
+- **Backend:** Node.js, Express.js (`server.js` entry point), JWT, bcrypt, `express-validator`.
 - **Data:** MySQL / PostgreSQL database using Sequelize ORM.
-- **Architecture:** Modular MVC structure, DRY, Separation of Concerns (SoC), with business logic extracted into Service layers and DTOs.
+- **Architecture:** Structured MVC architecture inside `src/`, Separation of Concerns (SoC), Service layers, and Data Transfer Objects (DTOs).
 
 ## ✨ Key Features
 
 ### 1. 🔐 Role-Based Routing & Security
 
-- Secure JWT authentication and hashed passwords.
-- Dynamic user redirection based on their role after authentication.
-- Separate interfaces for Students, Teachers, and Curators.
-- Middleware-protected routes to enforce access rights.
+- Secure JWT authentication, password hashing, and reset flow with token expiration.
+- Dynamic user redirection based on role after authentication.
+- Middleware-protected routes (`is-teacher`, `is-student`) to enforce access rights.
+- Environment variables management via `.env`.
 
 ### 2. 📅 Dynamic Class Schedule
 
@@ -53,31 +53,28 @@ Secure JWT-based authentication with role verification is implemented for testin
 - Interactive week pagination (**±4 weeks from the current date**).
 - Navigation between different academic weeks.
 - Schedule filtering by selected group.
-- Display of lesson times.
-- Dynamic schedule rendering.
+- Display of lesson times and dynamic schedule rendering.
 
-### 3. 👨‍💼 Curator Dashboard
+### 3. 👨‍💼 Curator Dashboard & Reporting
 
-- Dynamic rendering of the student list.
-- Real-time student search and filtering.
+- Dynamic rendering of the student list with real-time search and filtering.
 - Sorting students according to the Ukrainian alphabet.
-- Calculation of average grades.
-- Display of student attendance information.
-- Academic performance overview.
-- Grade distribution visualization using 5-point and 12-point grading scales.
-- Interactive **Chart.js** diagrams with a custom legend.
+- Academic performance overview, grade distribution visualization, and attendance tracking.
+- Interactive **Chart.js** diagrams with custom legends.
+- **PDF Report Export:** Downloadable PDF summaries for student grades and attendance records formatted with custom Cyrillic TTF fonts.
 
 ### 4. 📊 Statistics & Analytics
 
-- Visual representation of academic performance.
-- Grade distribution analysis.
-- Support for both 5-point and 12-point grading scales.
-- Dynamic statistics updates based on the selected data.
+- Visual representation of academic performance and grade distribution analysis.
+- Support for both 5-point and 12-point grading scales with seamless conversion logic for average calculation.
+- Dynamic statistics updates based on selected periods or subjects.
 
 ### 5. 🧩 State Management & API Integration
 
-- Application data is separated from DOM manipulation and fetched dynamically from backend controllers.
-- DTOs (Data Transfer Objects) ensure clean data formatting before reaching the client side.
+- Full REST API coverage for Core CRUD operations across Teacher and Student entities.
+- Business logic decoupled into Service layers (`scheduleService.js`, `gradesReport.js`, `passesReport.js`).
+- DTOs (Data Transfer Objects) ensuring consistent API response structures.
+- Robust payload validation via `express-validator`.
 
 ## 🚀 How to Run Locally
 
@@ -99,13 +96,30 @@ cd online-journal
 npm install
 ```
 
-### 4. Start the local server
+### 4. Configure Environment Variables
+
+Create a .env file in the root directory and add your database credentials and JWT secret key:
+
+```bash
+PORT=3000
+DB_NAME=online_journal
+DB_USER=root
+DB_PASSWORD=your_password
+DB_HOST=localhost
+JWT_SECRET=your_jwt_secret
+```
+
+### 5. Import the Database
+
+Import the provided SQL dump file dump.sql into your local MySQL server.
+
+### 6. Start the local server
 
 ```bash
 npm start
 ```
 
-### 5. Open the application
+### 7. Open the application
 
 Open the following address in your browser:
 
@@ -116,7 +130,7 @@ http://localhost:3000
 ## 🚧 Plans for the Future (Roadmap)
 
 - [x] Integrating a real relational database (**PostgreSQL / MySQL**).
-- [ ] Creating a **RESTful API** for client-server communication.
+- [x] Creating a **RESTful API** for client-server communication.
 - [x] Importing test JSON data into the database.
 - [x] Implement CRUD operations for core entities.
 - [x] Set up a secure authentication system.
@@ -136,5 +150,5 @@ http://localhost:3000
 
 ## 📌 Current Status
 
-**The project is in active development.**
+**Phase 1 (Coursework Core Milestone) Complete.**
 The application now features a fully functional REST API, JWT-based authentication, and a connected MySQL database via Sequelize. Both teacher and student interfaces are active, allowing full CRUD operations for core educational entities. The codebase is currently undergoing architectural refactoring—extracting business logic into dedicated Service layers and DTOs—to prepare a clean, scalable MVC structure before final testing and deployment.

@@ -25,6 +25,11 @@ exports.login = (req, res, next) => {
   let loadUser;
   User.findOne({ where: { login: gmail } })
     .then((user) => {
+      if (!user) {
+        const err = new Error("Користувача не знайдено!");
+        err.statusCode = 404;
+        throw err;
+      }
       loadUser = user;
       return bcrypt.compare(password, user.password);
     })
@@ -38,21 +43,26 @@ exports.login = (req, res, next) => {
     })
     .then((teacher) => {
       const isCuratorFlag = teacher ? teacher.isCurator : false;
+      const teacherId = teacher ? teacher.id : null;
       const timeActive = rememberMe === true ? "30d" : "24h";
+
       const token = jwt.sign(
         {
           userId: loadUser.id,
           userRole: loadUser.role,
           isCurator: isCuratorFlag,
+          teacherId: teacherId,
         },
         process.env.JWT_SECRET,
         { expiresIn: timeActive },
       );
+
       res.status(200).json({
         token: token,
         userId: loadUser.id,
         userRole: loadUser.role,
         isCurator: isCuratorFlag,
+        teacherId: teacherId,
       });
     })
     .catch((err) => {

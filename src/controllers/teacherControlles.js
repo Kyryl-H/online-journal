@@ -10,7 +10,15 @@ const Grades = require("../models/grades");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const { getLessons } = require("../services/scheduleService");
-
+const {
+  buildGradesReport,
+  streamGradesReportPdf,
+  getAcademicStartYear,
+} = require("../services/gradesReport");
+const {
+  buildPassesReport,
+  streamPassesReportPdf,
+} = require("../services/passesReport");
 // Дані для головної сторіник
 exports.getMessage = async (req, res, next) => {
   const currentUserId = req.userId;
@@ -172,8 +180,19 @@ exports.updateLesson = async (req, res, next) => {
   try {
     const { id, lessonType, date, lessonNumber, room, topic, homework } =
       req.body;
+    const teacherId = req.teacherId;
 
     const lesson = await Schedule.findByPk(id);
+    if (!lesson) {
+      const err = new Error("Пару не знайдено");
+      err.statusCode = 404;
+      throw err;
+    }
+    if (lesson.teacherId !== req.teacherId && req.userRole !== "admin") {
+      const err = new Error("Ви не можете редагувати чужу пару!");
+      err.statusCode = 403;
+      throw err;
+    }
 
     await lesson.update({
       lessonType: lessonType,
@@ -193,8 +212,10 @@ exports.updateLesson = async (req, res, next) => {
       lesson: cleanedLesson,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Помилка збереження" });
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
   }
 };
 
@@ -208,15 +229,22 @@ exports.createLesson = async (req, res, next) => {
   try {
     const { lessonType, date, lessonNumber, room, topic, homework, subjectId } =
       req.body;
+    const teacherId = req.teacherId;
+    // Для не-пар номер пари й аудиторії немає: порожній рядок → NULL
+    const toNumberOrNull = (value) =>
+      value === "" || value === null || value === undefined
+        ? null
+        : Number(value);
 
     const newLesson = await Schedule.create({
-      lessonType: lessonType,
-      date: date,
-      lessonNumber: lessonNumber,
-      room: room,
-      topic: topic,
-      homework: homework,
-      subjectId: subjectId,
+      lessonType,
+      date,
+      lessonNumber: toNumberOrNull(lessonNumber),
+      room: room || null,
+      topic,
+      homework,
+      subjectId,
+      teacherId,
     });
 
     res.status(200).json({
@@ -368,5 +396,104 @@ exports.getCuratorStudent = async (req, res, next) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Помилка збереження" });
+  }
+};
+// Експорт успішності куратора групи у PDF (рубіжна / семестрова відомість)
+exports.exportCuratorGrades = async (req, res) => {
+  try {
+    const kind = req.query.kind;
+    const semester = Number(req.query.semester);
+    const startYear = req.query.year
+      ? Number(req.query.year)
+      : getAcademicStartYear();
+
+    if (
+      !["milestone", "semester"].includes(kind) ||
+      ![1, 2].includes(semester) ||
+      !Number.isInteger(startYear) ||
+      startYear < 2000 ||
+      startYear > 2100
+    ) {
+      return res.status(422).json({ message: "Некоректні параметри звіту" });
+    }
+
+    const teacher = await Teacher.findOne({ where: { userId: req.userId } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Викладача не знайдено" });
+    }
+
+    // Експортувати може лише куратор цієї групи
+    const group = await Group.findOne({
+      where: { id: req.params.groupId, teacherId: teacher.id },
+    });
+    if (!group) {
+      return res.status(403).json({ message: "Ви не є куратором цієї групи" });
+    }
+
+    const report = await buildGradesReport({
+      group,
+      teacher,
+      kind,
+      semester,
+      startYear,
+    });
+    streamGradesReportPdf(res, report);
+  } catch (err) {
+    console.error(err);
+    if (res.headersSent) return res.end();
+    const status = err.statusCode || 500;
+    res.status(status).json({
+      message: status === 500 ? "Не вдалося сформувати звіт" : err.message,
+    });
+  }
+};
+// Експорт пропусків куратора групи у PDF (місяць / семестр)
+exports.exportCuratorPasses = async (req, res) => {
+  try {
+    const { period } = req.query;
+    const year = Number(req.query.year);
+    const month = Number(req.query.month);
+    const semester = Number(req.query.semester);
+
+    const validYear = Number.isInteger(year) && year >= 2000 && year <= 2100;
+    const validPeriod =
+      (period === "month" &&
+        Number.isInteger(month) &&
+        month >= 1 &&
+        month <= 12) ||
+      (period === "semester" && [1, 2].includes(semester));
+
+    if (!validYear || !validPeriod) {
+      return res.status(422).json({ message: "Некоректні параметри звіту" });
+    }
+
+    const teacher = await Teacher.findOne({ where: { userId: req.userId } });
+    if (!teacher) {
+      return res.status(404).json({ message: "Викладача не знайдено" });
+    }
+
+    const group = await Group.findOne({
+      where: { id: req.params.groupId, teacherId: teacher.id },
+    });
+    if (!group) {
+      return res.status(403).json({ message: "Ви не є куратором цієї групи" });
+    }
+
+    const report = await buildPassesReport({
+      group,
+      teacher,
+      period,
+      month,
+      semester,
+      year,
+    });
+    streamPassesReportPdf(res, report);
+  } catch (err) {
+    console.error(err);
+    if (res.headersSent) return res.end();
+    const status = err.statusCode || 500;
+    res.status(status).json({
+      message: status === 500 ? "Не вдалося сформувати звіт" : err.message,
+    });
   }
 };

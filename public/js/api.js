@@ -110,6 +110,26 @@ export const getCuratorGroup = () => safeRequest("/api/curator/groups");
 export const getCuratorStudents = (groupId, year, month) =>
   safeRequest(`/api/curator/${groupId}/${year}/${month}`);
 
+// Завантаження файлу з токеном. Кидає Error з повідомленням сервера
+const requestBlob = async function (url) {
+  const response = await fetch(url, {
+    headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.message || "Помилка сервера");
+  }
+  return response.blob();
+};
+
+export const getCuratorGradesReport = (groupId, params) =>
+  requestBlob(
+    `/api/curator-reports/${groupId}/grades?${new URLSearchParams(params)}`,
+  );
+export const getCuratorPassesReport = (groupId, params) =>
+  requestBlob(
+    `/api/curator-reports/${groupId}/passes?${new URLSearchParams(params)}`,
+  );
 //  Розклад
 
 // STUDENT: { myGroup, group: [усі групи] }, TEACHER: { group: [групи, де викладає] }

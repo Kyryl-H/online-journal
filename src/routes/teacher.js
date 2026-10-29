@@ -60,5 +60,16 @@ rout.delete(
   Validators.deleteLesson,
   Controllers.deleteLesson,
 );
-
+rout.get(
+  "/api/curator-reports/:groupId/grades",
+  isAuth,
+  isTeacher,
+  Controllers.exportCuratorGrades,
+);
+rout.get(
+  "/api/curator-reports/:groupId/passes",
+  isAuth,
+  isTeacher,
+  Controllers.exportCuratorPasses,
+);
 module.exports = rout;

@@ -2,8 +2,13 @@
 
 import { renderLayout, renderExit } from "../components.js";
 import { initGlobal, escapeHtml, showLoader, hideLoader } from "../global.js";
-import { getCuratorGroup, getCuratorStudents } from "../api.js";
-
+import {
+  getCuratorGroup,
+  getCuratorStudents,
+  getCuratorGradesReport,
+  getCuratorPassesReport,
+  showToast,
+} from "../api.js";
 const state = {
   chartInstance: null,
   lastChartData: null,
@@ -27,6 +32,8 @@ const els = {
 
   monthSelect: document.querySelector("#month-select"),
   periodSelect: document.querySelector("#report-period"),
+  typeRadios: document.querySelectorAll('input[name="report-type"]'),
+  exportBtn: document.querySelector(".modal-save-btn"),
   exportHint: document.querySelector(".export-hint"),
 };
 
@@ -58,7 +65,138 @@ const updateExportHint = () => {
   els.exportHint.querySelector(".export-month-name").textContent =
     getSelectedMonthName();
 };
+// Періоди звіту залежно від його типу. value лишились тими самими, що й раніше
+const periodOptions = {
+  passes: [
+    { value: "month", label: "Місяць" },
+    { value: "semester-1", label: "Семестр 1" },
+    { value: "semester-2", label: "Семестр 2" },
+  ],
+  grades: [
+    { value: "milestone-1", label: "Рубіжна, 1 семестр" },
+    { value: "milestone-2", label: "Рубіжна, 2 семестр" },
+    { value: "semester-1", label: "Семестрова, 1 семестр" },
+    { value: "semester-2", label: "Семестрова, 2 семестр" },
+  ],
+};
 
+const getReportType = () =>
+  document.querySelector('input[name="report-type"]:checked')?.value ??
+  "passes";
+
+const fillPeriodOptions = () => {
+  const options = periodOptions[getReportType()];
+  const previous = els.periodSelect.value;
+
+  els.periodSelect.innerHTML = options
+    .map(
+      ({ value, label }) =>
+        `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`,
+    )
+    .join("");
+
+  // Лишаємо попередній вибір, якщо він є в новому списку (наприклад, «Семестр 1»)
+  els.periodSelect.value = options.some((o) => o.value === previous)
+    ? previous
+    : options[0].value;
+
+  updateExportHint();
+};
+
+const initPeriodSelect = () => {
+  els.typeRadios.forEach((radio) =>
+    radio.addEventListener("change", fillPeriodOptions),
+  );
+  fillPeriodOptions();
+};
+
+const PERIOD_RE = /^(milestone|semester)-([12])$/;
+const KIND_NAMES = { milestone: "Рубіжна", semester: "Семестрова" };
+
+// Навчальний рік починається у вересні; у липні–серпні показуємо рік, що завершився
+const academicStartYear = () => {
+  const now = new Date();
+  return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+};
+
+const downloadBlob = (blob, filename) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+};
+
+const SEMESTER_RE = /^semester-([12])$/;
+
+// Місяць зі статистики на сторінці, якого стосується «Буде експортовано за місяць».
+// monthSelect.value — індекс місяця 0–11, на сервер передаємо 1–12
+const getStatsPeriod = () => {
+  const raw = els.monthSelect.value;
+  if (raw === "" || !Number.isInteger(Number(raw)))
+    return { month: 0, year: 0 };
+
+  const month = Number(raw) + 1;
+  const startYear = academicStartYear();
+  return { month, year: month >= 9 ? startYear : startYear + 1 };
+};
+const handleExport = async () => {
+  const groupId = els.select.value;
+  if (!groupId) return;
+
+  const startYear = academicStartYear();
+  const groupName = els.select.selectedOptions[0]?.text ?? "група";
+  const yy = (y) => String(y).slice(2);
+
+  let request;
+  let filename;
+
+  if (getReportType() === "grades") {
+    const match = PERIOD_RE.exec(els.periodSelect.value);
+    if (!match) return;
+    const [, kind, semester] = match;
+    request = () =>
+      getCuratorGradesReport(groupId, { kind, semester, year: startYear });
+    filename = `${KIND_NAMES[kind]}_${groupName}_${semester}-семестр_${yy(startYear)}-${yy(startYear + 1)}.pdf`;
+  } else if (els.periodSelect.value === "month") {
+    const { month, year } = getStatsPeriod();
+    if (!month) return;
+    const monthName = els.monthSelect.selectedOptions[0]?.text ?? month;
+    request = () =>
+      getCuratorPassesReport(groupId, { period: "month", month, year });
+    filename = `Пропуски_${groupName}_${monthName}_${year}.pdf`;
+  } else {
+    const semester = SEMESTER_RE.exec(els.periodSelect.value)?.[1];
+    if (!semester) return;
+    request = () =>
+      getCuratorPassesReport(groupId, {
+        period: "semester",
+        semester,
+        year: startYear,
+      });
+    filename = `Пропуски_${groupName}_${semester}-семестр_${yy(startYear)}-${yy(startYear + 1)}.pdf`;
+  }
+
+  const originalHtml = els.exportBtn.innerHTML;
+  els.exportBtn.disabled = true;
+  els.exportBtn.textContent = "Формуємо PDF…";
+
+  try {
+    const blob = await request();
+    downloadBlob(blob, filename.replace(/\s+/g, "_"));
+    els.modalOverlay.classList.add("hidden");
+    showToast("Звіт сформовано", "info-msg");
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || "Не вдалося сформувати звіт");
+  } finally {
+    els.exportBtn.disabled = false;
+    els.exportBtn.innerHTML = originalHtml;
+  }
+};
 const initMonthSelect = (onMonthChange) => {
   els.monthSelect.innerHTML = MONTHS.map(
     ({ value, name }) =>
@@ -217,6 +355,8 @@ const setupEventListeners = () => {
     });
   });
 
+  els.exportBtn.addEventListener("click", handleExport);
+
   els.reportBtn.addEventListener("click", () =>
     els.modalOverlay.classList.remove("hidden"),
   );
@@ -237,6 +377,7 @@ const initApp = async () => {
   renderExit();
   initGlobal();
 
+  initPeriodSelect();
   // Ініціалізуємо селект місяців
   // При його зміні перезавантажуємо дані для вибраної групи
   initMonthSelect((selectedMonth) => {

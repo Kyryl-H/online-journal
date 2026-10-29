@@ -363,8 +363,6 @@ els.modalSaveBtn.addEventListener("click", async function () {
       showLoader();
       const update = await updateTopic(lesson);
       if (!update) {
-        console.log("Помилка збереження");
-        showToast("Помилка при збереженні");
         return;
       }
 
@@ -386,7 +384,7 @@ els.modalSaveBtn.addEventListener("click", async function () {
       showToast(update.message, "info-msg");
     } catch (err) {
       console.error(err);
-      showToast("Помилка при збереженні");
+      showToast(update.message);
     } finally {
       hideLoader();
     }
@@ -612,13 +610,19 @@ const render = async function () {
     renderTable();
     moreFunctionality();
 
-    if (state.date && state.scheduleId) {
+    // Перехід із сповіщення: відкриваємо модалку редагування лише один раз
+    if (state.scheduleId) {
       const currentBtn = document.querySelector(
         `.insert-lesson[data-scheduleid="${state.scheduleId}"]`,
       );
-      if (currentBtn) {
-        currentBtn.click();
-      }
+      currentBtn?.click();
+
+      // Після відкриття лишаємо в адресі тільки журнал (група, предмет, шлях назад)
+      state.scheduleId = "";
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("scheduleId");
+      cleanUrl.searchParams.delete("data");
+      window.history.replaceState(null, "", cleanUrl);
     }
   } catch (err) {
     console.error(err);

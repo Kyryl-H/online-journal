@@ -26,8 +26,7 @@ const Schedule = sequelize.define("schedule", {
   },
   lessonType: {
     type: Sequelize.STRING,
-    allowNull: false,
-    defaultValue: "Пара",
+    defaultValue: "para",
   },
   homework: {
     type: Sequelize.TEXT,

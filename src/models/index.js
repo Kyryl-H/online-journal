@@ -29,8 +29,6 @@ Subject.hasMany(Schedule);
 Schedule.belongsTo(Subject);
 Teacher.hasMany(Schedule);
 Schedule.belongsTo(Teacher);
-Teacher.hasMany(Grades);
-Grades.belongsTo(Teacher);
 
 const db = {
   sequelize,
